@@ -1,3 +1,8 @@
+---
+name: architecture-aware-reviewer
+description: Reviews a product spec or user story set against established architecture principles and ADRs, surfacing conflicts and risks before engineering picks up the work.
+---
+
 # Skill: Architecture-Aware Reviewer
 
 ## What It Does
@@ -109,9 +114,9 @@ Reviews a product spec or user story set against established architecture princi
 
 This skill instructs Claude to:
 
-1. Parse all system references, data models, and integration points from the spec
-2. Apply a default set of common architecture principles (layered architecture, single ownership, backward compatibility, security-first)
-3. If ADRs are provided in the input, cross-reference each finding against them
+1. **Step 1 — Architecture context.** Use the Notion MCP (notion-search, query_type=internal) to find: 'Architecture Principles', the relevant 'ADR's, 'C4 Architecture — Veevart 2.0', and the '[domain] Domain' page; then fetch them. The architecture source of truth lives in Notion, not in local or project knowledge.
+2. Parse all system references, data models, and integration points from the spec
+3. Apply the architecture principles and ADRs retrieved from Notion in step 1; cross-reference each finding against them
 4. Rate severity as: Blocker (will cause implementation failure), Warning (will cause friction or tech debt), Info (suggestion)
 5. Never recommend specific implementation approaches — only surface conflicts and options
 

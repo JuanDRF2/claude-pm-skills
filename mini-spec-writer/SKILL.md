@@ -1,3 +1,8 @@
+---
+name: mini-spec-writer
+description: Converts a raw product idea, feature request, or Slack message into a structured, implementation-ready mini specification.
+---
+
 # Skill: Mini Spec Writer
 
 ## What It Does
@@ -44,6 +49,16 @@ Converts a raw product idea, feature request, or Slack message into a structured
 
 ## Goal
 [What success looks like]
+
+### 2a. Success Metrics / KPIs
+The primary and secondary metrics this feature should move. State each as a
+measurable, directional target where possible.
+- Primary KPI: [e.g., reduce Step-1 donation drop-off by 10pts]
+- Secondary KPI: [e.g., cut masking-related support tickets to zero]
+
+### 2b. Target Persona
+The primary persona(s) this is for. Name them explicitly.
+- [e.g., First-time online donor; Development Officer configuring funds]
 
 ## Scope
 ### In Scope
@@ -95,6 +110,7 @@ Converts a raw product idea, feature request, or Slack message into a structured
 
 This skill is invoked as a Claude Code slash command. The skill definition in this file instructs Claude to:
 
+0. **Step 0 — Architecture context.** Use the Notion MCP (notion-search, query_type=internal) to find: 'Architecture Principles', the relevant 'ADR's, 'C4 Architecture — Veevart 2.0', and the '[domain] Domain' page; then fetch them. The architecture source of truth lives in Notion, not in local or project knowledge.
 1. Parse any free-form input (text, bullets, copied messages)
 2. Apply the output format template above
 3. Infer reasonable assumptions from the context
