@@ -144,3 +144,14 @@ Close with a compact report:
 3. Did I surface inconsistencies beyond the requested change?
 4. Did I bump the spec version and leave an audit trail in Jira?
 5. Is it unambiguous what still needs a human (Figma, code)?
+
+---
+
+## Configuration
+
+This file contains placeholders for workspace-specific values. Replace them before use:
+
+| Placeholder | What to set |
+|---|---|
+| `<JIRA_SITE>` | Your Atlassian hostname — e.g. `yourorg.atlassian.net` |
+| `<NOTION_RELEASE_NOTES_COLLECTION_ID>` | The Notion database ID for your Product Release Notes collection |
