@@ -114,7 +114,7 @@ Reviews a product spec or user story set against established architecture princi
 
 This skill instructs Claude to:
 
-1. **Step 1 — Architecture context.** Use the Notion MCP (notion-search, query_type=internal) to find: 'Architecture Principles', the relevant 'ADR's, 'C4 Architecture — Veevart 2.0', and the '[domain] Domain' page; then fetch them. The architecture source of truth lives in Notion, not in local or project knowledge.
+1. **Step 1 — Architecture context.** Use the Notion MCP (notion-search, query_type=internal) to find: 'Architecture Principles', the relevant 'ADR's, 'C4 Architecture', and the '[domain] Domain' page; then fetch them. The architecture source of truth lives in Notion, not in local or project knowledge.
 2. Parse all system references, data models, and integration points from the spec
 3. Apply the architecture principles and ADRs retrieved from Notion in step 1; cross-reference each finding against them
 4. Rate severity as: Blocker (will cause implementation failure), Warning (will cause friction or tech debt), Info (suggestion)

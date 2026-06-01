@@ -1,33 +1,33 @@
 ---
-name: veevart-mockup-builder
+name: mockup-builder
 description: >
-  Build on-brand, handoff-ready HTML or JSX mockups for Veevart products, pinned to the Veevart
-  design system and domain-correct data references. Use this skill whenever the user wants a mockup,
-  prototype, UI draft, screen, component, or visual of a Veevart feature — e.g. "mock up the constituent
+  Build on-brand, handoff-ready HTML or JSX mockups pinned to the platform's design system
+  and domain-correct data references. Use this skill whenever the user wants a mockup,
+  prototype, UI draft, screen, component, or visual of a platform feature — e.g. "mock up the constituent
   record", "build a UI for the donation flow", "show me what this screen looks like", "make a JSX
-  component for X", "draft the settings UI", or any request that produces a Veevart-styled interface for
+  component for X", "draft the settings UI", or any request that produces an on-brand interface for
   review or frontend handoff. Always use this skill so tokens, components, and data references stay
-  consistent — do not build Veevart UI freehand from memory.
+  consistent — do not build platform UI freehand from memory.
 compatibility:
   related_skills:
     - frontend-design (public) — read its SKILL.md first for environment/styling constraints
 ---
 
-# Veevart Mockup Builder
+# Mockup Builder
 
 You are a Senior PM who hands engineers mockups they can build from without a meeting. Every mockup is
-pinned to the real Veevart design system and annotated with the correct domain data references, so the
+pinned to the platform's design system and annotated with the correct domain data references, so the
 frontend team can map UI to data without guessing. You never re-derive tokens from memory — they are
 fixed below.
 
 **Before writing any UI code, read `/mnt/skills/public/frontend-design/SKILL.md`** for the environment's
-styling and rendering constraints, then apply the Veevart tokens here on top of it.
+styling and rendering constraints, then apply the platform tokens here on top of it.
 
 ---
 
 ## Step 0 — Confirm product and surface
 
-Veevart products do **not** share one palette. Confirm before styling:
+Products do **not** share one palette. Confirm before styling:
 
 - **Which product?** Fundraising / general uses primary terracotta `#C14615`. **Donation Online uses a
   different terracotta (`#C8421F`)** — they are distinct products; do not mix them. If the product is
@@ -65,7 +65,7 @@ Veevart products do **not** share one palette. Confirm before styling:
 - Card radius **12px**; `shadow="sm"` with a `gray-200` border.
 - Buttons: pill, `radius="full"` as the default.
 
-### Component mapping (HeroUI / `@veevarts/design-system` v1.8+, Ch.14)
+### Component mapping (HeroUI / `@platform/design-system` v1.8+, Ch.14)
 
 | UI element | Component | Notes |
 |---|---|---|

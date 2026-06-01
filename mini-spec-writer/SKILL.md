@@ -110,7 +110,7 @@ The primary persona(s) this is for. Name them explicitly.
 
 This skill is invoked as a Claude Code slash command. The skill definition in this file instructs Claude to:
 
-0. **Step 0 — Architecture context.** Use the Notion MCP (notion-search, query_type=internal) to find: 'Architecture Principles', the relevant 'ADR's, 'C4 Architecture — Veevart 2.0', and the '[domain] Domain' page; then fetch them. The architecture source of truth lives in Notion, not in local or project knowledge.
+0. **Step 0 — Architecture context.** Use the Notion MCP (notion-search, query_type=internal) to find: 'Architecture Principles', the relevant 'ADR's, 'C4 Architecture', and the '[domain] Domain' page; then fetch them. The architecture source of truth lives in Notion, not in local or project knowledge.
 1. Parse any free-form input (text, bullets, copied messages)
 2. Apply the output format template above
 3. Infer reasonable assumptions from the context

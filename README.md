@@ -1,90 +1,46 @@
-# 🤖 Claude PM Skills
+# Claude PM Skills
 
-> **AI-native Product Management workflow**: Custom Claude skills that transform how Product Managers write specs, create user stories, and ensure architectural alignment.
-
-## 🎯 Overview
-
-As a Product Manager building products for museums and cultural institutions, I've developed three custom Claude skills that accelerate my workflow from idea to implementation:
-
-1. **Mini Spec Writer** - Converts product ideas into structured, implementation-ready specifications
-2. **Jira Story Writer** - Transforms specs into well-formatted Jira user stories with Gherkin acceptance criteria
-3. **Architecture-Aware Reviewer** - Reviews specs against architecture principles and ADRs to catch conflicts early
-
-These skills are built using [Claude's MCP (Model Context Protocol)](https://www.anthropic.com/news/model-context-protocol) and demonstrate how AI can augment—not replace—product management work.
+A library of product-management Skills for Claude. Each skill is a folder containing a `SKILL.md` that instructs Claude how to handle a specific PM workflow — from writing specs to distributing launch comms.
 
 ---
 
-## 🚀 Why I Built This
+## Skills
 
-**The Problem:**
-- Writing specs from scratch takes hours
-- Converting specs to user stories is repetitive and error-prone
-- Architecture conflicts are caught too late (during implementation)
-- Context switching between tools (Notion → Jira → Confluence) kills productivity
-
-**The Solution:**
-AI-assisted PM workflow that:
-- ✅ Reduces spec writing time by 60%
-- ✅ Ensures consistent story format across teams
-- ✅ Catches architecture conflicts before engineering picks up work
-- ✅ Maintains quality while increasing velocity
+| Skill | Description |
+|---|---|
+| [`mini-spec-writer`](./mini-spec-writer/) | Converts a raw product idea, feature request, or Slack message into a structured, implementation-ready mini specification. |
+| [`jira-story-writer`](./jira-story-writer/) | Transforms a mini spec or feature description into a set of well-formatted Jira user stories with Gherkin acceptance criteria. |
+| [`architecture-aware-reviewer`](./architecture-aware-reviewer/) | Reviews a product spec or user story set against established architecture principles and ADRs, surfacing conflicts and risks before engineering picks up the work. |
+| [`artifact-sync`](./artifact-sync/) | Propagates a single product decision across every linked artifact so nothing drifts: Jira (epic/story body and comments), the Notion spec (with a version bump), design references, and HTML/JSX mockups. |
+| [`mockup-builder`](./mockup-builder/) | Builds on-brand, handoff-ready HTML or JSX mockups pinned to the platform's design system and domain-correct data references. |
+| [`launch-comms`](./launch-comms/) | Turns an approved release note into a set of short, channel-specific launch communications: internal Slack announcement, leadership brief, CS/Support heads-up, sales enablement blurb, and customer-facing copy. |
 
 ---
 
-## 📂 Repository Structure
+## Install
 
+Upload a skill folder in Claude → **Settings → Capabilities**. Each folder's `SKILL.md` is the skill definition; no other files are required.
+
+---
+
+## Configuration
+
+Some skills reference workspace-specific values that are not published in this repo. Each affected `SKILL.md` has a `## Configuration` section at the bottom listing its placeholders. Replace them with your own values before use:
+
+| Placeholder | What to set |
+|---|---|
+| `<JIRA_SITE>` | Your Atlassian hostname — e.g. `yourorg.atlassian.net` |
+| `<NOTION_RELEASE_NOTES_COLLECTION_ID>` | The Notion database ID for your Product Release Notes collection |
+
+---
+
+## Contributing
+
+Each skill lives in its own folder. The `SKILL.md` must start with YAML frontmatter containing at minimum `name` and `description`. The `name` must match the folder name exactly.
+
+```yaml
+---
+name: skill-folder-name
+description: One-line description of what the skill does and when to trigger it.
+---
 ```
-claude-pm-skills/
-├── README.md                          # This file
-├── mini-spec-writer/
-│   ├── SKILL.md                       # Skill documentation
-│   └── examples/
-│       ├── input-example.md           # Sample input
-│       └── output-example.md          # Sample output
-├── jira-story-writer/
-│   ├── SKILL.md                       # Skill documentation
-│   └── examples/
-│       ├── input-spec.md              # Sample spec input
-│       └── output-stories.md          # Sample Jira stories
-└── architecture-aware-reviewer/
-    ├── SKILL.md                       # Skill documentation
-    └── examples/
-        ├── input-spec.md              # Spec to review
-        └── review-output.md           # Review feedback
-```
-
----
-
-## 🛠️ How It Works
-
-Each skill is invoked inside Claude Code using a `/skill-name` command. Claude reads the skill definition from `SKILL.md`, applies the documented workflow, and produces structured output.
-
-```bash
-# Example usage inside Claude Code
-/mini-spec-writer
-/jira-story-writer
-/architecture-aware-reviewer
-```
-
----
-
-## 📊 Impact
-
-| Metric | Before | After |
-|---|---|---|
-| Spec writing time | 3–4 hours | 45–60 min |
-| Story writing time | 1–2 hours | 15–20 min |
-| Architecture conflicts caught pre-sprint | ~20% | ~85% |
-| Story format consistency | Variable | 100% |
-
----
-
-## 🔗 Links
-
-- 📧 Contact: [jdavidramosf@gmail.com](mailto:jdavidramosf@gmail.com)
-- 💼 LinkedIn: [linkedin.com/in/juandrf](https://linkedin.com/in/juandrf)
-- 🐙 GitHub: [@JuanDRF2](https://github.com/JuanDRF2)
-
----
-
-**Built by Juan Ramos** | Product Manager specializing in AI-native workflows and full-stack product development

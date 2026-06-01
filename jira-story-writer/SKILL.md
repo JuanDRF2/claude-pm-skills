@@ -1,3 +1,8 @@
+---
+name: jira-story-writer
+description: Transforms a mini spec or feature description into a set of well-formatted Jira user stories with Gherkin acceptance criteria.
+---
+
 # Skill: Jira Story Writer
 
 ## What It Does

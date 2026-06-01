@@ -36,9 +36,9 @@ full diff, and only then propagate. You never silently edit, and you never leave
 
 ## Defaults (override if the user says otherwise)
 
-- Jira cloudId (hostname form): `veevart.atlassian.net`
+- Jira cloudId (hostname form): `<JIRA_SITE>`
 - Jira content format for read and write: `markdown`
-- Notion Product Release Notes collection: `33e02267-648e-80a5-930b-000b2de43bbb`
+- Notion Product Release Notes collection: `<NOTION_RELEASE_NOTES_COLLECTION_ID>`
 - Primary projects: `FR`, `MM`, `AC` (also `PP`, `NOXSCRUM`, `SH`, `REN`)
 
 ---
