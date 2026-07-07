@@ -132,7 +132,7 @@ Built from one primary hue (teal, ~175°) plus a neutral slate scale — this ke
 
 ## Hybrid UI Architecture
 
-If your platform sits partly on a legacy/third-party shell (e.g. a CRM's native UI layer) and partly on your own renovated surfaces, keep the two visually and structurally separate:
+If your platform sits partly on a legacy/third-party shell (e.g. a CRM's native UI layer) and partly on your own custom surfaces, keep the two visually and structurally separate:
 
 ### Legacy/Third-Party Shell (Global Chrome)
 - Utility bar

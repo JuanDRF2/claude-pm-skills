@@ -55,10 +55,10 @@ The skill writes a complete spec, but it's not the last word. Treat it as a high
 
 ## When NOT to use this skill
 
-- **Architecture decisions** (ADRs) — use the Architecture Guild process, not this.
+- **Architecture decisions** (ADRs) — use the Architecture Review Board process, not this.
 - **Tiny enhancements** — a one-line config change doesn't need a spec.
 - **Pure bug fixes** — file in JIRA, not here.
-- **Strategy documents / "Love Letters"** — these are a different format.
+- **Strategy documents / "Vision Docs"** — these are a different format.
 
 ## Where to get help
 

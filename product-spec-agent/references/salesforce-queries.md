@@ -15,7 +15,7 @@ These are the only Case fields the skill uses for the business case. All other f
 **Breakdown / filter fields** — used to characterize the matched cases:
 
 4. **`Request_Category__c`** — picklist. Used to exclude Implementation Cases AND to group cases by category in the business case output.
-5. **`Case_Priority__c`** — picklist. Strategic priority of the case ("1. Compliance…", "2. Strategic Growth…", "3. Feature Parity…", "4. Custom Delight…", "5. Not Applicable").
+5. **`Case_Priority__c`** — picklist. Strategic priority of the case ("1. Compliance…", "2. Strategic Growth…", "3. Feature Parity…", "4. Customer Delight…", "5. Not Applicable").
 6. **`Case_Severity__c`** — picklist. Impact severity of the case (Business Stopping / Critical / High / Medium / Low).
 
 ## Step 1 — Resolve the PM's plain-English answers to SF records
@@ -25,7 +25,7 @@ The PM gives you "Product: Membership", "Feature: Digital Membership Cards". You
 ### Resolve Product Tag
 
 ```
-objectName: "agf__ADM_Product_Tag__c"
+objectName: "ADM_Product_Tag__c"
 selectFields: ["Id", "Name"]
 whereClause: "Name LIKE '%<PM's product term>%'"
 limit: 10
@@ -81,9 +81,9 @@ If the PM picks a subset, restate the locked scope back to them ("Including #1, 
 
 #### Zero-match recovery — Product Feature creation required
 
-When the Product Feature lookup returns no matches, the feature is net-new and does not yet exist in the Product Feature taxonomy. Examples: Email Engine, Bug Killer Machine, any V2-native infrastructure that's never been client-requested because it didn't exist to request.
+When the Product Feature lookup returns no matches, the feature is net-new and does not yet exist in the Product Feature taxonomy. Examples: Email Engine, Regression Bot, any V2-native infrastructure that's never been client-requested because it didn't exist to request.
 
-**The skill must not produce a spec without a Product Feature record.** Future case tagging, JTBD linkage, business case queries across the org, and Architecture Guild visibility all depend on the Product Feature existing in SF. Skipping this means the spec is orphan data the moment it ships.
+**The skill must not produce a spec without a Product Feature record.** Future case tagging, JTBD linkage, business case queries across the org, and Architecture Review Board visibility all depend on the Product Feature existing in SF. Skipping this means the spec is orphan data the moment it ships.
 
 Mirror the JTBD creation flow:
 
@@ -112,7 +112,7 @@ This flow accepts that some specs will have empty business case tables. That's c
 
 ### Resolve Jobs to be Done
 
-**JTBD resolution is mandatory for every spec, for every PM-stated JTBD.** The skill is a JTBD taxonomy auditor: each PM-stated JTBD must either map to an existing `agf__PPM_Program__c` record or trigger creation of a new one. There is no "leave unresolved" path. Empty business case for an unresolved JTBD silently misleads future specs.
+**JTBD resolution is mandatory for every spec, for every PM-stated JTBD.** The skill is a JTBD taxonomy auditor: each PM-stated JTBD must either map to an existing `PPM_Program__c` record or trigger creation of a new one. There is no "leave unresolved" path. Empty business case for an unresolved JTBD silently misleads future specs.
 
 The skill **does not write to Salesforce.** When a new JTBD is needed, the skill drafts the record content for the PM to create manually, then asks the PM to paste back the new record ID.
 
@@ -121,11 +121,11 @@ The skill **does not write to Salesforce.** When a new JTBD is needed, the skill
 For each JTBD the PM provided in Round 1 (typically 2–6 JTBDs):
 
 1. Extract the core action from the "As a [role], I want [goal] so that [outcome]" phrasing. The matchable concept is the goal — verb + object.
-2. Query `agf__PPM_Program__c` with `Name LIKE '%<keyword>%'` on the 2–3 most distinctive nouns/verbs.
+2. Query `PPM_Program__c` with `Name LIKE '%<keyword>%'` on the 2–3 most distinctive nouns/verbs.
 3. Rank matches by name overlap. Limit 10.
 
 ```
-objectName: "agf__PPM_Program__c"
+objectName: "PPM_Program__c"
 selectFields: ["Id", "Name"]
 whereClause: "Name LIKE '%<keyword 1>%' OR Name LIKE '%<keyword 2>%' OR Name LIKE '%<keyword 3>%'"
 limit: 10
@@ -192,7 +192,7 @@ After warnings, present the draft record for the PM to create in Salesforce:
 >
 > - **Name:** Issue Digital Membership Card via Portal
 > - **Description:** [PM-provided context, e.g., "Members access their active membership cards via the portal and add them to Apple Wallet or Google Wallet."]
-> - [Other required `agf__PPM_Program__c` fields determined by describing the object on first run]
+> - [Other required `PPM_Program__c` fields determined by describing the object on first run]
 
 #### Step 4 — Lock the JTBD IDs
 

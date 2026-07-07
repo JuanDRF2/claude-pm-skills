@@ -60,7 +60,7 @@ The template is in Notion-flavored Markdown. When publishing via `notion-create-
 | 1. Compliance | [N] | [N] |
 | 2. Strategic Growth | [N] | [N] |
 | 3. Feature Parity | [N] | [N] |
-| 4. Custom Delight | [N] | [N] |
+| 4. Customer Delight | [N] | [N] |
 | 5. Not Applicable | [N] | [N] |
 
 ### Cases by Severity
@@ -84,7 +84,7 @@ The template is in Notion-flavored Markdown. When publishing via `notion-create-
 ## Non-Goals
 
 - [Explicit out-of-scope item 1]
-- [Item 2 — attribute to owning initiative if applicable, e.g., "Email engine work (separate initiative, John Gomez)"]
+- [Item 2 — attribute to owning initiative if applicable, e.g., "Email engine work (separate initiative, [Name])"]
 - [Item 3]
 
 ## Success Metrics
@@ -147,7 +147,7 @@ erDiagram
 
 | Risk | Likelihood | Impact | Mitigation |
 |---|---|---|---|
-| [Specific risk, not vague] | High/Med/Low | High/Med/Low | [Concrete mitigation, often "spike in week 1" or "Architecture Guild review before [deliverable]"] |
+| [Specific risk, not vague] | High/Med/Low | High/Med/Low | [Concrete mitigation, often "spike in week 1" or "Architecture Review Board review before [deliverable]"] |
 
 [At least 4–6 risks. Include the standard ones for the lane — pass cert rotation, scanner regression, PII on lock screen, API quota — when applicable.]
 

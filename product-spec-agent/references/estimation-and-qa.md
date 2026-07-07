@@ -43,7 +43,7 @@ Default the value to the midpoint: S=1.5, M=4, L=8.
 
 ### Velocity
 
-**4 merged PRs/week per agent+human pair.** This is the V2 baseline. If a team is consistently exceeding or missing this, flag it to the Architecture Guild — but don't change the formula in a spec.
+**4 merged PRs/week per agent+human pair.** This is the V2 baseline. If a team is consistently exceeding or missing this, flag it to the Architecture Review Board — but don't change the formula in a spec.
 
 ## Worked examples
 
@@ -110,7 +110,7 @@ Every deliverable must define its QA scope across these layers. Not every layer 
 | **E2E** | User-facing happy path + 2–3 critical error paths | Agent writes, human reviews | Per JTBD in the spec |
 | **Manual exploratory** | Human-only — find what tests missed | Human (QA team) | One cycle per deliverable |
 | **Performance / load** | Throughput, latency, scale | Agent writes + human reviews; runs in CI | Only when scale or latency is a flagged risk |
-| **Bug Killer Machine regression hook** | Auto-regression on existing bug repros | Agent-generated tests, QA reviews | Required when fixing a bug; optional for greenfield |
+| **Regression Bot regression hook** | Auto-regression on existing bug repros | Agent-generated tests, QA reviews | Required when fixing a bug; optional for greenfield |
 | **Security review** | Authn/authz, signing, secrets handling | Human | Required when handling credentials, signing keys, PII |
 
 ## QA estimation

@@ -46,7 +46,7 @@ Always ask for these five things. Do not proceed without them.
 
 1. **Product** — which product is this for? (e.g., Billing, Onboarding, Reporting, Integrations, etc. — swap in your own product areas.)
 2. **Feature** — what feature within that product? Use the exact name as it would appear in SF case tagging if possible.
-3. **Jobs to be Done** — list them as "As a [user role], I want to [goal] so that [outcome]". Accept multiple JTBDs (most features have 2–6). If the PM gives you fewer than 2, push back: most features have multiple users (member + staff, buyer + seller, etc.). **Each JTBD must resolve to a formal `agf__PPM_Program__c` record in Salesforce** — either an existing one or a new one the PM creates during this session. This is non-negotiable; see Round 1 resolution flow below.
+3. **Jobs to be Done** — list them as "As a [user role], I want to [goal] so that [outcome]". Accept multiple JTBDs (most features have 2–6). If the PM gives you fewer than 2, push back: most features have multiple users (member + staff, buyer + seller, etc.). **Each JTBD must resolve to a formal `PPM_Program__c` record in Salesforce** — either an existing one or a new one the PM creates during this session. This is non-negotiable; see Round 1 resolution flow below.
 4. **Lane** — V2-Native, V2-Native + Portal, Salesforce Package (legacy AppExchange package), or Both during migration. If unsure, default to V2-Native for new functionality — SF packages are bug-fix-only.
 5. **Domain owner** — which of the six teams owns this? (e.g., Billing/Payments, Storefront, Groups/Scheduling, Reservations, Growth/Memberships, DevOps — swap in your own team names) or Cross-Cutting Platform.
 
@@ -70,14 +70,14 @@ Once Round 1 is locked, query the Salesforce MCP. The query pattern is mandatory
 
 The PM gives you plain-English Product, Feature, and JTBDs. You must resolve them to SF record IDs first:
 
-- Resolve the PM's "Product" → `agf__ADM_Product_Tag__c` record(s) by Name LIKE.
+- Resolve the PM's "Product" → `ADM_Product_Tag__c` record(s) by Name LIKE.
 - Resolve the PM's "Feature" → `Product_Feature__c` record(s) by Name LIKE, filtered to the matched Product Tag and `Deprecated__c = false`. **Expect multiple matches.**
 - For each matched Product Feature, pull case count + distinct account count for the last 3 years (one aggregate query — see `references/salesforce-queries.md`).
 - **Present matches as a weighted table** with Name, Product Tag, Status, Cases (3y), Accounts.
 - **Flag scope divergence** when matches span multiple Product Tags ("these likely belong to different initiatives").
 - **Ask explicitly which to include. Never default to all.** Accept: "all", "just #X, #Y", "let me describe the scope and you recommend", or "add ones you missed." Restate the locked scope back to the PM before moving on.
 - If zero matches found for the Product Feature, the feature is net-new. **The skill must not proceed without a Product Feature record.** Mirror the JTBD creation flow: skill drafts the Product Feature record content (Name, Product Tag, Status, Description, other required fields surfaced by describing the object); PM creates it in SF; PM pastes new ID back. Warn about duplicates, bad names, and wrong Product Tag before creation. Business case tables for net-new features will show zero counts — that's expected; strategic rationale lives in the Problem & Why Now section. See `references/salesforce-queries.md` for the full zero-match recovery flow.
-- Resolve JTBDs (mandatory, not optional). For each PM-stated JTBD, fuzzy-match against `agf__PPM_Program__c`. If match found → confirm with PM. If no match → challenge the PM to either pick from a wider existing list or create a new JTBD record. **There is no "leave unresolved" option.** When the PM creates a new JTBD, the skill drafts the record content; the PM creates it in Salesforce manually (the skill does NOT write to SF) and pastes the new record ID back. Before drafting a new JTBD, warn the PM about: possible duplicates, bad naming (vague / non-actionable / >60 chars), and cross-product scope. See `references/salesforce-queries.md` for the full challenge protocol.
+- Resolve JTBDs (mandatory, not optional). For each PM-stated JTBD, fuzzy-match against `PPM_Program__c`. If match found → confirm with PM. If no match → challenge the PM to either pick from a wider existing list or create a new JTBD record. **There is no "leave unresolved" option.** When the PM creates a new JTBD, the skill drafts the record content; the PM creates it in Salesforce manually (the skill does NOT write to SF) and pastes the new record ID back. Before drafting a new JTBD, warn the PM about: possible duplicates, bad naming (vague / non-actionable / >60 chars), and cross-product scope. See `references/salesforce-queries.md` for the full challenge protocol.
 
 **Then query Cases filtered by `Product_Feature__c IN (<PM-confirmed IDs>)` with the Implementation Cases exclusion.**
 
@@ -124,7 +124,7 @@ Every deliverable you propose must meet all three:
 2. **Adds value to at least one customer category** (OR, not AND):
    - Customer-org staff (Membership Manager, Program Director, IC roles, etc.)
    - Visitors / members / members (end users)
-   - internal team — *only if work compounds across customers* (e.g., Bug Killer Machine speeds bug resolution across all clients; implementation templates speed every onboarding). The test: does this make the company better at serving N customers, or just more comfortable for the team? If the latter, doesn't qualify.
+   - internal team — *only if work compounds across customers* (e.g., Regression Bot speeds bug resolution across all clients; implementation templates speed every onboarding). The test: does this make the company better at serving N customers, or just more comfortable for the team? If the latter, doesn't qualify.
 3. **Testable.** Can be objectively verified as working.
 
 **Backend-only deliverables** are valid only when the backend IS the customer artifact: public APIs, webhooks, SDKs that external developers consume. A backend service no customer category directly touches is not a valid standalone deliverable — fold it into the deliverable that needs it.
@@ -346,7 +346,7 @@ If the publish call fails for any reason (permission denied, property name misma
 
 4. Do not call publish a second time in the same session. The PM resolves the underlying issue (or pastes manually) and re-runs the skill later if needed.
 
-After publishing successfully, give the PM the page URL and offer to walk through next steps (review cycle, Architecture Guild trigger, JIRA project creation if applicable).
+After publishing successfully, give the PM the page URL and offer to walk through next steps (review cycle, Architecture Review Board trigger, JIRA project creation if applicable).
 
 ## The 15 skill rules (never violate)
 
@@ -361,7 +361,7 @@ After publishing successfully, give the PM the page URL and offer to walk throug
 9. Estimation formula shown explicitly per deliverable, not just the final number.
 10. **Every deliverable is the thinnest vertical slice that adds value to at least one customer category:** customer-org staff, visitors/members, OR the internal team. Internal-team value qualifies *only* when the work compounds across customers (test: does this make the company better at serving N customers, or just more comfortable?). Shared infrastructure is built incrementally inside customer-facing slices, not as a standalone foundation deliverable. Backend-only deliverables are valid only when the backend IS the customer artifact (public APIs, webhooks, SDKs for external developers). Deliverables that reuse infrastructure built earlier in the same spec get reduced complexity multipliers — the reuse discount stays.
 11. Use Mermaid for data model in every spec. Add flow diagrams only when sequencing or branching matters.
-12. **Every PM-stated JTBD must resolve to a formal `agf__PPM_Program__c` record** — either an existing one (confirmed by PM) or a new one the PM creates in Salesforce during this session. There is no "leave unresolved" option. The skill does not write JTBD records to SF; it drafts content for the PM to create. Warn the PM about possible duplicates, bad names, and cross-product scope before they create — but defer governance to product leadership.
+12. **Every PM-stated JTBD must resolve to a formal `PPM_Program__c` record** — either an existing one (confirmed by PM) or a new one the PM creates in Salesforce during this session. There is no "leave unresolved" option. The skill does not write JTBD records to SF; it drafts content for the PM to create. Warn the PM about possible duplicates, bad names, and cross-product scope before they create — but defer governance to product leadership.
 13. **The spec cannot proceed without a `Product_Feature__c` record.** When zero matches are found, the skill drafts a new Product Feature record and the PM creates it in Salesforce (same pattern as JTBD creation — skill drafts, PM creates, PM pastes ID back). Net-new features will have zero prior cases; that's expected. The strategic rationale lives in Problem & Why Now, not in case volume.
 14. **Revisions update the existing spec when Status is Draft / In Review / Approved; new versions when Status is Building / Shipped.** Detection is automatic (fuzzy title match in the Product Specs DB). The Status field carries the operational meaning — a spec being built or shipped is locked; everything else is alive. Revising an In-Review or Approved spec drops Status back to Draft because reviewers need to re-approve. The skill tells the PM what it's doing but does not ask for permission unless multiple existing specs match the title.
 15. **Every deliverable has Gherkin acceptance criteria generated exhaustively across structured axes:** JTBD coverage, Authorization, Data state, Boundaries, Failure modes, Concurrency, Platform, Localization. Skill judges which axes apply per deliverable, generates exhaustively across applicable ones, and states which it skipped and why. No hard upper bound; soft warning when scenarios exceed 30 per deliverable (suggests the deliverable may need to be split). Each scenario has an Axis label, plain-English description (for reviewers), Type tag, JTBD mapping, and Given/When/Then steps (for AI agents and QA engineers). PM prunes obvious junk at Checkpoint 4; tech lead prunes deeper when the spec moves Draft → In Review. Pruning is deletion, not archiving — the Notion page edit history is the audit trail. Gherkin covers E2E and integration only; unit-level coverage stays at agent discretion in each deliverable's QA section.
@@ -392,4 +392,4 @@ This file contains placeholders for workspace-specific values. Replace them befo
 | `<NOTION_PRODUCT_SPECS_URL>` | The direct URL to your Notion Product Specs database |
 | `$[YOUR_ARR]M` | Your organization's total ARR, used as the denominator for business-case exposure percentages |
 
-The custom object/field names throughout (`agf__PPM_Program__c`, `agf__ADM_Product_Tag__c`, `Product_Tag__c`, etc.) are kept as a worked Salesforce example rather than genericized — swap them for your own CRM's schema if you're not on Salesforce.
+The custom object/field names throughout (`PPM_Program__c`, `ADM_Product_Tag__c`, `Product_Tag__c`, etc.) are kept as a worked Salesforce example rather than genericized — swap them for your own CRM's schema if you're not on Salesforce.

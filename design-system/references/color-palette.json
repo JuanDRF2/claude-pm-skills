@@ -24,13 +24,6 @@
         "hsl": "hsl(142, 71%, 36%)",
         "usage": "Status indicators, checkmarks, success states",
         "examples": ["Active status badges", "completion indicators"]
-      },
-      "warningRed": {
-        "hex": "#0F766E",
-        "rgb": "rgb(15, 118, 110)",
-        "hsl": "hsl(175, 84%, 25%)",
-        "usage": "Errors, warnings, destructive actions",
-        "examples": ["Error messages", "cancel buttons"]
       }
     },
     "text": {
@@ -80,7 +73,7 @@
         "usage": "Dividers, card borders, input borders",
         "examples": ["Form field borders", "section dividers"]
       },
-      "accent": {
+      "accentBorder": {
         "hex": "#99F6E4",
         "rgb": "rgb(153, 246, 228)",
         "hsl": "hsl(168, 84%, 78%)",
