@@ -1,6 +1,6 @@
 ---
 name: video-demo-generator
-description: Generate polished, on-brand MP4 demo videos for interactive artifacts and UI components. Use this skill whenever you need to create a video walkthrough of an interactive HTML artifact, showcase a feature flow, document user interactions, or create a demo for stakeholders. The generator automatically applies design tokens (colors, typography, spacing) from the design-system skill, ensuring consistent branding. Works with: membership flows, upgrade/renewal interfaces, modal interactions, form wizards, or any interactive component. Creates videos in MP4 format, ready to embed or share.
+description: Generate polished, on-brand MP4 demo videos for interactive artifacts and UI components. Use this skill whenever you need to create a video walkthrough of an interactive HTML artifact, showcase a feature flow, document user interactions, or create a demo for stakeholders. The generator automatically applies design tokens (colors, typography, spacing) from the design-system skill, ensuring consistent branding. Works with: billing flows, upgrade/renewal interfaces, modal interactions, form wizards, or any interactive component. Creates videos in MP4 format, ready to embed or share.
 ---
 
 # Video Demo Generator
@@ -23,7 +23,7 @@ Given an interactive HTML artifact or feature flow description, this generator:
 | "Show me how the artifact works in a video" | ✅ Yes |
 | "Create a demo for stakeholders" | ✅ Yes |
 | "I need a 60-90 second walkthrough" | ✅ Yes |
-| "Document the membership flow visually" | ✅ Yes |
+| "Document the billing flow visually" | ✅ Yes |
 | "Show all the tabs and interactions" | ✅ Yes |
 | "Embed a video on a landing page" | ✅ Yes (MP4 works everywhere) |
 
@@ -31,7 +31,7 @@ Given an interactive HTML artifact or feature flow description, this generator:
 
 ### Minimum Required:
 - **Artifact HTML file path** (e.g., `/path/to/artifact.html`) OR
-- **Feature description** (e.g., "Membership Status Card with Manage modal, 3 tabs: Upgrade, Renew, Cancel")
+- **Feature description** (e.g., "Team Billing Card with Manage modal, 3 tabs: Change Plan, Seats, Cancel")
 
 ### Optional:
 - **Scene timing** (how many seconds per scene; default 5-10s)
@@ -41,7 +41,7 @@ Given an interactive HTML artifact or feature flow description, this generator:
 ## Output: What You Get
 
 ```
-membership-artifact-demo.mp4
+billing-artifact-demo.mp4
 ├─ Resolution: 1280x720 (HD)
 ├─ Duration: ~60-90 seconds
 ├─ FPS: 30 fps
@@ -129,16 +129,16 @@ This skill **automatically imports** from `design-system`:
 
 ## Common Use Cases
 
-### 1. Membership Management Flow
+### 1. Team Billing Flow
 ```
-Input: "Show the Membership Status Card with Manage modal"
+Input: "Show the Team Billing Card with Manage modal"
 Output:
 - Scene 1: Card visible (5s)
-- Scene 2: Click "Manage Membership" (3s)
-- Scene 3: Modal opens on "Upgrade" tab (10s)
-- Scene 4: Show payment options (radio buttons) (5s)
-- Scene 5: Switch to "Renew" tab (10s)
-- Scene 6: Show renewal options (10s)
+- Scene 2: Click "Manage Plan" (3s)
+- Scene 3: Modal opens on "Change Plan" tab (10s)
+- Scene 4: Show billing-cycle options (radio buttons) (5s)
+- Scene 5: Switch to "Seats" tab (10s)
+- Scene 6: Show seat add/remove options (10s)
 - Scene 7: Switch to "Cancel" tab (10s)
 - Scene 8: Close modal, back to card (5s)
 Total: ~58 seconds
@@ -146,13 +146,13 @@ Total: ~58 seconds
 
 ### 2. Feature Announcement
 ```
-Input: "Short 30-second demo of new Pay by Installments feature"
+Input: "Short 30-second demo of new annual billing discount"
 Output:
-- Scene 1: Upgrade option visible (3s)
-- Scene 2: Show "Pay Monthly" selected (5s)
-- Scene 3: Show "Pay Annually" option (5s)
+- Scene 1: Change Plan option visible (3s)
+- Scene 2: Show "Billed Monthly" selected (5s)
+- Scene 3: Show "Billed Annually" option (5s)
 - Scene 4: Amount calculation highlights (5s)
-- Scene 5: "Upgrade Now" button ready (5s)
+- Scene 5: "Switch to Annual" button ready (5s)
 - Scene 6: Confirm state (5s)
 Total: 28 seconds
 ```
@@ -206,7 +206,7 @@ All demos are saved to:
 ```
 
 Examples:
-- `membership-artifact-demo.mp4` (membership flow)
+- `billing-artifact-demo.mp4` (billing flow)
 - `upgrade-flow-demo.mp4` (upgrade experience)
 - `payment-options-demo.mp4` (payment selection)
 
@@ -254,7 +254,7 @@ Every video frame automatically follows these rules from `design-system`:
 
 ## Examples Generated with This Skill
 
-- ✅ `membership-artifact-demo.mp4` (membership flow module)
+- ✅ `billing-artifact-demo.mp4` (billing flow module)
 - ✅ `upgrade-flow-demo.mp4` (upgrade options with payment methods)
 - ✅ `payment-options-demo.mp4` (monthly vs. annual payment)
 

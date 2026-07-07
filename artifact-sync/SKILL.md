@@ -39,7 +39,7 @@ full diff, and only then propagate. You never silently edit, and you never leave
 - Jira cloudId (hostname form): `<JIRA_SITE>`
 - Jira content format for read and write: `markdown`
 - Notion Product Release Notes collection: `<NOTION_RELEASE_NOTES_COLLECTION_ID>`
-- Primary projects: `MEM`, `CORE`, `OPS` (also `FIN`, `TIX`, `SHOP`, `SCHD`) — swap in your own project keys
+- Primary projects: `CORE`, `API`, `WEB` (also `INFRA`, `QA`) — swap in your own project keys
 
 ---
 

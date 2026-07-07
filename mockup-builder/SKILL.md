@@ -3,7 +3,7 @@ name: mockup-builder
 description: >
   Build on-brand, handoff-ready HTML or JSX mockups pinned to the platform's design system
   and domain-correct data references. Use this skill whenever the user wants a mockup,
-  prototype, UI draft, screen, component, or visual of a platform feature — e.g. "mock up the contact
+  prototype, UI draft, screen, component, or visual of a platform feature — e.g. "mock up the account
   record", "build a UI for the checkout flow", "show me what this screen looks like", "make a JSX
   component for X", "draft the settings UI", or any request that produces an on-brand interface for
   review or frontend handoff. Always use this skill so tokens, components, and data references stay
@@ -83,12 +83,12 @@ Products do **not** share one palette. Confirm before styling:
 ## Step 1 — Domain-correct data references (annotate for handoff)
 
 Annotate the mockup (comments in JSX, notes in HTML) with the exact domain entities/junctions the UI maps
-to, so frontend doesn't invent a data shape. For the **Contacts Domain v0.5**:
+to, so frontend doesn't invent a data shape. For the **Accounts Domain v0.5**:
 
-- Emails → `contact_emails` junction; phones → `contact_phones`; addresses → `contact_addresses`.
-- Group → `group_members` with `role` and `is_primary`.
-- Contact ↔ Organization → the `Relationship` entity (not a direct field).
-- Payments reference a **`payer_ref`** (opaque) — **never a direct Contact object**.
+- Emails → `user_emails` junction; phones → `user_phones`; addresses → `user_addresses`.
+- Team → `team_members` with `role` and `is_primary`.
+- User ↔ Organization → the `Membership` entity (not a direct field).
+- Payments reference a **`payer_ref`** (opaque) — **never a direct User object**.
 
 If the feature touches another domain, ask for or state the domain version you are mapping to. Never invent
 field, object, or junction names.

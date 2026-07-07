@@ -211,39 +211,39 @@ class DemoVideoGenerator:
             return None
 
 
-def generate_membership_demo():
-    """Example: Generate a membership flow demo video"""
+def generate_billing_demo():
+    """Example: Generate a team billing flow demo video"""
     gen = DemoVideoGenerator()
 
     scenes = [
         {
-            "name": "Scene 1: Membership Status Card",
-            "description": "Clean card showing member info\n\nMember Since: May 15, 2023\nStart Date: May 27, 2024\nExpiration: May 26, 2025 (ACTIVE)\nDays Remaining: 364",
+            "name": "Scene 1: Team Billing Card",
+            "description": "Clean card showing plan info\n\nPlan: Pro\nBilling Cycle: Monthly\nNext Invoice: Aug 12, 2026\nSeats Used: 8 / 10",
             "duration": 5
         },
         {
             "name": "Scene 2: Click Manage Button",
-            "description": "User clicks 'Manage Membership'\nbutton\n\nModal is opening...",
+            "description": "User clicks 'Manage Plan'\nbutton\n\nModal is opening...",
             "duration": 3
         },
         {
-            "name": "Scene 3: Upgrade Tab",
-            "description": "Upgrade options visible\n\n• Platinum - $9.99/month\n  Pay Monthly OR Pay Annually\n\n• Diamond - $19.99/month\n  Pay Monthly OR Pay Annually",
+            "name": "Scene 3: Change Plan Tab",
+            "description": "Plan options visible\n\n• Starter - $9.99/seat/month\n  Billed Monthly OR Annually\n\n• Pro - $19.99/seat/month\n  Billed Monthly OR Annually",
             "duration": 10
         },
         {
-            "name": "Scene 4: Payment Options",
-            "description": "User selects payment method\n\nRadio buttons for:\n• Pay Monthly\n• Pay Annually\n\nShowing pricing breakdown",
+            "name": "Scene 4: Billing Options",
+            "description": "User selects billing cycle\n\nRadio buttons for:\n• Billed Monthly\n• Billed Annually\n\nShowing pricing breakdown",
             "duration": 8
         },
         {
-            "name": "Scene 5: Renew Tab",
-            "description": "Renewal options displayed\n\nCurrent: Gold - $50.75/year\n\n• Pay Monthly: $4.23/month\n• Pay Annually: $50.75 total",
+            "name": "Scene 5: Seats Tab",
+            "description": "Seat management displayed\n\nCurrent: 10 seats - $199.90/month\n\n• Add seats: +$19.99/seat/month\n• Remove seats: prorated credit",
             "duration": 10
         },
         {
             "name": "Scene 6: Cancel Tab",
-            "description": "Cancel option with warnings\n\n⚠️ What you'll lose:\n✗ All benefits\n✗ Member events\n✗ Discounts",
+            "description": "Cancel option with warnings\n\n⚠️ What you'll lose:\n✗ All Pro features\n✗ Priority support\n✗ Team seats above 3",
             "duration": 10
         },
         {
@@ -253,16 +253,16 @@ def generate_membership_demo():
         },
         {
             "name": "Scene 8: Complete Flow",
-            "description": "Membership Flow\n\n✓ Simple card + Rich modal\n✓ 3 functional tabs\n✓ Payment options\n✓ Professional design",
+            "description": "Billing Flow\n\n✓ Simple card + Rich modal\n✓ 3 functional tabs\n✓ Plan & seat options\n✓ Professional design",
             "duration": 5
         }
     ]
 
-    return gen.generate_video(scenes, "membership-demo.mp4")
+    return gen.generate_video(scenes, "billing-demo.mp4")
 
 
 if __name__ == "__main__":
     print("🎬 Video Demo Generator")
     print("Using design tokens from design-system\n")
 
-    generate_membership_demo()
+    generate_billing_demo()

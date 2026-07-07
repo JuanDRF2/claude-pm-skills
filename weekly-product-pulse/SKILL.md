@@ -40,11 +40,11 @@ Always query all five projects unless the user specifies otherwise:
 
 | Project Key | Team |
 |-------------|------|
-| `FIN` | Billing |
-| `TIX` | Ticketing |
-| `MEM` | Memberships |
-| `SHOP` | Storefront |
-| `SCHD` | Scheduling |
+| `PLAT` | Platform |
+| `MOB` | Mobile |
+| `GRW` | Growth |
+| `DATA` | Data |
+| `WEB` | Web |
 
 ---
 
@@ -171,7 +171,7 @@ What does the Head of Product need to act on today?}
 
 ## Team-by-team breakdown
 
-### 🏦 Billing (FIN)
+### 🏗️ Platform (PLAT)
 **Sprint:** {sprint name} | **Ends:** {end date} | **Health:** {🟢 On Track / 🟡 At Risk / 🔴 Off Track}
 
 **Delivered this sprint**
@@ -195,7 +195,7 @@ What does the Head of Product need to act on today?}
 
 {If there are no bugs: "No bugs in this sprint." — state it explicitly, it's good news.}
 {If there are carry-over bugs or unstarted high-priority bugs, call them out by key:
-  e.g. "🔴 [FIN-88] 'Payment webhook fails on retry' — carried over 2 sprints, High priority, unassigned."}
+  e.g. "🔴 [PLAT-88] 'Payment webhook fails on retry' — carried over 2 sprints, High priority, unassigned."}
 
 **⚠️ Alerts**
 - 🔴 [Issue key] "{Summary}" has been open for {N} sprints with no resolution.
@@ -210,22 +210,22 @@ the in-progress items? If the team's work feels scattered, say that.}
 
 ---
 
-### 🎫 Ticketing (TIX)
+### 📱 Mobile (MOB)
 [same structure]
 
 ---
 
-### 💰 Memberships (MEM)
+### 📈 Growth (GRW)
 [same structure]
 
 ---
 
-### 🛒 Storefront (SHOP)
+### 📊 Data (DATA)
 [same structure]
 
 ---
 
-### 🏠 Scheduling (SCHD)
+### 🌐 Web (WEB)
 [same structure]
 
 ---
@@ -234,11 +234,11 @@ the in-progress items? If the team's work feels scattered, say that.}
 
 | Team | Bugs open | Bugs closed | Carry-overs | High/Critical unstarted |
 |------|-----------|-------------|-------------|------------------------|
-| Billing | {N} | {N} | {N} | {N} |
-| Ticketing | {N} | {N} | {N} | {N} |
-| Memberships | {N} | {N} | {N} | {N} |
-| Storefront | {N} | {N} | {N} | {N} |
-| Scheduling | {N} | {N} | {N} | {N} |
+| Platform | {N} | {N} | {N} | {N} |
+| Mobile | {N} | {N} | {N} | {N} |
+| Growth | {N} | {N} | {N} | {N} |
+| Data | {N} | {N} | {N} | {N} |
+| Web | {N} | {N} | {N} | {N} |
 | **Total** | **{N}** | **{N}** | **{N}** | **{N}** |
 
 {1–2 sentence read on the bug signal: Is bug volume trending up? Are carry-over bugs
@@ -262,9 +262,9 @@ escalated before new feature work continues?}
 {3–5 specific, actionable recommendations based on what the data shows.
 Not generic advice. Grounded in the actual issues found.
 Examples:
-- "Billing's [issue XX-123] has been in 3 sprints. Recommend a decision call this week — ship, cut, or escalate."
-- "Memberships sprint ends in 2 days with 5 unstarted stories. Suggest a quick sync with the team lead."
-- "Time overruns are concentrated in Scheduling — may indicate estimation issues or hidden complexity in the epic."}
+- "Platform's [issue XX-123] has been in 3 sprints. Recommend a decision call this week — ship, cut, or escalate."
+- "Growth sprint ends in 2 days with 5 unstarted stories. Suggest a quick sync with the team lead."
+- "Time overruns are concentrated in Web — may indicate estimation issues or hidden complexity in the epic."}
 ```
 
 ---

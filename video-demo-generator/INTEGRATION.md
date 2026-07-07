@@ -133,7 +133,7 @@ video-demo-generator/
 ## Data Flow
 
 ```
-1. User asks: "Create a video of the membership flow"
+1. User asks: "Create a video of the billing flow"
    ↓
 2. Video Generator calls:
    generate_video(scenes, filename)
