@@ -16,8 +16,8 @@ Before proceeding, confirm you have:
 | Input | Example |
 |---|---|
 | **Bug description** | Plain-language explanation of the problem |
-| **Project key** | `PP`, `NOXSCRUM`, `FR`, etc. |
-| **Jira link (optional)** | Salesforce case or related ticket URL |
+| **Project key** | `PROJ`, `WEB`, `API`, etc. |
+| **Jira link (optional)** | Related support case or ticket URL |
 
 If the project key is missing, ask for it. If anything else is missing, make a reasonable assumption and state it.
 
@@ -92,7 +92,7 @@ When the user confirms:
 2. Create the issue as **Bug** type under the specified project.
 3. Set the **summary** to the bug title.
 4. Place the full formatted content (Description, Steps to Reproduce, Expected Behavior) in the **description** field using ADF format.
-5. If a related URL (e.g., Salesforce case link) was provided, include it as a remote link or in the description body.
+5. If a related URL (e.g., a support case link) was provided, include it as a remote link or in the description body.
 
 #### Phase 2 output
 
@@ -100,7 +100,7 @@ Return a summary:
 
 | Field | Value |
 |---|---|
-| Issue Key | `PP-XXX` |
+| Issue Key | `PROJ-XXX` |
 | Title | [Bug title] |
 | Project | [Project key] |
 | Jira Link | [Direct link to the created issue] |
