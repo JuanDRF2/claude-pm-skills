@@ -90,7 +90,7 @@ The template is in Notion-flavored Markdown. When publishing via `notion-create-
 ## Success Metrics
 
 **Leading**
-- [Metric with specific target, e.g., "% of new memberships issued a digital card within 7 days — target ≥ 80% at activated museums"]
+- [Metric with specific target, e.g., "% of new memberships issued a digital card within 7 days — target ≥ 80% at activated accounts"]
 - [Metric 2]
 
 **Lagging**
@@ -101,10 +101,10 @@ The template is in Notion-flavored Markdown. When publishing via `notion-create-
 
 **Estimation formula:** `(scope × complexity × risk) / velocity`, where scope is PRs (S=1-2, M=3-5, L=6-10, XL=10+), complexity is 1× baseline / 1.5× cross-domain / 2× novel pattern, risk is 1× known / 1.3× integration / 1.5× SF↔V2 dual-write, velocity is 4 merged PRs/week per agent+human pair. Output is pair-weeks of effort.
 
-**Deliverable sizing:** Each deliverable must be the thinnest vertical slice that delivers value to museum/nonprofit staff, visitors/constituents/members, OR the internal team (latter only when work compounds across customers). Name deliverables for what a user can DO after they ship, not for what code gets written. "Member views digital card in portal" — yes. "Wallet pass backend service" — no, unless the backend is a public API consumed by external developers.
+**Deliverable sizing:** Each deliverable must be the thinnest vertical slice that delivers value to customer-org staff, visitors/members, OR the internal team (latter only when work compounds across customers). Name deliverables for what a user can DO after they ship, not for what code gets written. "Member views digital card in portal" — yes. "Wallet pass backend service" — no, unless the backend is a public API consumed by external developers.
 
 ### D1 · [Action-Object phrasing — e.g., "Member views digital card in portal"]
-**User category.** [Museum staff / Member-Visitor / internal team — pick one or more. If internal team, justify how it compounds across customers.]
+**User category.** [Customer-org staff / Member-Visitor / internal team — pick one or more. If internal team, justify how it compounds across customers.]
 **Scope.** [What this deliverable builds. Include any shared infrastructure built incrementally inside this slice. Be specific about what's included and what's deferred to later deliverables.]
 **Value.** [What a user in the named category can do after this ships. One sentence.]
 **Estimate.** [Scope X (N PRs) × Complexity Y× (reason) × Risk Z× (reason) / Velocity 4 = **N.N pair-weeks**]
@@ -187,7 +187,7 @@ Gherkin scenarios that define "done" for each deliverable. Generated exhaustivel
 ​```gherkin
 Scenario: [Scenario name]
   Given a member with an active Gold membership
-  And the museum has digital cards enabled for Gold tier
+  And the account has digital cards enabled for Gold tier
   When the member logs into the portal
   Then their digital Gold membership card is visible in the "My Cards" view
   And the "Add to Apple Wallet" button is shown for iOS users

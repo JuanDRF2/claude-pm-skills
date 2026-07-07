@@ -39,7 +39,7 @@ full diff, and only then propagate. You never silently edit, and you never leave
 - Jira cloudId (hostname form): `<JIRA_SITE>`
 - Jira content format for read and write: `markdown`
 - Notion Product Release Notes collection: `<NOTION_RELEASE_NOTES_COLLECTION_ID>`
-- Primary projects: `FR`, `MM`, `AC` (also `PP`, `NOXSCRUM`, `SH`, `REN`)
+- Primary projects: `MEM`, `CORE`, `OPS` (also `FIN`, `TIX`, `SHOP`, `SCHD`) — swap in your own project keys
 
 ---
 
@@ -79,7 +79,7 @@ one table. Be specific about location (section, field, comment, line).
 
 | Artifact | Location | Current | Proposed | Action |
 |---|---|---|---|---|
-| FR-1316 | Description · Business Rules #4 | "retry day 3/7/14" | "retry day 1/2/3" | Edit body |
+| MEM-1316 | Description · Business Rules #4 | "retry day 3/7/14" | "retry day 1/2/3" | Edit body |
 | Spec v1.3 | §8.2 table | old rows | corrected rows | Edit + bump to v1.4 |
 | mockup.jsx | grace-period row | label "Day 7" | "Day 3" | Edit file |
 | Figma frame | node 5167 | stale | — | **Flag for designer** |

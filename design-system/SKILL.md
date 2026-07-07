@@ -1,6 +1,6 @@
 ---
 name: design-system
-description: Implement your platform's design system consistently across all UI components and modules. Use this skill whenever building new features, designing components, creating member/constituent-facing interfaces, or any donor/customer-facing features. This skill ensures color consistency, typography standards, spacing rules, component patterns, and accessibility across the entire platform. Always reference this when designing new modules, updating existing ones, or creating mockups.
+description: Implement your platform's design system consistently across all UI components and modules. Use this skill whenever building new features, designing components, creating member-facing interfaces, or any customer-facing features. This skill ensures color consistency, typography standards, spacing rules, component patterns, and accessibility across the entire platform. Always reference this when designing new modules, updating existing ones, or creating mockups.
 ---
 
 # Design System Implementation

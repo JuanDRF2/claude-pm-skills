@@ -1,6 +1,6 @@
 ---
 name: jira-update-cases
-description: "Fetches resolved bugs from Jira across product teams and displays them in a flat grid — one row per Salesforce case — ready to be exported to Excel. Use this skill whenever the user asks for a bug report, wants to see resolved bugs from Jira, mentions \"bugs done\", \"export bugs\", \"Salesforce cases from Jira\", \"bugs desde Jira\", \"reporte de bugs\", or requests any combination of Jira projects (PP, NOXSCRUM, FR, SH, REN) with a date filter. Always trigger for requests that combine Jira + bugs + date + Salesforce cases, even if phrased casually."
+description: "Fetches resolved bugs from Jira across product teams and displays them in a flat grid — one row per Salesforce case — ready to be exported to Excel. Use this skill whenever the user asks for a bug report, wants to see resolved bugs from Jira, mentions \"bugs done\", \"export bugs\", \"Salesforce cases from Jira\", \"bugs desde Jira\", \"reporte de bugs\", or requests any combination of Jira projects (FIN, TIX, MEM, SHOP, SCHD) with a date filter. Always trigger for requests that combine Jira + bugs + date + Salesforce cases, even if phrased casually."
 ---
 
 # Jira Bug Report — Salesforce Case Grid
@@ -18,11 +18,11 @@ Present these options:
 
 | Key | Product |
 |-----|---------|
-| PP | the finance module |
-| NOXSCRUM | Ticketing |
-| FR | Fundraising |
-| SH | Shop |
-| REN | Rentals |
+| FIN | Billing |
+| TIX | Ticketing |
+| MEM | Memberships |
+| SHOP | Storefront |
+| SCHD | Scheduling |
 | ALL | All five projects |
 
 **2. From date**
@@ -45,12 +45,12 @@ Use `Atlassian:searchJiraIssuesUsingJql` with the platform cloudId: `<JIRA_CLOUD
 
 For ALL projects:
 ```
-issuetype = Bug AND status = Done AND project in (PP, NOXSCRUM, FR, SH, REN) AND resolutiondate >= "YYYY-MM-DD" AND Associations is not EMPTY ORDER BY resolutiondate DESC
+issuetype = Bug AND status = Done AND project in (FIN, TIX, MEM, SHOP, SCHD) AND resolutiondate >= "YYYY-MM-DD" AND Associations is not EMPTY ORDER BY resolutiondate DESC
 ```
 
-For a single project (e.g. PP):
+For a single project (e.g. FIN):
 ```
-issuetype = Bug AND status = Done AND project = PP AND resolutiondate >= "YYYY-MM-DD" AND Associations is not EMPTY ORDER BY resolutiondate DESC
+issuetype = Bug AND status = Done AND project = FIN AND resolutiondate >= "YYYY-MM-DD" AND Associations is not EMPTY ORDER BY resolutiondate DESC
 ```
 
 > **Important:** `Associations is not EMPTY` is the primary filter — it ensures only bugs with at least one Salesforce case linked are returned. This is a hard requirement and must always be present in the JQL.
@@ -140,7 +140,7 @@ Display results using `visualize:show_widget`. The widget must:
 - `customfield_10256` = "Associations" field — contains linked Salesforce cases in ADF format.
 - `resolutiondate` is the correct field for when a bug moved to Done. Do NOT use `updated` or `created`.
 - Always use `responseContentFormat: "markdown"` when calling Jira tools to keep responses compact.
-- Project display names for the summary bar: PP → the finance module, NOXSCRUM → Ticketing, FR → Fundraising, SH → Shop, REN → Rentals.
+- Project display names for the summary bar: FIN → Billing, TIX → Ticketing, MEM → Memberships, SHOP → Storefront, SCHD → Scheduling.
 ---
 
 ## Configuration

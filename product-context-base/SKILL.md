@@ -38,7 +38,7 @@ Before fetching anything, ask the user:
 
 > "Which team should I load context for? Please tell me:
 > 1. **Team name** (e.g. [YourTeamName])
-> 2. **Jira project key** (e.g. `PP`)
+> 2. **Jira project key** (e.g. `PROJ`)
 > 3. **Notion product label** — the value in the `Product` field that matches your team (e.g. `[YourTeamName]`)
 >
 > I'll pull the last 6 months of Jira issues and your team's Notion product pages."
@@ -110,7 +110,7 @@ Combine Jira + Notion data into a structured context object using this format:
 ```json
 {
   "team": "[YourTeamName]",
-  "jira_project": "PP",
+  "jira_project": "PROJ",
   "generated_at": "2026-03-28",
   "valid_until": "2026-04-28",
   "product_snapshot": {

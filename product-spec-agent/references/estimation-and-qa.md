@@ -30,7 +30,7 @@ Default the value to the midpoint: S=1.5, M=4, L=8.
 | Multiplier | When |
 |---|---|
 | **1.0×** | Baseline — patterns the team has built before, single domain, well-understood |
-| **1.5×** | Cross-domain — touches multiple teams' bounded contexts (e.g., Membership + Ticketing) |
+| **1.5×** | Cross-domain — touches multiple teams' bounded contexts (e.g., Membership + Scheduling) |
 | **2.0×** | Novel pattern — no existing reference implementation at the company (e.g., first Apple PassKit integration) |
 
 ### Risk multiplier
@@ -65,7 +65,7 @@ Apple + Google wallet pass generation from scratch. Net-new infrastructure (nove
 
 ### Example 3: Cross-domain event consumer
 
-Membership team writes a consumer of Ticketing domain events. 4 PRs, cross-domain, integrates with an internal event bus (not third-party).
+Membership team writes a consumer of Scheduling domain events. 4 PRs, cross-domain, integrates with an internal event bus (not third-party).
 
 ```
 (4 × 1.5 × 1.0) / 4 = 1.5 pair-weeks

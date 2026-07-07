@@ -26,6 +26,7 @@ A library of product-management Skills for Claude. Each skill is a folder contai
 | [`release-notes-writer`](./release-notes-writer/) | Writes structured, audience-aware release notes and publishes them to Notion. |
 | [`video-demo-generator`](./video-demo-generator/) | Generates an on-brand MP4 demo video from an interactive artifact or feature flow, using design tokens from `design-system`. |
 | [`weekly-product-pulse`](./weekly-product-pulse/) | Generates a structured weekly status report for the Head of Product by pulling the active sprint from all product team Jira projects, grouping results by team, and surfacing delivery health, blockers, and risks. |
+| [`writing-voice`](./writing-voice/) | Applies your own calibrated writing voice — direct, human, no AI-tells — to external-facing content (LinkedIn, cover letters, bios, launch announcements) in English or Spanish. |
 
 ---
 

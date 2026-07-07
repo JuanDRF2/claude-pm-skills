@@ -66,7 +66,7 @@ orderBy: "COUNT(Id) DESC"
 
 **Flag scope divergence.** If matches span multiple Product Tags, state it explicitly:
 
-> "These matches span 3 Product Tags (Accounting, Fundraising, Payments). That's a strong signal the spec scope needs to be narrower than all matches — these are likely different initiatives owned by different domain teams."
+> "These matches span 3 Product Tags (Accounting, Billing, Payments). That's a strong signal the spec scope needs to be narrower than all matches — these are likely different initiatives owned by different domain teams."
 
 **Mandatory PM confirmation.** Never default to "include all." Always ask explicitly, with the table above visible. Acceptable PM answers:
 
@@ -135,7 +135,7 @@ limit: 10
 
 **Likely match (1 high-overlap result):**
 
-> For *"As a member, I want to access my museum benefits without carrying a physical card"*, closest JTBD: **Member Benefit Access** (12 cases, 8 accounts on the matched Product Features). Use this, or show me more?
+> For *"As a member, I want to access my membership benefits without carrying a physical card"*, closest JTBD: **Member Benefit Access** (12 cases, 8 accounts on the matched Product Features). Use this, or show me more?
 
 PM confirms or asks for the wider list.
 
@@ -182,7 +182,7 @@ If the proposed JTBD name fails any check, warn:
 
 > The proposed name *"Card works for members"* is too vague — it doesn't name the action or context. Suggested rewrite: *"Issue Digital Membership Card via Portal"*. You can override, but generic action names produce better case-tagging downstream.
 
-**Check C — Cross-product warning.** If the JTBD's core concept likely applies to multiple Product Tags (e.g., "Receive Email Confirmation" applies to Membership + Ticketing + Donations), warn:
+**Check C — Cross-product warning.** If the JTBD's core concept likely applies to multiple Product Tags (e.g., "Receive Email Confirmation" applies to Membership + Scheduling + Payments), warn:
 
 > This JTBD looks like it spans multiple products — *"Receive Email Confirmation"* applies to membership purchases, ticket purchases, donations, and gift card purchases. That's likely a cross-product JTBD. Product leadership manages cross-product JTBD scoping outside this skill, but flagging so leadership can review.
 
@@ -338,8 +338,8 @@ If both Case Priority and Severity get dropped, the spec is still complete — R
 Multi-match is the common case, not the exception. Examples from the Product Feature taxonomy:
 
 - "Digital Membership Cards" → 3 matches, all under Membership Management (scope-equivalent)
-- "Donations" → 5+ matches across Accounting, Fundraising, and Payments (scope-divergent — different initiatives)
-- "Gift Cards" → 7+ matches across Shop, Accounting, Payments (scope-divergent)
+- "Refunds" → 5+ matches across Accounting, Billing, and Payments (scope-divergent — different initiatives)
+- "Gift Cards" → 7+ matches across Storefront, Accounting, Payments (scope-divergent)
 - "Membership Sales" → 5 matches across POS / Online / Console / Renewals / Upgrades (channel-divergent)
 - "Events" → 8+ matches across sales / config / reports / membership-tied events (scope-divergent within one Product Tag)
 

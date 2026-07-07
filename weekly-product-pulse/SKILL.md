@@ -40,11 +40,11 @@ Always query all five projects unless the user specifies otherwise:
 
 | Project Key | Team |
 |-------------|------|
-| `PP` | the finance module |
-| `NOXSCRUM` | Ticketing |
-| `FR` | Fundraising |
-| `SH` | Shop |
-| `REN` | Rentals |
+| `FIN` | Billing |
+| `TIX` | Ticketing |
+| `MEM` | Memberships |
+| `SHOP` | Storefront |
+| `SCHD` | Scheduling |
 
 ---
 
@@ -171,7 +171,7 @@ What does the Head of Product need to act on today?}
 
 ## Team-by-team breakdown
 
-### 🏦 the finance module (PP)
+### 🏦 Billing (FIN)
 **Sprint:** {sprint name} | **Ends:** {end date} | **Health:** {🟢 On Track / 🟡 At Risk / 🔴 Off Track}
 
 **Delivered this sprint**
@@ -195,7 +195,7 @@ What does the Head of Product need to act on today?}
 
 {If there are no bugs: "No bugs in this sprint." — state it explicitly, it's good news.}
 {If there are carry-over bugs or unstarted high-priority bugs, call them out by key:
-  e.g. "🔴 [PP-88] 'Payment webhook fails on retry' — carried over 2 sprints, High priority, unassigned."}
+  e.g. "🔴 [FIN-88] 'Payment webhook fails on retry' — carried over 2 sprints, High priority, unassigned."}
 
 **⚠️ Alerts**
 - 🔴 [Issue key] "{Summary}" has been open for {N} sprints with no resolution.
@@ -210,22 +210,22 @@ the in-progress items? If the team's work feels scattered, say that.}
 
 ---
 
-### 🎫 Ticketing (NOXSCRUM)
+### 🎫 Ticketing (TIX)
 [same structure]
 
 ---
 
-### 💰 Fundraising (FR)
+### 💰 Memberships (MEM)
 [same structure]
 
 ---
 
-### 🛒 Shop (SH)
+### 🛒 Storefront (SHOP)
 [same structure]
 
 ---
 
-### 🏠 Rentals (REN)
+### 🏠 Scheduling (SCHD)
 [same structure]
 
 ---
@@ -234,11 +234,11 @@ the in-progress items? If the team's work feels scattered, say that.}
 
 | Team | Bugs open | Bugs closed | Carry-overs | High/Critical unstarted |
 |------|-----------|-------------|-------------|------------------------|
-| the finance module | {N} | {N} | {N} | {N} |
+| Billing | {N} | {N} | {N} | {N} |
 | Ticketing | {N} | {N} | {N} | {N} |
-| Fundraising | {N} | {N} | {N} | {N} |
-| Shop | {N} | {N} | {N} | {N} |
-| Rentals | {N} | {N} | {N} | {N} |
+| Memberships | {N} | {N} | {N} | {N} |
+| Storefront | {N} | {N} | {N} | {N} |
+| Scheduling | {N} | {N} | {N} | {N} |
 | **Total** | **{N}** | **{N}** | **{N}** | **{N}** |
 
 {1–2 sentence read on the bug signal: Is bug volume trending up? Are carry-over bugs
@@ -262,9 +262,9 @@ escalated before new feature work continues?}
 {3–5 specific, actionable recommendations based on what the data shows.
 Not generic advice. Grounded in the actual issues found.
 Examples:
-- "the finance module's [issue XX-123] has been in 3 sprints. Recommend a decision call this week — ship, cut, or escalate."
-- "Fundraising sprint ends in 2 days with 5 unstarted stories. Suggest a quick sync with the team lead."
-- "Time overruns are concentrated in Rentals — may indicate estimation issues or hidden complexity in the epic."}
+- "Billing's [issue XX-123] has been in 3 sprints. Recommend a decision call this week — ship, cut, or escalate."
+- "Memberships sprint ends in 2 days with 5 unstarted stories. Suggest a quick sync with the team lead."
+- "Time overruns are concentrated in Scheduling — may indicate estimation issues or hidden complexity in the epic."}
 ```
 
 ---

@@ -3,8 +3,8 @@ name: mockup-builder
 description: >
   Build on-brand, handoff-ready HTML or JSX mockups pinned to the platform's design system
   and domain-correct data references. Use this skill whenever the user wants a mockup,
-  prototype, UI draft, screen, component, or visual of a platform feature — e.g. "mock up the constituent
-  record", "build a UI for the donation flow", "show me what this screen looks like", "make a JSX
+  prototype, UI draft, screen, component, or visual of a platform feature — e.g. "mock up the contact
+  record", "build a UI for the checkout flow", "show me what this screen looks like", "make a JSX
   component for X", "draft the settings UI", or any request that produces an on-brand interface for
   review or frontend handoff. Always use this skill so tokens, components, and data references stay
   consistent — do not build platform UI freehand from memory.
@@ -12,6 +12,9 @@ compatibility:
   related_skills:
     - frontend-design (public) — read its SKILL.md first for environment/styling constraints
 ---
+
+**The tokens below are a placeholder example** — coherent but not tied to any real product's actual
+brand. Replace `Product A`/`Product B` and their accent colors with your own before shipping real UI.
 
 # Mockup Builder
 
@@ -29,10 +32,10 @@ styling and rendering constraints, then apply the platform tokens here on top of
 
 Products do **not** share one palette. Confirm before styling:
 
-- **Which product?** Fundraising / general uses primary terracotta `#C14615`. **Donation Online uses a
-  different terracotta (`#C8421F`)** — they are distinct products; do not mix them. If the product is
+- **Which product?** Product A / general uses primary accent `#EA580C`. **Product B uses a
+  different accent (`#B45309`)** — they are distinct products; do not mix them. If the product is
   ambiguous, ask which palette applies.
-- **Which surface?** Salesforce LWC/Aura, standalone web (React), or the customer portal. This affects
+- **Which surface?** Legacy platform shell (e.g. Salesforce LWC/Aura), standalone web (React), or the customer portal. This affects
   component conventions and constraints.
 - **Output format?** `HTML` for fast review now, `JSX` for repo handoff, or both (default to both when the
   user will hand it to engineering).
@@ -45,10 +48,10 @@ Products do **not** share one palette. Confirm before styling:
 
 | Token | Value | Use |
 |---|---|---|
-| `primary` | `#C14615` | Fundraising / general (Donation Online: `#C8421F`) |
-| `success` | `#057A54` | Positive state, "Live", paid |
-| `warning` | `#F5A524` | Caution, pending |
-| `danger`  | `#B62214` | Error, failed, destructive |
+| `primary` | `#EA580C` | Product A / general (Product B: `#B45309`) |
+| `success` | `#16A34A` | Positive state, "Live", paid |
+| `warning` | `#F59E0B` | Caution, pending |
+| `danger`  | `#DC2626` | Error, failed, destructive |
 | neutral text | `#1F2937` | Near-black headers/body |
 | muted | `#6B7280` | Secondary text |
 | border | `#E5E7EB` / `gray-200` | Card and divider borders |
@@ -80,12 +83,12 @@ Products do **not** share one palette. Confirm before styling:
 ## Step 1 — Domain-correct data references (annotate for handoff)
 
 Annotate the mockup (comments in JSX, notes in HTML) with the exact domain entities/junctions the UI maps
-to, so frontend doesn't invent a data shape. For the **Constituents Domain v0.5**:
+to, so frontend doesn't invent a data shape. For the **Contacts Domain v0.5**:
 
 - Emails → `contact_emails` junction; phones → `contact_phones`; addresses → `contact_addresses`.
-- Household → `household_members` with `role` and `is_primary`.
-- Contact ↔ Organization → the `Affiliation` entity (not a direct field).
-- Contributions reference a **`payer_or_donor_ref`** (opaque) — **never a direct Contact object**.
+- Group → `group_members` with `role` and `is_primary`.
+- Contact ↔ Organization → the `Relationship` entity (not a direct field).
+- Payments reference a **`payer_ref`** (opaque) — **never a direct Contact object**.
 
 If the feature touches another domain, ask for or state the domain version you are mapping to. Never invent
 field, object, or junction names.
@@ -105,7 +108,7 @@ field, object, or junction names.
 ## Hard rules
 
 - **Never invent tokens, colors, fonts, field names, or domain junctions.** Use the values above or ask.
-- **Confirm the palette** when the product is ambiguous (Fundraising `#C14615` vs Donation Online `#C8421F`).
+- **Confirm the palette** when the product is ambiguous (Product A `#EA580C` vs Product B `#B45309`).
 - **All monetary values in JetBrains Mono.** No exceptions.
 - **8px grid only.** No arbitrary pixel values.
 - **Annotate domain references** so the mockup is handoff-ready, not just pretty.

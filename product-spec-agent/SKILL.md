@@ -44,11 +44,11 @@ Revision detection → Publish to Notion Product Specs database
 
 Always ask for these five things. Do not proceed without them.
 
-1. **Product** — which product is this for? (Membership, Fundraising, Ticketing/Courses, Shop, Accounting, Groups/Rentals, etc.)
+1. **Product** — which product is this for? (e.g., Billing, Onboarding, Reporting, Integrations, etc. — swap in your own product areas.)
 2. **Feature** — what feature within that product? Use the exact name as it would appear in SF case tagging if possible.
 3. **Jobs to be Done** — list them as "As a [user role], I want to [goal] so that [outcome]". Accept multiple JTBDs (most features have 2–6). If the PM gives you fewer than 2, push back: most features have multiple users (member + staff, buyer + seller, etc.). **Each JTBD must resolve to a formal `agf__PPM_Program__c` record in Salesforce** — either an existing one or a new one the PM creates during this session. This is non-negotiable; see Round 1 resolution flow below.
-4. **Lane** — V2-Native, V2-Native + Portal, Salesforce Package (VNFP/Auctifera), or Both during migration. If unsure, default to V2-Native for new functionality — SF packages are bug-fix-only.
-5. **Domain owner** — which of the six teams owns this? (Accounting/Payments, Shop, Groups/Rentals, Ticketing/Courses, Fundraising/Memberships, DevOps) or Cross-Cutting Platform.
+4. **Lane** — V2-Native, V2-Native + Portal, Salesforce Package (legacy AppExchange package), or Both during migration. If unsure, default to V2-Native for new functionality — SF packages are bug-fix-only.
+5. **Domain owner** — which of the six teams owns this? (e.g., Billing/Payments, Storefront, Groups/Scheduling, Reservations, Growth/Memberships, DevOps — swap in your own team names) or Cross-Cutting Platform.
 
 **Checkpoint 1.** Read back what you heard. Confirm before you pull SF.
 
@@ -98,7 +98,7 @@ Compute and present:
 Ask in this order. Present your own read first where you can (the SF data and Round 1 answers should let you), and let the PM react. Do not just dump open-ended questions.
 
 1. **Why now?** What's the forcing function — sales blocker, churn risk, competitive parity, implementation cost, strategic bet? Propose 2–3 you can infer from the data.
-2. **Success metrics** — both leading (adoption rate, time-to-issue, feature-enabled museum count) and lagging (renewal conversion, NPS, case reduction, support hours saved). Propose specific targets, let PM revise.
+2. **Success metrics** — both leading (adoption rate, time-to-issue, feature-enabled account count) and lagging (renewal conversion, NPS, case reduction, support hours saved). Propose specific targets, let PM revise.
 3. **Constraints** — technical, regulatory, customer environment. Confirm or revise from PM's input.
 4. **Non-goals** — explicit list of what this spec is NOT doing. Critical for scope discipline. Always include this section.
 5. **Architecture Context** (mandatory section — see references/notion-page-template.md):
@@ -122,8 +122,8 @@ Every deliverable you propose must meet all three:
 
 1. **As small as possible.** The thinnest slice that delivers value. Bias toward more, smaller deliverables.
 2. **Adds value to at least one customer category** (OR, not AND):
-   - Museum / nonprofit staff (Membership Manager, Development Director, IC roles, etc.)
-   - Visitors / constituents / members (end users)
+   - Customer-org staff (Membership Manager, Program Director, IC roles, etc.)
+   - Visitors / members / members (end users)
    - internal team — *only if work compounds across customers* (e.g., Bug Killer Machine speeds bug resolution across all clients; implementation templates speed every onboarding). The test: does this make the company better at serving N customers, or just more comfortable for the team? If the latter, doesn't qualify.
 3. **Testable.** Can be objectively verified as working.
 
@@ -359,7 +359,7 @@ After publishing successfully, give the PM the page URL and offer to walk throug
 7. **Dependencies section second** — other initiatives that must ship first.
 8. Out-of-scope items get attributed to their owning initiative if applicable.
 9. Estimation formula shown explicitly per deliverable, not just the final number.
-10. **Every deliverable is the thinnest vertical slice that adds value to at least one customer category:** museum/nonprofit staff, visitors/constituents/members, OR the internal team. Internal-team value qualifies *only* when the work compounds across customers (test: does this make the company better at serving N customers, or just more comfortable?). Shared infrastructure is built incrementally inside customer-facing slices, not as a standalone foundation deliverable. Backend-only deliverables are valid only when the backend IS the customer artifact (public APIs, webhooks, SDKs for external developers). Deliverables that reuse infrastructure built earlier in the same spec get reduced complexity multipliers — the reuse discount stays.
+10. **Every deliverable is the thinnest vertical slice that adds value to at least one customer category:** customer-org staff, visitors/members, OR the internal team. Internal-team value qualifies *only* when the work compounds across customers (test: does this make the company better at serving N customers, or just more comfortable?). Shared infrastructure is built incrementally inside customer-facing slices, not as a standalone foundation deliverable. Backend-only deliverables are valid only when the backend IS the customer artifact (public APIs, webhooks, SDKs for external developers). Deliverables that reuse infrastructure built earlier in the same spec get reduced complexity multipliers — the reuse discount stays.
 11. Use Mermaid for data model in every spec. Add flow diagrams only when sequencing or branching matters.
 12. **Every PM-stated JTBD must resolve to a formal `agf__PPM_Program__c` record** — either an existing one (confirmed by PM) or a new one the PM creates in Salesforce during this session. There is no "leave unresolved" option. The skill does not write JTBD records to SF; it drafts content for the PM to create. Warn the PM about possible duplicates, bad names, and cross-product scope before they create — but defer governance to product leadership.
 13. **The spec cannot proceed without a `Product_Feature__c` record.** When zero matches are found, the skill drafts a new Product Feature record and the PM creates it in Salesforce (same pattern as JTBD creation — skill drafts, PM creates, PM pastes ID back). Net-new features will have zero prior cases; that's expected. The strategic rationale lives in Problem & Why Now, not in case volume.
