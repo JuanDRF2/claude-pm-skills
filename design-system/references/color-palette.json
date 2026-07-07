@@ -1,0 +1,190 @@
+{
+  "_comment": "Placeholder example palette — colorimetrically coherent (one primary hue + a neutral slate scale), not any specific company's real brand. Swap `primary` for your own brand color and regenerate tints/shades around it.",
+  "colors": {
+    "primary": {
+      "brand": {
+        "hex": "#0F766E",
+        "rgb": "rgb(15, 118, 110)",
+        "hsl": "hsl(175, 84%, 25%)",
+        "usage": "Primary buttons, active states, hover effects, important alerts",
+        "examples": ["CTA buttons", "active tab underlines", "action confirmations"]
+      },
+      "linkBlue": {
+        "hex": "#2563EB",
+        "rgb": "rgb(37, 99, 235)",
+        "hsl": "hsl(221, 83%, 53%)",
+        "usage": "Links, external-system UI elements",
+        "examples": ["External links", "third-party record links"]
+      }
+    },
+    "semantic": {
+      "successGreen": {
+        "hex": "#16A34A",
+        "rgb": "rgb(22, 163, 74)",
+        "hsl": "hsl(142, 71%, 36%)",
+        "usage": "Status indicators, checkmarks, success states",
+        "examples": ["Active status badges", "completion indicators"]
+      },
+      "warningRed": {
+        "hex": "#0F766E",
+        "rgb": "rgb(15, 118, 110)",
+        "hsl": "hsl(175, 84%, 25%)",
+        "usage": "Errors, warnings, destructive actions",
+        "examples": ["Error messages", "cancel buttons"]
+      }
+    },
+    "text": {
+      "dark": {
+        "hex": "#1E293B",
+        "rgb": "rgb(30, 41, 59)",
+        "hsl": "hsl(217, 33%, 17%)",
+        "usage": "Primary text, headings, high-contrast content",
+        "examples": ["Body text", "card titles", "labels"]
+      },
+      "muted": {
+        "hex": "#64748B",
+        "rgb": "rgb(100, 116, 139)",
+        "hsl": "hsl(215, 16%, 47%)",
+        "usage": "Secondary text, hints, disabled states",
+        "examples": ["Helper text", "descriptions", "form labels"]
+      }
+    },
+    "backgrounds": {
+      "light": {
+        "hex": "#F1F5F9",
+        "rgb": "rgb(241, 245, 249)",
+        "hsl": "hsl(210, 40%, 96%)",
+        "usage": "Secondary backgrounds, hover states",
+        "examples": ["Page background", "disabled buttons"]
+      },
+      "lighter": {
+        "hex": "#F8FAFC",
+        "rgb": "rgb(248, 250, 252)",
+        "hsl": "hsl(210, 40%, 98%)",
+        "usage": "Tertiary backgrounds, section backgrounds",
+        "examples": ["Card backgrounds", "form sections"]
+      },
+      "accent": {
+        "hex": "#F0FDFA",
+        "rgb": "rgb(240, 253, 250)",
+        "hsl": "hsl(166, 76%, 97%)",
+        "usage": "Callout backgrounds, warning/info boxes",
+        "examples": ["Preview panels", "info sections"]
+      }
+    },
+    "borders": {
+      "default": {
+        "hex": "#E2E8F0",
+        "rgb": "rgb(226, 232, 240)",
+        "hsl": "hsl(214, 32%, 91%)",
+        "usage": "Dividers, card borders, input borders",
+        "examples": ["Form field borders", "section dividers"]
+      },
+      "accent": {
+        "hex": "#99F6E4",
+        "rgb": "rgb(153, 246, 228)",
+        "hsl": "hsl(168, 84%, 78%)",
+        "usage": "Accent borders for tinted backgrounds",
+        "examples": ["Borders around callout sections"]
+      }
+    }
+  },
+  "spacing": {
+    "xs": "4px",
+    "s": "8px",
+    "m": "12px",
+    "l": "16px",
+    "xl": "20px",
+    "2xl": "24px",
+    "3xl": "32px"
+  },
+  "borderRadius": {
+    "subtle": "4px",
+    "standard": "6px",
+    "prominent": "12px",
+    "pill": "20px"
+  },
+  "typography": {
+    "fontStack": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+    "scales": {
+      "pageTitle": {
+        "fontSize": "32px",
+        "fontWeight": "700",
+        "lineHeight": "1.2"
+      },
+      "sectionTitle": {
+        "fontSize": "20px",
+        "fontWeight": "700",
+        "lineHeight": "1.3"
+      },
+      "subsection": {
+        "fontSize": "16px",
+        "fontWeight": "700",
+        "lineHeight": "1.3"
+      },
+      "body": {
+        "fontSize": "14px",
+        "fontWeight": "400",
+        "lineHeight": "1.5"
+      },
+      "small": {
+        "fontSize": "13px",
+        "fontWeight": "400",
+        "lineHeight": "1.4"
+      },
+      "label": {
+        "fontSize": "12px",
+        "fontWeight": "700",
+        "lineHeight": "1.2"
+      }
+    }
+  },
+  "components": {
+    "button": {
+      "primary": {
+        "background": "#0F766E",
+        "color": "#FFFFFF",
+        "padding": "12px 24px",
+        "borderRadius": "6px",
+        "fontWeight": "600",
+        "hover": {
+          "background": "#115E59"
+        }
+      },
+      "secondary": {
+        "background": "#FFFFFF",
+        "border": "1px solid #E2E8F0",
+        "color": "#1E293B",
+        "padding": "12px 24px",
+        "hover": {
+          "background": "#F1F5F9",
+          "borderColor": "#64748B"
+        }
+      }
+    },
+    "card": {
+      "background": "#FFFFFF",
+      "border": "1px solid #E2E8F0",
+      "borderRadius": "8px",
+      "padding": "16px",
+      "boxShadow": "0 1px 3px rgba(0, 0, 0, 0.1)"
+    },
+    "modal": {
+      "background": "#FFFFFF",
+      "borderRadius": "16px",
+      "maxWidth": "700px",
+      "boxShadow": "0 20px 60px rgba(0, 0, 0, 0.3)",
+      "padding": "24px"
+    },
+    "input": {
+      "height": "40px",
+      "border": "1px solid #E2E8F0",
+      "borderRadius": "4px",
+      "padding": "0 12px",
+      "focus": {
+        "borderColor": "#0F766E",
+        "boxShadow": "0 0 0 3px rgba(15, 118, 110, 0.1)"
+      }
+    }
+  }
+}

@@ -11,6 +11,7 @@ A library of product-management Skills for Claude. Each skill is a folder contai
 | [`architecture-aware-reviewer`](./architecture-aware-reviewer/) | Reviews a product spec or user story set against established architecture principles and ADRs, surfacing conflicts and risks before engineering picks up the work. |
 | [`artifact-sync`](./artifact-sync/) | Propagates a single product decision across every linked artifact so nothing drifts: Jira (epic/story body and comments), the Notion spec (with a version bump), design references, and HTML/JSX mockups. |
 | [`competitive-teardown`](./competitive-teardown/) | Researches, analyzes, and documents competitive intelligence for a product, feature, or market. |
+| [`design-system`](./design-system/) | Defines a coherent design token system — colors, typography, spacing, components — for consistent UI. Ships with a placeholder colorimetric palette; swap in your own brand color. |
 | [`discovery-interview-guide`](./discovery-interview-guide/) | Plans and runs user discovery research, including interview guides, usability test scripts, and survey questions. |
 | [`jira-bug-writer`](./jira-bug-writer/) | Formats and creates bug issues in Jira from a plain-language description. |
 | [`jira-story-writer`](./jira-story-writer/) | Transforms a mini spec or feature description into a set of well-formatted Jira user stories with Gherkin acceptance criteria. |
@@ -21,7 +22,9 @@ A library of product-management Skills for Claude. Each skill is a folder contai
 | [`okr-tracker`](./okr-tracker/) | Defines, reviews, scores, and updates OKRs (Objectives and Key Results) for a product team or initiative. |
 | [`prd-writer`](./prd-writer/) | Writes a full Product Requirements Document (PRD) for a feature, initiative, or product area. |
 | [`product-context-base`](./product-context-base/) | Builds and stores a rich product context snapshot for a specific team by pulling the last 6 months of Jira issues and relevant Notion product pages. |
+| [`product-spec-agent`](./product-spec-agent/) | Interviews a PM through a structured product-spec process — pulling a real CRM business case, sizing deliverables as vertical slices with explicit estimates, and generating exhaustive Gherkin acceptance criteria — before publishing to Notion. |
 | [`release-notes-writer`](./release-notes-writer/) | Writes structured, audience-aware release notes and publishes them to Notion. |
+| [`video-demo-generator`](./video-demo-generator/) | Generates an on-brand MP4 demo video from an interactive artifact or feature flow, using design tokens from `design-system`. |
 | [`weekly-product-pulse`](./weekly-product-pulse/) | Generates a structured weekly status report for the Head of Product by pulling the active sprint from all product team Jira projects, grouping results by team, and surfacing delivery health, blockers, and risks. |
 
 ---
@@ -44,6 +47,9 @@ Some skills reference workspace-specific values that are not published in this r
 | `<YOUR_PRODUCT_AREAS>` | The product areas / team names used in your release notes metadata |
 | `<SALESFORCE_INSTANCE_URL>` | Your Salesforce instance hostname — e.g. `yourorg.my.salesforce.com` |
 | `<SALESFORCE_CASE_ID>` | Example Salesforce case ID used in documentation samples |
+| `<NOTION_PRODUCT_SPECS_DATA_SOURCE_ID>` | Your Notion Product Specs database's data source ID |
+| `<NOTION_PRODUCT_SPECS_URL>` | The direct URL to your Notion Product Specs database |
+| `$[YOUR_ARR]M` | Your organization's total ARR, used as the denominator for business-case exposure percentages in `product-spec-agent` |
 
 ---
 
