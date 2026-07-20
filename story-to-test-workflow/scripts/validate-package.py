@@ -9,13 +9,16 @@ import sys
 from pathlib import Path
 
 ID_PATTERNS = {
+    # A trailing [A-Za-z]? on each numeric segment supports user-story-splitting's own
+    # "03a"/"03b" sub-story convention (e.g. US-MOS-03a, AC-MOS-03A-01, SC-MOS-03A-01-01)
+    # — split IDs are an expected output of that skill, not an edge case to special-case away.
     "BR": re.compile(r"\bBR-\d{2,}\b"),
-    "US": re.compile(r"\bUS-[A-Z0-9]+-\d{2,}\b"),
-    "AC": re.compile(r"\bAC-[A-Z0-9]+-\d{2,}-\d{2,}\b"),
+    "US": re.compile(r"\bUS-[A-Z0-9]+-\d{2,}[A-Za-z]?\b"),
+    "AC": re.compile(r"\bAC-[A-Z0-9]+-\d{2,}[A-Za-z]?-\d{2,}[A-Za-z]?\b"),
     "TC": re.compile(r"\bTC-[A-Z0-9]+-\d{3,}\b"),
     "CHK": re.compile(r"\bCHK-[A-Z0-9]+-\d{3,}\b"),
     "FTC": re.compile(r"\bFTC-[A-Z0-9]+-\d{2,}\b"),
-    "SC": re.compile(r"\bSC-[A-Z0-9]+-\d{2,}-\d{2,}(?:-\d{2,})?\b"),
+    "SC": re.compile(r"\bSC-[A-Z0-9]+-\d{2,}[A-Za-z]?-\d{2,}[A-Za-z]?(?:-\d{2,}[A-Za-z]?)?\b"),
 }
 
 RANGE_PATTERN = re.compile(
@@ -235,12 +238,17 @@ def validate(root: Path, language: str, strict: bool = False) -> tuple[list[str]
     if not any(path.is_file() and path.read_text(encoding="utf-8").strip() for path in test_design_files):
         errors.append("Missing test design artifact: 07-functional-test-cases.md")
 
-    jira_files = list((root / "jira").glob("US-*.md")) if (root / "jira").is_dir() else []
-    # Candidate stories in the map/release slices are intentionally not tickets yet.
-    # Only stories formally defined in the approved story artifact require Jira views.
-    story_defs = definitions_in_text(files.get(root / "05-user-stories.md", ""), "US")
-    if story_defs and len(jira_files) < len(story_defs):
-        errors.append(f"Jira views ({len(jira_files)}) are fewer than story IDs ({len(story_defs)}).")
+    # Solo + AI, no-tracker initiatives (idea-to-ship "tracking mode 2") never file Jira
+    # issues at all, so no jira/ views are expected either — that's not a gap, it's the mode.
+    state_text = files.get(root / "00-workflow-state.md", "")
+    no_tracker_mode = bool(re.search(r"solo\s*\+?\s*AI|no\s+tracker|sin\s+tracker|sin\s+tablero", state_text, re.IGNORECASE))
+    if not no_tracker_mode:
+        jira_files = list((root / "jira").glob("US-*.md")) if (root / "jira").is_dir() else []
+        # Candidate stories in the map/release slices are intentionally not tickets yet.
+        # Only stories formally defined in the approved story artifact require Jira views.
+        story_defs = definitions_in_text(files.get(root / "05-user-stories.md", ""), "US")
+        if story_defs and len(jira_files) < len(story_defs):
+            errors.append(f"Jira views ({len(jira_files)}) are fewer than story IDs ({len(story_defs)}).")
 
     all_text = "\n".join(files.values())
     defined = {kind: definitions(files, kind) for kind in ID_PATTERNS}

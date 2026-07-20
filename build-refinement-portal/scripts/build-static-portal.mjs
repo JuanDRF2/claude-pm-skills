@@ -56,23 +56,47 @@ function parseProject(folder) {
     if (table) rules.set(table[1], table[2].trim());
   });
   const checks = coverageSource.split("\n").filter((line) => /^\|\s*CHK-[A-Z0-9]+-\d+\s*\|/.test(line)).map((line) => { const c = line.split("|").slice(1, -1).map((cell) => cell.trim()); return { id:c[0], stories:c[1], criteria:c[2], rules:c[3], title:c[4], risk:c[5], level:c[6], evidence:c[7], status:c[8] }; });
+  // Trailing [A-Za-z]? on each numeric segment supports user-story-splitting's own "03a"/"03b"
+  // sub-story convention (e.g. AC-MOS-03A-01, SC-MOS-03A-01-01) — without it, any split story's
+  // criteria/scenarios silently vanish from the portal instead of erroring.
   const caseHits = [...functionalSource.matchAll(/^##\s+(FTC-[A-Z0-9]+-\d+)\s+[—-]\s+(.+)$/gm)];
   const cases = caseHits.map((hit, index) => {
     const source = functionalSource.slice(hit.index, caseHits[index + 1]?.index ?? functionalSource.length);
-    const scenarioHits = [...source.matchAll(/^###\s+(SC-[A-Z0-9]+-\d+-\d+)\s+[—-]\s+(.+)$/gm)];
+    const scenarioHits = [...source.matchAll(/^###\s+(SC-[A-Z0-9]+-\d+[A-Za-z]?-\d+[A-Za-z]?)\s+[—-]\s+(.+)$/gm)];
     const scenarios = scenarioHits.map((scenario, position) => ({ id:scenario[1], title:scenario[2].trim(), markdown:source.slice(scenario.index, scenarioHits[position + 1]?.index ?? source.length).trim() }));
     return { id:hit[1], title:hit[2].trim(), scenarios };
   });
   const jira = join(folder, "jira");
-  const storyFiles = existsSync(jira) ? readdirSync(jira).filter((name) => name.endsWith(".md")).sort().map((name) => join(jira, name)) : [join(folder, "05-user-stories.md")];
-  const stories = storyFiles.map((path) => {
-    const source = read(path); const titleHit = source.match(/^#\s+(US-[A-Z0-9]+-\d+)\s+[—-]\s+(.+)$/m); const id = titleHit?.[1] ?? basename(path, ".md");
-    const criterionHits = [...source.matchAll(/^#{3,6}\s+(AC-[A-Z0-9]+-\d+-\d+)\s+[—-]\s+(.+)$/gm)];
+  // Split-story IDs (US-MOS-03a) may carry a trailing letter — same convention as AC/SC below.
+  const usHeading = /^#{1,6}\s+(US-[A-Z0-9]+-\d+[A-Za-z]?)\s+[—-]\s+(.+)$/gm;
+  let storyBlocks;
+  if (existsSync(jira)) {
+    // One file per story (real Jira views) — each file's own top-level heading is its title.
+    storyBlocks = readdirSync(jira).filter((name) => name.endsWith(".md")).sort().map((name) => {
+      const path = join(jira, name);
+      const source = read(path);
+      const titleHit = source.match(new RegExp(usHeading.source, "m"));
+      return { id: titleHit?.[1] ?? basename(path, ".md"), title: titleHit?.[2]?.trim(), source };
+    });
+  } else {
+    // No jira/ folder (e.g. a solo, tracker-less initiative) — 05-user-stories.md holds every
+    // story under its own "## US-*" heading; split it into one block per story instead of
+    // treating the whole file as a single story (which silently drops every story but the first).
+    const full = read(join(folder, "05-user-stories.md"));
+    const hits = [...full.matchAll(usHeading)];
+    storyBlocks = hits.map((hit, index) => ({
+      id: hit[1],
+      title: hit[2].trim(),
+      source: full.slice(hit.index, hits[index + 1]?.index ?? full.length),
+    }));
+  }
+  const stories = storyBlocks.map(({ id, title, source }) => {
+    const criterionHits = [...source.matchAll(/^#{3,6}\s+(AC-[A-Z0-9]+-\d+[A-Za-z]?-\d+[A-Za-z]?)\s+[—-]\s+(.+)$/gm)];
     const criteria = criterionHits.map((hit, index) => ({ id:hit[1], title:hit[2].trim(), markdown:source.slice(hit.index, criterionHits[index + 1]?.index ?? source.length).split(/^##\s+/m)[0].trim() }));
     const storyCases = cases.filter((item) => source.includes(item.id));
     const questions = ids(source, /Q-\d+/g);
     const riskLines = unique([...source.split("\n").filter((line) => /Pregunta abierta|Open question/i.test(line)), ...risksSource.split("\n").filter((line) => line.includes(id) || questions.some((q) => line.includes(q)))]).filter((line) => line.trim() && !/^\|[-\s|]+\|$/.test(line));
-    return { id, title:titleHit?.[2]?.trim() ?? id, source, criteria, cases:storyCases, checks:checks.filter((check) => check.stories.includes(id)), risks:riskLines.join("\n") || "No se identificaron pendientes específicos para esta historia." };
+    return { id, title: title ?? id, source, criteria, cases:storyCases, checks:checks.filter((check) => check.stories.includes(id)), risks:riskLines.join("\n") || "No se identificaron pendientes específicos para esta historia." };
   });
   const projectTitle = coverageSource.match(/^[-*]\s+(?:Proyecto|Project):\s*(.+)$/m)?.[1]?.trim() ?? basename(folder).replaceAll("-", " ");
   return { id:basename(folder), title:projectTitle, rules:Object.fromEntries(rules), stories };
