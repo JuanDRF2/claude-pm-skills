@@ -114,6 +114,8 @@ Exit condition includes release communication being sent. Route:
 
 Before pointing to the next stage, check whether the current stage's exit condition is actually met — don't infer it from "we did some of the work." Ask it as a plain yes/no, never open-ended, and match the question to the tracking mode: tracking mode 1 → "Does a real Jira ticket already exist for this story? **1.** Yes. **2.** Not yet." Tracking mode 2 → "Is the story already marked as approved (not a draft)? **1.** Yes. **2.** Not yet." If the answer is no, say in one sentence what's missing and stay in the current stage — don't advance on a promise.
 
+**Record every "yes" immediately, not just in the moment.** The instant a stage's exit condition is confirmed met, append one line to the Gate approval log in the state note (see below): who confirmed it (the user, by name if known from the conversation, otherwise "the user") and today's date. This isn't a formality — it's the difference between "the model said this was fine at some point" and an actual auditable record of who signed off on what. Never backfill or infer a missing log line from context; if it isn't logged, treat that stage as unconfirmed.
+
 ## State
 
 Keep a short state note per initiative — don't re-derive it from scratch each session:
@@ -125,6 +127,10 @@ Keep a short state note per initiative — don't re-derive it from scratch each 
 - Current stage:
 - Last skill run:
 - Exit condition met?: yes/no — what's missing if no
+- Gate approval log:
+  - Define → Build: [approved by <name>, <date>] or [pending]
+  - Build → Verify: [approved by <name>, <date>] or [pending]
+  - Verify → Ship: [approved by <name>, <date>] or [pending]
 - Artifact package path (if Define started): artifacts/<project>/00-workflow-state.md
 - Jira issue (only if tracking mode is "uses a tracker"):
 - Next action:

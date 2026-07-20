@@ -387,13 +387,19 @@ Update `00-workflow-state.md` and `09-package-index.md` with every selected form
 
 ## State and Resumption
 
-At each gate, maintain a compact state summary:
+At each gate, maintain a compact state summary. The instant a gate is approved, append one line to the Gate approval log below — who approved it (the user, by name if known, otherwise "the user") and today's date — before moving on. Don't infer or backfill a missing log line later; if a gate isn't logged, treat it as not actually approved yet.
 
 ```markdown
 ## Workflow State
 - Mode:
 - Current phase:
 - Approved through:
+- Gate approval log:
+  - Gate 1 (Understanding): [approved by <name>, <date>] or [pending]
+  - Gate 2 (Scope): [approved by <name>, <date>] or [pending]
+  - Gate 3 (Behavior): [approved by <name>, <date>] or [pending]
+  - Gate 4 (Coverage): [approved by <name>, <date>] or [pending]
+  - Gate 5 (Publication): [approved by <name>, <date>] or [pending] or [not requested]
 - Confirmed rules:
 - Open blocking questions:
 - Selected scope:
