@@ -73,7 +73,7 @@ Only update fields the user explicitly changes.
 
 ### Step 3 — Draft in Chat First
 
-**Never push to Notion without explicit user approval.** Always show the full draft in the chat first. The user will review it and say "push to Notion" or "publish" when ready.
+**Never push to Notion without explicit user approval.** Always show the full draft in the chat first. The user will review it and say "push to Notion" or "publish" when ready. Publishing is an `ask`-tier action — see `skills/ACTION-TIERS.md`.
 
 ---
 

@@ -4,6 +4,8 @@ A library of product-management Skills for Claude. Each skill is a folder contai
 
 Not sure which one to use? Start with [`idea-to-ship`](./idea-to-ship/) — it doesn't draft anything itself, it figures out where your initiative stands (idea, spec, approved stories, mid-build, shipped) and routes you to the right skill below, one guided step at a time. Works the same whether you run this with a team on Jira or solo with AI and no tracker at all.
 
+See [`ACTION-TIERS.md`](./ACTION-TIERS.md) for the shared `allow`/`ask`/`block` classification that any skill touching a live system (Jira, Notion, a hosted portal) follows instead of inventing its own confirmation rule.
+
 ---
 
 ## Skills

@@ -36,6 +36,7 @@ No simular una publicación exitosa. Generar `notion-refinement-export.md` con l
 - No reemplazar contenido completo si basta una actualización localizada.
 - No crear bases de datos, comentarios, tareas ni aprobaciones persistentes salvo solicitud explícita.
 - No publicar como sitio público sin confirmación informada.
+- Publicar o actualizar una página real es una acción de nivel `ask`; ver `skills/ACTION-TIERS.md`.
 
 ## Resultado requerido
 

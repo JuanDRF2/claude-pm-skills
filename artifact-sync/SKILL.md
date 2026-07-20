@@ -136,6 +136,7 @@ Close with a compact report:
 - **Comments are first-class.** Read them in Phase 1; write an audit comment in Phase 4.
 - **Always bump the spec version** when the spec body changes, with a one-line changelog.
 - All written content in **English**, regardless of the language the user writes in.
+- Propagating to any already-published artifact is an `ask`-tier action; editing Figma/code instead of flagging is `block`-tier — see `skills/ACTION-TIERS.md`.
 
 ## Quality bar
 

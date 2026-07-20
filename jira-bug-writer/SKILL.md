@@ -134,3 +134,4 @@ Return a summary:
 - **Never ask unnecessary questions** — make grounded assumptions and flag them.
 - **Never write vague steps** — if the description is unclear, infer from context and mark assumptions.
 - All output must be in **English**, regardless of the language the user writes in.
+- Creating a Jira issue is an `ask`-tier action — see `skills/ACTION-TIERS.md`.

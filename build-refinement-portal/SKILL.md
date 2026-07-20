@@ -50,3 +50,5 @@ Crear una capa de lectura sobre artefactos existentes. No modificar decisiones d
 - URL privada solo cuando el usuario solicite publicación.
 
 No crear comentarios, aprobaciones persistentes ni sincronización bidireccional con Jira salvo solicitud explícita; esas funciones convierten el portal en un sistema de gestión adicional.
+
+Alojar el portal en una URL pública es una acción de nivel `ask` (privado por defecto, nunca sin confirmación informada); ver `skills/ACTION-TIERS.md`.

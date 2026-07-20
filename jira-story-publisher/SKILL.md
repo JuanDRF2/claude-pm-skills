@@ -143,6 +143,7 @@ Before creating any issue, verify:
 - **Never skip Phase 1** — always show the assembled ticket and estimate first.
 - **Never publish an unapproved story** — check approval state before estimating.
 - All Jira output must be in **English**, regardless of the language the source story was written in.
+- Creating a Jira issue is an `ask`-tier action — see `skills/ACTION-TIERS.md`. No approval from a prior issue carries over to the next one.
 
 ---
 
