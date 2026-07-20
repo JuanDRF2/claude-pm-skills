@@ -1,0 +1,4 @@
+interface:
+  display_name: "Build Refinement Portal"
+  short_description: "Genera portales claros para refinamiento"
+  default_prompt: "Usa $build-refinement-portal para convertir mis artefactos Markdown en un portal interactivo de refinamiento."

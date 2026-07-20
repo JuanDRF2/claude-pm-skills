@@ -1,0 +1,4 @@
+interface:
+  display_name: "Publish Refinement to Notion"
+  short_description: "Publish refinement artifacts as a readable Notion page"
+  default_prompt: "Use $publish-refinement-to-notion to publish this approved Markdown refinement package as a clear Notion refinement workspace."

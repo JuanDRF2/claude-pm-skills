@@ -258,3 +258,9 @@ Before finishing, ask yourself:
 7. Does the spec use domain vocabulary exactly as defined — no informal synonyms?
 
 If the answer to any of these is "no," fix it before delivering.
+
+---
+
+## Related Skills
+
+Once this Mini Spec is approved and needs to become sprint-ready stories with QA coverage, hand it to `skills/story-to-test-workflow/SKILL.md` — do not draft stories or acceptance criteria inside this skill. Its Business Rules and Standard Scenarios sections are exactly the input that orchestrator's Phase 1 (`user-story-mapping`) expects.

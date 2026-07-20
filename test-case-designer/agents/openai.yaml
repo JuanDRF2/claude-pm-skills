@@ -1,0 +1,4 @@
+interface:
+  display_name: "Test Case Designer"
+  short_description: "Design clear QA checks and functional scenarios"
+  default_prompt: "Use $test-case-designer to derive risk-based checks and plain-language functional scenarios with clear journey boundaries, traceability, automation guidance, and a downstream test-management handoff."

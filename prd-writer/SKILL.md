@@ -20,7 +20,8 @@ A great PRD is opinionated about the problem, clear about the solution direction
 | Feature needs leadership or stakeholder sign-off | **PRD** (this skill) |
 | Feature touches architecture boundaries or multiple services | **PRD** (this skill), then `architecture-aware-reviewer` |
 | Feature is well-understood, single-team, engineering-ready | **Mini Spec** (`mini-spec-writer`) |
-| Epic is approved and needs to be broken into stories | **Jira Story Writer** (`jira-story-writer`) |
+| Epic is approved and needs to be broken into sprint-ready stories + QA coverage | **Story to Test Workflow** (`story-to-test-workflow`) |
+| Not sure which of the above applies, or where this initiative is in the process at all | **Idea to Ship** (`idea-to-ship`) |
 
 When in doubt: if the PM needs alignment before engineering needs detail, write a PRD first.
 
@@ -164,7 +165,7 @@ Things worth doing eventually, but not now. Capturing them here prevents them fr
 ---
 
 ### 8. User Stories (High-Level)
-*Not the full Jira stories — those come later via `jira-story-writer`.*
+*Not the full Jira stories — those come later via `story-to-test-workflow`.*
 
 Write 3–8 high-level user stories that capture the primary ways users will interact with this feature. Format:
 
@@ -237,7 +238,7 @@ Once the PRD is approved, the typical next steps are:
 
 1. **Architecture review** — run `architecture-aware-reviewer` if the initiative touches domain boundaries or introduces new patterns
 2. **Mini Spec** — use `mini-spec-writer` to write the engineering-ready spec for each feature slice
-3. **Story creation** — use `jira-story-writer` to break the spec into Jira stories under the Epic
+3. **Story creation & QA coverage** — use `story-to-test-workflow` to break the spec into sprint-ready stories with acceptance criteria and test coverage; then `jira-story-publisher` to estimate and file each approved story in Jira under the Epic
 
 Tell the user which of these is the right next step based on the size and complexity of what was just written.
 

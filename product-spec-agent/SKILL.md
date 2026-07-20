@@ -376,6 +376,10 @@ After publishing successfully, give the PM the page URL and offer to walk throug
 - Do not publish to Notion before Checkpoint 3 approval.
 - Do not improvise the spec structure. Use the template.
 
+## Related Skills
+
+Once a spec is Approved and a deliverable needs to become sprint-ready stories, hand that deliverable to `skills/story-to-test-workflow/SKILL.md` — do not draft `US-*` stories inside this skill. This skill's exhaustive per-deliverable Gherkin ACs (axis-labeled, JTBD-mapped) are one altitude up from that orchestrator's `AC-*`/`SC-*` model; treat them as the deliverable's confirmed behavior for `user-story-mapping` to consume, not as a substitute for it. `test-case-designer` (inside that orchestrator) is where exhaustive AC coverage turns into QA-reviewable `CHK-*`/`FTC-*` checks — this skill stops at acceptance criteria and does not design test cases.
+
 ## Reference files
 
 - `references/salesforce-queries.md` — SOQL templates, picklist values, dedup logic
