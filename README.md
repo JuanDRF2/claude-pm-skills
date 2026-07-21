@@ -79,3 +79,10 @@ name: skill-folder-name
 description: One-line description of what the skill does and when to trigger it.
 ---
 \`\`\`
+
+## Related
+
+- [`ai-first-workspace`](https://github.com/JuanDRF2/ai-first-workspace) — the personal workspace
+  these skills are used from day to day; this repo is the public, sanitized, always-in-sync copy.
+- [`genesis`](https://github.com/JuanDRF2/genesis) — a companion tool for scaffolding a
+  brand-new project from scratch with guardrails already installed, usable alongside these skills.
