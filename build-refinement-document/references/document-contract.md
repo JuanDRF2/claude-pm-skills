@@ -10,12 +10,13 @@
 | `06-test-coverage.md` | Definición canónica de comprobaciones `CHK` |
 | `07-functional-test-cases.md` | Casos `FTC`, escenarios `SC` y automatización |
 | `08-traceability-and-risks.md` | Pendientes, bloqueos y riesgo residual |
+| `11-refinement-judge-report.md` | Veredicto, hallazgos y autorización del gate, cuando exista |
 
 ## Estructura editorial
 
 1. Portada breve: proyecto, estado, alcance, fecha e idioma.
 2. Cómo leer: significado humano de `US`, `AC`, `BR`, `CHK`, `FTC` y `SC`.
-3. Resumen: objetivo, incluido, excluido, entregas y decisiones principales.
+3. Resumen: objetivo, incluido, excluido, entregas, decisiones principales y veredicto de `Refinement Judge` cuando exista.
 4. Una sección por historia:
    - historia y valor;
    - estado, alcance y dependencias;
@@ -28,6 +29,7 @@
 5. Plan funcional transversal.
 6. Pendientes y riesgos reales.
 7. Anexo de trazabilidad cuando aporte valor.
+8. Anexo de revisión adversarial con hallazgos y autorización del gate cuando exista.
 
 ## Control de densidad
 

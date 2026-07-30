@@ -1,0 +1,4 @@
+interface:
+  display_name: "Refinement Judge"
+  short_description: "Audita refinamientos antes de publicarlos"
+  default_prompt: "Usa $refinement-judge para auditar este paquete de refinamiento y emitir un veredicto independiente."

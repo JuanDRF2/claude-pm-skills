@@ -31,6 +31,7 @@ See [`ACTION-TIERS.md`](./ACTION-TIERS.md) for the shared `allow`/`ask`/`block` 
 | [`product-context-base`](./product-context-base/) | Builds and stores a rich product context snapshot for a specific team by pulling the last 6 months of Jira issues and relevant Notion product pages. |
 | [`product-spec-agent`](./product-spec-agent/) | Interviews a PM through a structured product-spec process — pulling a real CRM business case, sizing deliverables as vertical slices with explicit estimates, and generating exhaustive Gherkin acceptance criteria — before publishing to Notion. |
 | [`publish-refinement-to-notion`](./publish-refinement-to-notion/) | Publishes or updates an approved product/QA refinement Markdown package as native, readable Notion pages. |
+| [`refinement-judge`](./refinement-judge/) | Independent adversarial quality gate that audits a complete product-refinement package before external publication, Jira creation, or another consequential action — comparing it against original sources rather than trusting the generating skill's own conclusions. |
 | [`release-notes-writer`](./release-notes-writer/) | Writes structured, audience-aware release notes and publishes them to Notion. |
 | [`story-to-test-workflow`](./story-to-test-workflow/) | Orchestrates product refinement end to end — journey mapping, story splitting, user stories with acceptance criteria, and risk-based QA test design — through explicit decision gates, from a rough idea or an approved spec. |
 | [`test-case-designer`](./test-case-designer/) | Designs risk-based, traceable QA coverage from approved stories and criteria: atomic checks and QA-reviewable functional test cases, with automation guidance and a downstream test-management handoff. |
@@ -41,7 +42,7 @@ See [`ACTION-TIERS.md`](./ACTION-TIERS.md) for the shared `allow`/`ask`/`block` 
 | [`weekly-product-pulse`](./weekly-product-pulse/) | Generates a structured weekly status report for the Head of Product by pulling the active sprint from all product team Jira projects, grouping results by team, and surfacing delivery health, blockers, and risks. |
 | [`writing-voice`](./writing-voice/) | Applies your own calibrated writing voice — direct, human, no AI-tells — to external-facing content (LinkedIn, cover letters, bios, launch announcements) in English or Spanish. |
 
-28 skills in total.
+29 skills in total.
 
 ---
 

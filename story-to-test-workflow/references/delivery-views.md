@@ -12,12 +12,12 @@ Add `Pruebas relacionadas` grouped by criterion with: plain-language purpose, `C
 
 ## DEV handoff
 
-Include approved stories and criteria, dependencies, enablers, observability, failure behavior, and engineering confirmations. Do not paste every test step.
+Include approved stories and criteria, dependencies, enablers, observability, failure behavior, engineering confirmations, and the current Judge verdict with a relative report link. Do not paste every test step.
 
 ## QA handoff
 
-Group by story and functional case. Show scenarios, covered checks, preconditions, data/environment needs, risk, priority, level, each scenario's automation decision and rationale, expected evidence, and residual risk. Add a downstream instruction to preserve behavior and traceability while allowing assertions from the same flow to remain consolidated.
+Group by story and functional case. Show scenarios, covered checks, preconditions, data/environment needs, risk, priority, level, each scenario's automation decision and rationale, expected evidence, residual risk, and the current Judge verdict with a relative report link. Add a downstream instruction to preserve behavior and traceability while allowing assertions from the same flow to remain consolidated.
 
 ## Package index
 
-Show project status separately from each delivery, then link business understanding, rules, map, releases, tickets, tests, handoffs, and traceability.
+Show project status separately from each delivery, then link business understanding, rules, map, releases, tickets, tests, handoffs, traceability, and `11-refinement-judge-report.md`. Display the Judge verdict, reviewed snapshot, review date and exact next action allowed or blocked.

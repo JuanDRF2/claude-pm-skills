@@ -1,0 +1,218 @@
+#!/usr/bin/env python3
+"""Deterministic preflight and report validation for refinement-judge."""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+
+CANONICAL_FILES = [
+    "00-workflow-state.md",
+    "01-project-understanding.md",
+    "02-rules-and-questions.md",
+    "03-story-map.md",
+    "04-release-slices.md",
+    "05-user-stories.md",
+    "06-test-coverage.md",
+    "07-functional-test-cases.md",
+    "08-traceability-and-risks.md",
+    "09-package-index.md",
+]
+
+VERDICT_RE = re.compile(
+    r"(?im)^-\s*(?:Verdict|Veredicto)(?:\s*/\s*(?:Verdict|Veredicto))?\s*:\s*"
+    r"(PASS WITH OBSERVATIONS|PASS CON OBSERVACIONES|PASS|FAIL)\s*$"
+)
+SNAPSHOT_RE = re.compile(
+    r"(?im)^-\s*(?:Reviewed snapshot SHA-256|Snapshot revisado SHA-256)"
+    r"(?:\s*/\s*(?:Reviewed snapshot SHA-256|Snapshot revisado SHA-256))?\s*:\s*"
+    r"([0-9a-f]{64})\s*$"
+)
+FINDING_RE = re.compile(r"(?m)^###\s+(JUDGE-[A-Z0-9]+-\d{3,})\b")
+SEVERITY_RE = re.compile(
+    r"(?im)^-\s*(?:Severity|Severidad)(?:\s*/\s*(?:Severity|Severidad))?\s*:\s*"
+    r"(Critical|High|Medium|Low|Observation)\s*$"
+)
+STATUS_RE = re.compile(
+    r"(?im)^-\s*(?:Status|Estado)(?:\s*/\s*(?:Status|Estado))?\s*:\s*"
+    r"(Open|Resolved|Accepted risk|Not reproducible|Superseded)\s*$"
+)
+BLOCK_RE = re.compile(
+    r"(?im)^-\s*(?:Blocks action|Bloquea acción)(?:\s*/\s*(?:Blocks action|Bloquea acción))?\s*:\s*"
+    r"(Yes|No|Sí)\s*$"
+)
+
+
+def package_validator() -> Path:
+    candidate = Path(__file__).resolve().parents[2] / "story-to-test-workflow" / "scripts" / "validate-package.py"
+    if not candidate.is_file():
+        raise FileNotFoundError(f"Sibling package validator not found: {candidate}")
+    return candidate
+
+
+def snapshot_files(root: Path) -> list[Path]:
+    files: list[Path] = []
+    for relative in CANONICAL_FILES:
+        path = root / relative
+        if path.is_file():
+            files.append(path)
+    for folder in ("jira", "handoffs"):
+        directory = root / folder
+        if directory.is_dir():
+            files.extend(sorted(directory.rglob("*.md")))
+    return sorted(set(files), key=lambda path: path.relative_to(root).as_posix())
+
+
+def snapshot_hash(root: Path, files: list[Path]) -> str:
+    digest = hashlib.sha256()
+    for path in files:
+        relative = path.relative_to(root).as_posix().encode("utf-8")
+        digest.update(relative)
+        digest.update(b"\0")
+        digest.update(path.read_bytes())
+        digest.update(b"\0")
+    return digest.hexdigest()
+
+
+def run_preflight(root: Path, language: str) -> int:
+    if not root.is_dir():
+        print(f"ERROR: package folder does not exist: {root}")
+        return 2
+    command = [
+        sys.executable,
+        str(package_validator()),
+        str(root),
+        "--language",
+        language,
+        "--strict",
+    ]
+    result = subprocess.run(command, text=True, capture_output=True, check=False)
+    if result.stdout:
+        print(result.stdout.rstrip())
+    if result.stderr:
+        print(result.stderr.rstrip(), file=sys.stderr)
+    files = snapshot_files(root)
+    if not files:
+        print("ERROR: no canonical files available for snapshot")
+        return 1
+    print(f"SNAPSHOT_SHA256: {snapshot_hash(root.resolve(), files)}")
+    print(f"SNAPSHOT_FILES: {len(files)}")
+    return result.returncode
+
+
+def field_present(block: str, labels: tuple[str, ...]) -> bool:
+    joined = "|".join(re.escape(label) for label in labels)
+    return bool(re.search(rf"(?im)^-\s*(?:{joined})(?:\s*/\s*(?:{joined}))?\s*:\s*\S", block))
+
+
+def run_report(report: Path) -> int:
+    if not report.is_file():
+        print(f"ERROR: report does not exist: {report}")
+        return 2
+    text = report.read_text(encoding="utf-8")
+    errors: list[str] = []
+
+    verdict_match = VERDICT_RE.search(text)
+    if not verdict_match:
+        errors.append("Missing or unsupported Verdict/Veredicto.")
+    if not SNAPSHOT_RE.search(text):
+        errors.append("Missing valid 64-character reviewed snapshot SHA-256.")
+
+    required_sections = [
+        ("executive summary", ("Executive summary", "Resumen ejecutivo")),
+        ("scope and evidence", ("Scope and evidence", "Alcance y evidencia")),
+        ("findings", ("Findings", "Hallazgos")),
+        ("coverage summary", ("Coverage summary", "Resumen de cobertura")),
+        ("required corrections", ("Required corrections", "Correcciones requeridas")),
+        ("residual risk", ("Residual risk", "Riesgo residual")),
+        ("gate authorization", ("Gate authorization", "Autorización del gate")),
+    ]
+    for name, headings in required_sections:
+        if not any(re.search(rf"(?im)^##\s+.*{re.escape(heading)}", text) for heading in headings):
+            errors.append(f"Missing section: {name}.")
+
+    findings = list(FINDING_RE.finditer(text))
+    open_blocking_severities: list[str] = []
+    seen: set[str] = set()
+    for index, match in enumerate(findings):
+        finding_id = match.group(1)
+        if finding_id in seen:
+            errors.append(f"Duplicate finding ID: {finding_id}.")
+        seen.add(finding_id)
+        end = findings[index + 1].start() if index + 1 < len(findings) else len(text)
+        block = text[match.start():end]
+        severity = SEVERITY_RE.search(block)
+        status = STATUS_RE.search(block)
+        blocks = BLOCK_RE.search(block)
+        if not severity:
+            errors.append(f"{finding_id} is missing Severity/Severidad.")
+        if not status:
+            errors.append(f"{finding_id} is missing Status/Estado.")
+        if not blocks:
+            errors.append(f"{finding_id} is missing Blocks action/Bloquea acción.")
+        required_fields = [
+            ("evidence", ("Evidence", "Evidencia")),
+            ("affected artifacts", ("Affected artifacts", "Artefactos afectados")),
+            ("consequence", ("Consequence", "Consecuencia")),
+            ("required correction", ("Required correction", "Corrección requerida")),
+            ("verification", ("Verification", "Verificación")),
+        ]
+        for name, labels in required_fields:
+            if not field_present(block, labels):
+                errors.append(f"{finding_id} is missing {name}.")
+        if (
+            severity
+            and status
+            and severity.group(1) in {"Critical", "High", "Medium"}
+            and status.group(1) == "Open"
+        ):
+            open_blocking_severities.append(finding_id)
+
+    if verdict_match and verdict_match.group(1) != "FAIL" and open_blocking_severities:
+        errors.append(
+            "Non-FAIL verdict conflicts with open Critical/High/Medium findings: "
+            + ", ".join(open_blocking_severities)
+        )
+    if verdict_match and verdict_match.group(1) == "PASS" and findings:
+        open_findings = []
+        for index, match in enumerate(findings):
+            end = findings[index + 1].start() if index + 1 < len(findings) else len(text)
+            status = STATUS_RE.search(text[match.start():end])
+            if status and status.group(1) == "Open":
+                open_findings.append(match.group(1))
+        if open_findings:
+            errors.append("PASS conflicts with open findings: " + ", ".join(open_findings))
+
+    for error in errors:
+        print(f"ERROR: {error}")
+    if errors:
+        print(f"FAILED: {len(errors)} error(s)")
+        return 1
+    print(f"OK: report schema and verdict consistency passed ({len(findings)} finding(s))")
+    return 0
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    preflight = subparsers.add_parser("preflight")
+    preflight.add_argument("folder", type=Path)
+    preflight.add_argument("--language", choices=("en", "es"), required=True)
+
+    report = subparsers.add_parser("report")
+    report.add_argument("file", type=Path)
+
+    args = parser.parse_args()
+    if args.command == "preflight":
+        return run_preflight(args.folder.resolve(), args.language)
+    return run_report(args.file.resolve())
+
+
+if __name__ == "__main__":
+    sys.exit(main())

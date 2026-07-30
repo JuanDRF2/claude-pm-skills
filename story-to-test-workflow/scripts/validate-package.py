@@ -51,8 +51,17 @@ ES_MARKERS = re.compile(
 )
 
 
+AUDIT_ARTIFACTS = {
+    "11-refinement-judge-report.md",
+}
+
+
 def read_files(root: Path) -> dict[Path, str]:
-    return {path: path.read_text(encoding="utf-8") for path in root.rglob("*.md")}
+    return {
+        path: path.read_text(encoding="utf-8")
+        for path in root.rglob("*.md")
+        if path.relative_to(root).as_posix() not in AUDIT_ARTIFACTS
+    }
 
 
 def definitions(files: dict[Path, str], prefix: str) -> set[str]:
@@ -147,6 +156,29 @@ def strict_checks(root: Path, files: dict[Path, str]) -> tuple[list[str], list[s
         decision = re.search(r"Automatizaci[oó]n:\*\*\s*([^\n]+)", block, re.IGNORECASE)
         if decision and decision.group(1).strip() not in {"Automate now", "Automate later", "Manual", "Blocked"}:
             errors.append(f"{sc_id} has an unsupported canonical automation decision: {decision.group(1).strip()}.")
+        given_match = re.search(
+            r"(?im)^(?:-\s*)?\*\*(?:Given|Dado)\*\*\s*:?\s*([^\n]+)",
+            block,
+        )
+        if given_match:
+            given = given_match.group(1).strip()
+            opaque_reference = re.search(
+                r"\b(?:dataset|data\s+set|matrix|matriz|fixture)\b|"
+                r"\b(?:CYCLE|TAX|CASE|CASO)-[A-Z0-9]+(?:-[A-Z0-9]+)+\b",
+                given,
+                re.IGNORECASE,
+            )
+            qa_executes_reference = re.search(
+                r"\bQA\b.*\b(?:executes?|ejecuta|runs?|corre)\b",
+                given,
+                re.IGNORECASE,
+            )
+            if opaque_reference or qa_executes_reference:
+                errors.append(
+                    f"{sc_id} uses a matrix, dataset, or QA instruction as its Given/Dado. "
+                    "State the business context, relevant configuration, and representative values "
+                    "in the scenario; move the dataset ID or link to a test-data line after the behavior."
+                )
 
     for jira in (root / "jira").glob("US-*.md") if (root / "jira").is_dir() else []:
         jira_blocks = acceptance_blocks(jira.read_text(encoding="utf-8"))

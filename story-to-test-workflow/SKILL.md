@@ -63,7 +63,7 @@ Do not ask about information already clear. Preserve universal IDs such as `BR-`
 
 ## Key Concepts
 
-### One Entry Point, Seven Specialist Skills
+### One Entry Point, Eight Specialist Skills
 
 Use these local skills as the source of truth for each phase:
 
@@ -71,9 +71,10 @@ Use these local skills as the source of truth for each phase:
 2. `skills/user-story-splitting/SKILL.md`
 3. `skills/user-story/SKILL.md`
 4. `skills/test-case-designer/SKILL.md`
-5. `skills/build-refinement-portal/SKILL.md`
-6. `skills/build-refinement-document/SKILL.md`
-7. `skills/publish-refinement-to-notion/SKILL.md`
+5. `skills/refinement-judge/SKILL.md`
+6. `skills/build-refinement-portal/SKILL.md`
+7. `skills/build-refinement-document/SKILL.md`
+8. `skills/publish-refinement-to-notion/SKILL.md`
 
 Before executing a phase, read that skill completely and follow its current instructions. Do not copy its full methodology into this orchestrator.
 
@@ -141,6 +142,7 @@ artifacts/<project-name>/
 ├── 07-functional-test-cases.md
 ├── 08-traceability-and-risks.md
 ├── 09-package-index.md
+├── 11-refinement-judge-report.md
 ├── jira/US-[ID].md
 └── handoffs/{dev-handoff,qa-handoff}.md
 ```
@@ -307,6 +309,8 @@ Within each criterion, create one or more stable `SC-*` headings, then render re
 
 Write acceptance criteria in product language before technical language. A reader must understand the actor, action, outcome, validation and consequence without knowing internal object names or architecture. Put required terms such as `Subscription`, `Commitment`, Agreements, events, idempotency or correlation IDs in a separate `Consideración técnica` or `Evidencia técnica` line. Do not use compressed shorthand such as `Draft+Commitment`, `Payments→Canceled`, `preview=cronograma`, “no deja parcial”, or slash-separated outcomes.
 
+Read `references/matrix-decision.md` when requirements contain interacting settings, states, permissions, calculations, boundaries, or reusable datasets. Apply its deterministic matrix assessment before creating a decision table or parameterized dataset. A matrix is optional supporting evidence and must never replace the business context, representative values, action, or expected outcome in a canonical `SC-*`.
+
 ### Phase 4: Design Test Coverage
 
 Use `test-case-designer` on approved stories and criteria. Produce:
@@ -325,7 +329,7 @@ Do not compress a workflow walkthrough into one scenario by listing several acti
 
 Read `references/qa-design-handoff.md`. Treat `CHK-*` as coverage units, not executable files. Treat `FTC-*` as QA review units, not TestManager keys. Reuse the exact `SC-*` IDs and approved behavior from the criteria; add QA metadata without creating parallel scenarios.
 
-Apply the `test-case-designer` executability gate before Gate 4 approval. Do not call a scenario QA-ready merely because Given/When/Then headings exist.
+Apply the `test-case-designer` Gherkin clarity and executability gates before Gate 4 approval. Keep those checks internal rather than adding a repeated checklist to the artifacts. For existing approved or automated scenarios, preserve IDs, traceability, behavior and automation metadata; propose clarifications and obtain approval instead of rewriting them silently. Do not call a scenario QA-ready merely because Given/When/Then headings exist.
 
 Keep scenario executability and automation separate. For every `SC-*`, record `Automate`, `Manual`, `Later`, or `To define`; include the reason, priority, lowest useful level, dependencies, and `Not started`, `Planned`, or `Implemented` coverage status. Never report execution results in this workflow.
 
@@ -355,11 +359,21 @@ Read `references/artifact-contract.md` and verify:
 - Artifact language matches the confirmed output contract
 - Project and delivery statuses are not conflated
 
-Run `scripts/validate-package.py <artifact-folder> --language <code> --strict` and fix errors. Strict validation checks ID ranges, Gherkin clarity, Jira/master parity, readiness, check-to-scenario traceability, and the functional-case schema. Return a concise handoff containing completed artifacts, decisions, open questions, owners, and the recommended next action.
+Run `scripts/validate-package.py <artifact-folder> --language <code> --strict` and fix errors. Strict validation checks ID ranges, Gherkin clarity, Jira/master parity, readiness, check-to-scenario traceability, and the functional-case schema.
+
+After deterministic validation succeeds, invoke `refinement-judge` as an independent adversarial gate. Give it the original sources, approved decisions, current Markdown package, confirmed language, and intended next action. Do not give it the generating skill's conclusions or suspected findings. Require `11-refinement-judge-report.md` and a validated verdict.
+
+- `PASS`: continue.
+- `PASS WITH OBSERVATIONS` / `PASS CON OBSERVACIONES`: continue while preserving findings.
+- `FAIL`: return findings to the appropriate phase, obtain owner-approved corrections, rerun deterministic validation, and rerun the Judge against a new snapshot.
+
+Do not publish externally, create or update Jira tickets, or represent the final DEV/QA handoff as approved after `FAIL`. A human may explicitly accept named findings for one named action; record the override in the Judge report without changing its verdict.
+
+Return a concise handoff containing completed artifacts, Judge verdict, decisions, open questions, owners, and the recommended next action.
 
 ### Phase 6: Choose Final Presentations
 
-After Phase 5 succeeds, confirm that the canonical Markdown package is complete. Then open **Gate 5: Publication and export** and ask what additional presentation the user wants:
+After deterministic validation succeeds and the Judge returns `PASS` or `PASS WITH OBSERVATIONS` / `PASS CON OBSERVACIONES`, confirm that the canonical Markdown package is complete. Then open **Gate 5: Publication and export** and ask what additional presentation the user wants:
 
 1. Portal HTML local
 2. Documento Word
@@ -373,9 +387,13 @@ Route each selected output:
 
 - **Portal:** use `build-refinement-portal`; generate a self-contained local HTML, recommended as `10-refinement-portal.html` when available.
 - **Word:** use `build-refinement-document`; generate and visually verify a `.docx`, choosing the next free numbered filename.
-- **Notion:** use `publish-refinement-to-notion`; confirm workspace and destination, publish only with authorization, then verify by reading the result.
+- **Notion:** use `publish-refinement-to-notion`; confirm workspace and destination, publish only with authorization, then verify by reading the result. Classify the action as:
+  - `Publicación completa` when the user asks to publish or republish the refinement without limiting pages. Require the portada, every story page and the six native auxiliary pages.
+  - `Actualización localizada` when the user explicitly names affected stories, sections or pages. Preserve the rest and update cover facts whose truth changed.
 
 Generate every presentation from approved Markdown, never from another derived presentation. A user may select several formats; produce them independently so HTML, Word and Notion cannot silently drift through chained conversion.
+
+When the package contains a canonical matrix, every selected presentation must render it as navigable content or provide a valid destination-native link. Consumer stories still include the relevant input and expected values, so a reviewer can understand and approve each scenario without opening the matrix. Never leave a local filesystem path as the only matrix reference in Notion, Word, Portal, Jira, or another derived view.
 
 For external publication, preserve safety:
 
@@ -383,7 +401,9 @@ For external publication, preserve safety:
 - Hosted portal: offer private hosting only after validating the local HTML; require informed confirmation before public hosting.
 - Word: do not deliver internal render PNGs unless requested.
 
-Update `00-workflow-state.md` and `09-package-index.md` with every selected format, local path or URL, generation date, scope and status. Record declined outputs as `Not requested`, not as missing work. Do not mark the project incomplete because the user declines optional presentations.
+Update `00-workflow-state.md` and `09-package-index.md` with every selected format, local path or URL, generation date, publication mode, scope, status and page manifest. Record declined outputs as `Not requested`, not as missing work. Do not mark the project incomplete because the user declines optional presentations.
+
+After a Notion publication, rerun `refinement-judge` in presentation-parity mode against the same canonical snapshot and the pages just verified. A complete publication must fail parity when a required auxiliary page is absent, stale, duplicated, incorrectly linked or marked `No aplica` despite an applicable canonical source. A localized update is judged against its declared scope and the cover facts it changed.
 
 ## State and Resumption
 
@@ -408,93 +428,15 @@ At each gate, maintain a compact state summary. The instant a gate is approved, 
 - Artifact language/audiences:
 - Optional presentations selected:
 - Presentation paths or URLs:
+- Notion publication mode and page manifest:
 - Project status and delivery statuses:
 ```
 
 When the user returns later, continue from this state instead of restarting. If source material changed, identify what downstream artifacts may now be stale.
 
-## Examples
+## Examples and Pitfalls
 
-### Guided Membership Opening
-
-User:
-
-> We need individual, family, and gift membership purchases online.
-
-Good response:
-
-> I recommend Guided mode because several flows share a checkout but differ in membership ownership and communication rules. I understand that all three are online purchases. To map them correctly:
->
-> 1. Can each type be purchased as a guest, after login, or both?
-> 2. For an individual membership, is the buyer always the holder?
-> 3. Which flow should provide the first usable release?
->
-> If an answer is not decided, say “unknown”; I will record it rather than invent a rule.
-
-Why this works: it acknowledges known information, asks only three related questions, explains how to handle unknowns, and does not jump directly to stories.
-
-### Continue From Existing Stories
-
-User:
-
-> These stories are already approved. Create the test coverage.
-
-Good behavior:
-
-1. Start at Phase 4.
-2. Audit whether the stories contain enough confirmed behavior.
-3. Ask only blocking questions.
-4. Do not remap or rewrite approved stories unless a coverage gap reveals a contradiction.
-
-## Common Pitfalls
-
-### Pitfall 1: Questionnaire Dump
-
-**Symptom:** Ask twenty questions covering every possible phase.
-
-**Consequence:** The user cannot tell what matters now and abandons the workflow.
-
-**Fix:** Ask one to three related questions based on the current phase and previous answer.
-
-### Pitfall 2: Generating Everything Before Confirmation
-
-**Symptom:** Produce a map, backlog, criteria, and tests from a short paragraph.
-
-**Consequence:** Polished output hides invented rules and expensive rework.
-
-**Fix:** Use decision gates and keep provisional work clearly labeled.
-
-### Pitfall 3: Repeating Questions
-
-**Symptom:** Ask for information already present in notes or earlier answers.
-
-**Consequence:** The workflow feels mechanical and loses trust.
-
-**Fix:** Maintain workflow state and treat supplied context as answered.
-
-### Pitfall 4: Technical Questions to the Wrong Person
-
-**Symptom:** Ask a business stakeholder to design retry architecture or a developer to choose an unconfirmed membership policy.
-
-**Consequence:** The wrong role accidentally defines behavior.
-
-**Fix:** Route decisions to the appropriate owner and explain the user-visible consequence in plain language.
-
-### Pitfall 5: Orchestrator Replaces Specialist Skills
-
-**Symptom:** Reimplement simplified mapping, splitting, stories, and tests inside this file.
-
-**Consequence:** Methods drift and improvements to specialist skills are ignored.
-
-**Fix:** Read and apply the relevant local skill at each phase; keep this skill focused on sequence, interaction, state, and gates.
-
-### Pitfall 6: Approval Becomes Bureaucracy
-
-**Symptom:** Stop after every small detail or require all roles to be present synchronously.
-
-**Consequence:** The workflow slows work without reducing meaningful risk.
-
-**Fix:** Gate only decisions that materially affect product behavior, scope, or test validity. Record missing owners for asynchronous confirmation.
+Read `references/examples-and-pitfalls.md` only when the user requests an example, interaction quality is being reviewed, or the workflow shows questionnaire dumps, premature generation, repeated questions, role confusion, specialist-skill drift, or excessive approval pauses. Keep the phases, gates, state, and specialist routing in this file authoritative.
 
 ## References
 
@@ -504,6 +446,9 @@ Good behavior:
 - `references/rule-governance.md` — Sources, authority, contradictions, and rule consolidation
 - `references/readiness-and-approvals.md` — Backlog states, role readiness, and block approvals
 - `references/qa-design-handoff.md` — Boundary between QA design and downstream TestManager artifacts
+- `references/matrix-decision.md` — Deterministic rule for creating matrices without making scenarios depend on them
+- `references/examples-and-pitfalls.md` — Worked examples and common interaction failure patterns
+- `skills/refinement-judge/SKILL.md` — Independent adversarial gate before consequential actions
 - `skills/user-story-mapping/SKILL.md` — Journey, rules, variations, and release slices
 - `skills/user-story-splitting/SKILL.md` — Vertical decomposition and sequencing
 - `skills/user-story/SKILL.md` — User stories and acceptance criteria

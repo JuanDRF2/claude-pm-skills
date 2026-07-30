@@ -119,6 +119,13 @@ Read `references/test-design-techniques.md` and choose only applicable technique
 
 List dimensions, meaningful values or states, applicable rules, technique, priority, and planned test level. Consolidate equivalent combinations before writing cases.
 
+First apply the matrix suitability rule:
+
+- Create a matrix when at least two independent variables change the rule or expected result and yield four or more meaningful combinations; when exact calculations or boundaries are high risk; or when the same controlled dataset is reused by multiple stories or flows.
+- Do not create one for a linear journey, one changing variable, two or three cases that are clearer as scenarios, or variations with the same outcome.
+- Do not generate the full Cartesian product automatically. Use complete coverage for high-risk financial, permission, identity, destructive, or lifecycle interactions; otherwise use boundaries, equivalence classes, or justified pairwise sampling.
+- Record variables, meaningful combination count, whether the outcome changes, omission risk, reuse, decision, technique, and rationale. Record `Matrix not needed` when declining one.
+
 ### Step 5: Choose the Lowest Useful Test Level
 
 Prefer the least expensive level that can prove the behavior:
@@ -159,10 +166,21 @@ Start from the canonical `SC-*` scenarios under the acceptance criteria. Group t
 - Do not put a sequence of test actions in one `When` such as “searches, filters, clears, saves and retries”. Do not join unrelated outcomes in one `Then` with semicolons, arrows, plus signs, slashes or equals signs.
 - Keep several expected results together only when one primary event must produce all of them for the business outcome to be complete.
 - Explain exact UI or domain labels when needed, while keeping the surrounding sentence natural.
+- Treat matrix and dataset IDs as supporting test data, never as the business precondition. The scenario itself must state the relevant configuration, representative values, action, and expected result. Put the ID or link afterward under test data.
+- Keep rows parameterized only when their business event and expected-result structure are the same. Split materially different rules, triggers, validation paths, or outcomes into separate scenarios.
 
 Apply a readability gate before the executability gate: hide traceability metadata and technical evidence, then confirm that a product stakeholder can still explain who acts, what happens and what result is expected.
 
-Read `references/executability-gate.md`. Before approving a handoff, require each scenario to identify a known initial state, necessary data or a data strategy, a reproducible primary event, observable results, evidence locations, and any blocker. Multiple inseparable actions are allowed; do not enforce exactly one `When` keyword as a universal rule.
+Read `references/executability-gate.md`. Apply its Gherkin clarity check before approving a scenario: require a concrete initial state, one recognizable primary business event, specific observable results, relevant exact values, and explicit unchanged behavior when regression risk makes it material. Reject vague outcomes such as “works correctly”, “processes successfully”, “updates the information”, or equivalent wording unless the scenario names the resulting state and evidence. Multiple inseparable actions are allowed; do not enforce exactly one `When` keyword as a universal rule.
+
+Keep this quality control internal to test design. Do not add a repeated clarity checklist below every scenario or change the output schema.
+
+For existing packages, audit progressively:
+
+- Preserve an existing scenario unchanged when it passes the clarity and executability checks.
+- Propose an editorial clarification without changing its `SC-*` ID, traceability, behavior, or automation metadata when the meaning is confirmed but wording is vague.
+- Mark `Needs refinement` and raise a question when concrete behavior, data, unchanged state, or expected evidence is unknown; never invent the missing detail.
+- Do not rewrite an approved or automated scenario without showing the current wording, proposed wording, reason, and impact, then obtaining the applicable approval.
 
 Classify automation for every `SC-*` as **Automate now**, **Automate later**, **Manual**, or **Blocked**. Write that strategy directly below the canonical scenario under its acceptance criterion so the story is self-contained. Include rationale, priority, lowest useful level, dependencies, and implementation status. Derived FTC, Jira and publication views must reuse those fields verbatim and must never recalculate the decision. Keep this separate from executability: `Ready` means QA can execute the scenario reproducibly, not that automation is valuable or already implemented. Default implementation status to `Not started`; execution results remain downstream.
 

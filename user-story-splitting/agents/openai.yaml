@@ -1,0 +1,4 @@
+interface:
+  display_name: "User Story Splitting"
+  short_description: "Split large work into valuable stories"
+  default_prompt: "Use $user-story-splitting to split this large story or epic into smaller, valuable, testable, and deliberately sequenced backlog items."

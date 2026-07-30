@@ -56,6 +56,8 @@ Before handoff, confirm that every expected file is either present or explicitly
 
 Run `python3 skills/story-to-test-workflow/scripts/validate-package.py artifacts/<project> --language <code>` and fix errors before handoff. Explain any accepted warnings.
 
+After deterministic validation, run `refinement-judge` and add `11-refinement-judge-report.md`. Link that report from `09-package-index.md` and show its verdict, reviewed snapshot and blocked/allowed next action. The report is an audit record; it does not replace the product artifacts or silently correct them.
+
 ## Project Versus Delivery Status
 
 Always show project and delivery status separately. Never describe the project as complete merely because one selected delivery passed Gate 4.

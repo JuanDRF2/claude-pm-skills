@@ -310,6 +310,24 @@ def build(artifact_dir: Path, output: Path) -> None:
     doc.add_paragraph("Documento de refinamiento", style="Heading 3")
     doc.add_paragraph(project, style="Title")
     callout(doc, "Propósito", "Reunir historias, criterios, reglas y pruebas relacionadas en una lectura documental clara.")
+    judge_report = read(artifact_dir / "11-refinement-judge-report.md")
+    if judge_report:
+        verdict_match = re.search(
+            r"^-\s*(?:Verdict|Veredicto)(?:\s*/\s*(?:Verdict|Veredicto))?\s*:\s*(.+)$",
+            judge_report,
+            re.M | re.I,
+        )
+        gate_match = re.search(
+            r"^-\s*(?:Gate decision|Decisión del gate)(?:\s*/\s*(?:Gate decision|Decisión del gate))?\s*:\s*(.+)$",
+            judge_report,
+            re.M | re.I,
+        )
+        callout(
+            doc,
+            "Refinement Judge",
+            f"Veredicto: {verdict_match.group(1).strip() if verdict_match else 'No reconocido'}. "
+            f"Decisión del gate: {gate_match.group(1).strip() if gate_match else 'No disponible'}.",
+        )
     doc.add_paragraph("Cómo leer", style="Heading 1")
     for label, meaning in (
         ("Historia de usuario (US):", "necesidad y valor."),
@@ -335,6 +353,22 @@ def build(artifact_dir: Path, output: Path) -> None:
             for line in match.group(1).splitlines():
                 if line.strip() and not line.startswith("|") and not re.match(r"^[-| ]+$", line):
                     doc.add_paragraph(re.sub(r"^[-# ]+", "", line).strip())
+
+    if judge_report:
+        doc.add_page_break()
+        doc.add_paragraph("Refinement Judge", style="Title")
+        for line in judge_report.splitlines():
+            stripped = line.strip()
+            if not stripped or stripped.startswith("# Refinement Judge"):
+                continue
+            heading = re.match(r"^(#{2,4})\s+(.+)$", stripped)
+            if heading:
+                level = min(len(heading.group(1)) - 1, 3)
+                doc.add_paragraph(heading.group(2), style=f"Heading {level}")
+            elif stripped.startswith(("- ", "* ")):
+                doc.add_paragraph(stripped[2:], style="List Bullet")
+            elif not stripped.startswith("|"):
+                doc.add_paragraph(stripped)
 
     output.parent.mkdir(parents=True, exist_ok=True)
     doc.core_properties.title = f"Documento de refinamiento — {project}"

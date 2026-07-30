@@ -11,6 +11,7 @@ Aceptar nombres equivalentes, pero preferir esta estructura:
 | `06-test-coverage.md` | Definición canónica de cada comprobación `CHK` |
 | `07-functional-test-cases.md` | Casos funcionales `FTC` y escenarios `SC` |
 | `08-traceability-and-risks.md` | Trazabilidad, bloqueos, revisiones pendientes y riesgo residual |
+| `11-refinement-judge-report.md` | Veredicto adversarial, hallazgos y autorización del gate, cuando exista |
 
 ## Relaciones
 
@@ -51,6 +52,18 @@ Incluir únicamente:
 - riesgos residuales relevantes para la historia.
 
 Excluir matrices `AC → BR → CHK → SC`; pertenecen a cobertura o trazabilidad.
+
+## Refinement Judge
+
+Cuando exista `11-refinement-judge-report.md`, mostrar en el encabezado del proyecto:
+
+- nombre completo `Refinement Judge`;
+- veredicto;
+- fecha y snapshot revisado;
+- acción permitida o bloqueada;
+- enlace o sección navegable con hallazgos.
+
+No representar un `FAIL` como “documento aprobado”. No recalcular el veredicto ni ocultar hallazgos abiertos.
 
 ## Compatibilidad de idioma
 

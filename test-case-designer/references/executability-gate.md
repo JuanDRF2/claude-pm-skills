@@ -17,8 +17,23 @@ Mark each scenario Ready only when all applicable items are present:
 9. Product readability: after hiding IDs, fixtures and technical evidence, the scenario still states a recognizable actor, one reproducible primary action and an understandable business result in complete sentences.
 10. Scenario boundary: materially different actions, validation paths, failures or recovery outcomes are not compressed into one `When/Then` sequence.
 11. Criterion ownership: the acceptance criterion states an explicit acceptance condition and Product and QA reuse the same stable scenario ID.
+12. Gherkin clarity: after hiding traceability and technical metadata, the scenario identifies a recognizable actor or trigger, a concrete initial state, one primary business event, and specific observable results in complete product-language sentences.
+13. Precision: use exact values, states, recipients, dates, limits, or record effects whenever they change the expected result; do not rely on “valid”, “appropriate”, “correctly”, “successfully”, “the information”, “process”, or “update” without naming what those terms mean in this scenario.
+14. Unchanged behavior: when the action could affect related records, balances, payments, memberships, recipients, dates, statuses, or configurations, state what must remain unchanged or record why that assertion is not applicable.
+15. Execution separation: keep UI click-by-click instructions, fixtures, environment setup, and technical evidence outside the canonical Given/When/Then unless they are themselves approved product behavior.
 
 Use `Needs refinement` when behavior is confirmed but execution detail is missing. Use `Blocked` when a valid expected result or execution is impossible. Approval means ready for downstream implementation, not executed or passed.
+
+## Progressive review of existing scenarios
+
+Do not invalidate or rewrite an existing approved package merely because this gate was introduced later.
+
+- **Passes:** preserve the scenario and its IDs without change.
+- **Editorial ambiguity with confirmed meaning:** propose clearer wording and request approval before replacing the canonical scenario.
+- **Missing product decision or evidence:** preserve the current text, mark `Needs refinement` or `Blocked`, and record the question and owner.
+- **Already automated:** preserve scenario boundaries and automation metadata until the impact of the proposed clarification is reviewed.
+
+Apply all checks obligatorily to new scenarios and to existing scenarios when they are modified, prepared for execution, or selected for automation.
 
 ## Basis
 
