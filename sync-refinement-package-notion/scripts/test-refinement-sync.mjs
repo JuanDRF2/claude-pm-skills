@@ -255,7 +255,7 @@ try {
     pages: directTree.pages.map((page) => {
       const id = page.id.replace("discover", "internal");
       let parent_id = page.parent_id.replace("discover", "internal");
-      if (["internal-package", "internal-audit", "internal-story", "internal-rules"].includes(id)) {
+      if (["internal-package", "internal-audit"].includes(id)) {
         parent_id = "internal-container";
       }
       return { ...page, id, parent_id };
@@ -269,7 +269,19 @@ try {
   writeJson("internal-tree.json", internalTree);
   const internalDiscover = run("discover", "internal-discovered", "--tree", "internal-tree.json");
   assert.equal(internalDiscover.status, 0, internalDiscover.stderr);
-  assert.equal(parse(internalDiscover).hierarchy_mode, "internal-container");
+  const internalDiscoverResult = parse(internalDiscover);
+  assert.equal(internalDiscoverResult.hierarchy_mode, "internal-container");
+  assert.equal(internalDiscoverResult.classification_complete, true);
+  // Presentations (cover/story/auxiliary pages) live as children of root, siblings of
+  // the internal container, per native-package-contract.md's hierarchy diagram — NOT
+  // nested inside the internal container alongside Paquete Markdown/Historial. A prior
+  // version of this discover logic scanned the wrong parent and silently dropped every
+  // presentation except the cover; regression-tested here.
+  assert.equal(internalDiscoverResult.presentations, 3);
+  assert.deepEqual(
+    internalDiscoverResult.candidate_manifest.presentations.map((item) => item.title).sort(),
+    ["Demo refinement", "Reglas y decisiones", "📖 US-DEMO-01 — Review"].sort(),
+  );
 
   const treeWithSharedContract = {
     ...directTree,

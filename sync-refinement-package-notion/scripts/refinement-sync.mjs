@@ -187,8 +187,8 @@ if (command === "discover") {
     drift_policy: "review",
   });
   const presentations = [presentation(root, "cover")];
-  for (const page of childrenOf(contentParent)) {
-    if ([packagePage.id, auditPage.id].includes(page.id)) continue;
+  for (const page of childrenOf(rootId)) {
+    if ([internal?.id, packagePage.id, auditPage.id].filter(Boolean).includes(page.id)) continue;
     if (fold(page.title).startsWith("contrato compartido")) {
       classifyUnknown(page, "shared contract requires its own manifest");
       continue;
