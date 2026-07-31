@@ -1,0 +1,4 @@
+interface:
+  display_name: "Sync Refinement Package Notion"
+  short_description: "Sincroniza refinamientos con Notion de forma segura"
+  default_prompt: "Usa $sync-refinement-package-notion para descubrir, registrar, comparar o publicar un paquete mediante Notion sin sobrescribir cambios concurrentes."

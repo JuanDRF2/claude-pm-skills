@@ -18,7 +18,7 @@ BR-03: A rejected payment does not create or activate a membership.
 Candidate story: US-MEM-01 — Guest buys an individual membership end to end.
 ```
 
-The splitting skill decides whether `US-MEM-01` is small enough. The user-story skill turns it into accepted behavior. The test-case skill later produces `TC-MEM-*` evidence.
+The splitting skill decides whether `US-MEM-01` is small enough. The user-story skill turns it into accepted behavior. The test-case skill later produces `FTC-MEM-*` functional cases and `SC-*` scenarios as evidence.
 
 ---
 

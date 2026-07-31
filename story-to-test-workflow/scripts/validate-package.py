@@ -12,17 +12,22 @@ ID_PATTERNS = {
     # A trailing [A-Za-z]? on each numeric segment supports user-story-splitting's own
     # "03a"/"03b" sub-story convention (e.g. US-MOS-03a, AC-MOS-03A-01, SC-MOS-03A-01-01)
     # — split IDs are an expected output of that skill, not an edge case to special-case away.
-    "BR": re.compile(r"\bBR-\d{2,}\b"),
+    # BR also accepts an optional project-prefix segment (e.g. BR-MOS-01) in addition to BR-01.
+    "BR": re.compile(r"\bBR-(?:[A-Z0-9]+-)?\d{2,}\b"),
     "US": re.compile(r"\bUS-[A-Z0-9]+-\d{2,}[A-Za-z]?\b"),
     "AC": re.compile(r"\bAC-[A-Z0-9]+-\d{2,}[A-Za-z]?-\d{2,}[A-Za-z]?\b"),
     "TC": re.compile(r"\bTC-[A-Z0-9]+-\d{3,}\b"),
     "CHK": re.compile(r"\bCHK-[A-Z0-9]+-\d{3,}\b"),
     "FTC": re.compile(r"\bFTC-[A-Z0-9]+-\d{2,}\b"),
     "SC": re.compile(r"\bSC-[A-Z0-9]+-\d{2,}[A-Za-z]?-\d{2,}[A-Za-z]?(?:-\d{2,}[A-Za-z]?)?\b"),
+    "DELTA": re.compile(r"\bDELTA-[A-Z0-9]+-\d{3,}\b"),
+    "MAP": re.compile(r"\bMAP-[A-Z0-9]+-\d{2,}\b"),
 }
 
 RANGE_PATTERN = re.compile(
-    r"\b((?:BR-\d{2,}|(?:TC|CHK)-[A-Z0-9]+-\d{3,}))\s*[–—-]\s*((?:BR-)?\d{2,}|(?:(?:TC|CHK)-[A-Z0-9]+-)?\d{3,})\b"
+    r"\b((?:BR-(?:[A-Z0-9]+-)?\d{2,}|(?:TC|CHK)-[A-Z0-9]+-\d{3,}))"
+    r"\s*[–—-]\s*"
+    r"((?:BR-(?:[A-Z0-9]+-)?\d{2,}|(?:BR-)?\d{2,}|(?:(?:TC|CHK)-[A-Z0-9]+-)?\d{3,}))\b"
 )
 
 EXPECTED = [
@@ -39,6 +44,10 @@ EXPECTED = [
     "handoffs/qa-handoff.md",
 ]
 
+AUDIT_ARTIFACTS = {
+    "11-refinement-judge-report.md",
+}
+
 EN_MARKERS = re.compile(
     r"\b(Project|Status|Last updated|Approved through|User Story|Acceptance Criteria|"
     r"Expected Results|Preconditions|Actions|Rules|Risk|Test Cases)\b",
@@ -49,11 +58,6 @@ ES_MARKERS = re.compile(
     r"Criterios de aceptación|Resultados esperados|Precondiciones|Acciones|Reglas|Riesgo|Casos de prueba)\b",
     re.IGNORECASE,
 )
-
-
-AUDIT_ARTIFACTS = {
-    "11-refinement-judge-report.md",
-}
 
 
 def read_files(root: Path) -> dict[Path, str]:
@@ -109,14 +113,147 @@ def acceptance_blocks(text: str) -> dict[str, str]:
     return blocks
 
 
+def definition_blocks(files: dict[Path, str], prefix: str) -> dict[str, str]:
+    """Extract heading/table definition blocks for incremental contract checks."""
+    pattern = ID_PATTERNS[prefix]
+    blocks: dict[str, str] = {}
+    for text in files.values():
+        headings = list(
+            re.finditer(r"^#{1,6}\s+.*?(" + pattern.pattern + r").*$", text, re.MULTILINE)
+        )
+        for index, hit in enumerate(headings):
+            end = headings[index + 1].start() if index + 1 < len(headings) else len(text)
+            blocks.setdefault(hit.group(1), text[hit.start():end])
+        for line in text.splitlines():
+            match = re.match(r"^\|\s*(" + pattern.pattern + r")\s*\|", line)
+            if match:
+                blocks.setdefault(match.group(1), line)
+    return blocks
+
+
+def decision_checkpoint_checks(
+    root: Path, files: dict[Path, str]
+) -> tuple[list[str], list[str]]:
+    """Validate persisted decisions and mappings without requiring final-phase artifacts."""
+    errors: list[str] = []
+    warnings: list[str] = []
+    state = files.get(root / "00-workflow-state.md", "")
+    rules = files.get(root / "02-rules-and-questions.md", "")
+
+    checkpoint_fields = {
+        "last captured decision": r"(?:Last captured decision|Última decisión capturada)\s*:\s*([^\n]+)",
+        "last verified mapping": r"(?:Last verified mapping|Último mapping verificado|Último mapeo verificado)\s*:\s*([^\n]+)",
+        "rules changed": r"(?:Rules changed since last gate|Reglas modificadas desde el último gate|Reglas modificadas desde la última aprobación)\s*:\s*([^\n]+)",
+        "stale stories": r"(?:Stale stories|Historias desactualizadas)\s*:\s*([^\n]+)",
+        "stale acceptance criteria": r"(?:Stale acceptance criteria|Criterios de aceptación desactualizados)\s*:\s*([^\n]+)",
+        "stale test artifacts": r"(?:Stale test artifacts|Artefactos de prueba desactualizados)\s*:\s*([^\n]+)",
+        "unresolved mapping questions": r"(?:Unresolved mapping questions|Preguntas de mapping sin resolver|Preguntas de mapeo sin resolver)\s*:\s*([^\n]+)",
+        "last incremental validation": r"(?:Last incremental validation|Última validación incremental)\s*:\s*([^\n]+)",
+        "next reconciliation gate": r"(?:Next reconciliation gate|Próximo gate de reconciliación|Próxima aprobación de reconciliación)\s*:\s*([^\n]+)",
+    }
+    values: dict[str, str] = {}
+    for name, pattern in checkpoint_fields.items():
+        match = re.search(pattern, state, re.IGNORECASE)
+        if not match or not match.group(1).strip():
+            errors.append(f"Decision Checkpoint is missing a value for {name}.")
+        else:
+            values[name] = match.group(1).strip()
+
+    captured = values.get("last captured decision", "")
+    if captured and not ID_PATTERNS["BR"].search(captured):
+        errors.append("Last captured decision must reference a BR-* ID.")
+    verified_mapping = values.get("last verified mapping", "")
+    if verified_mapping and not (
+        ID_PATTERNS["MAP"].search(verified_mapping)
+        or re.fullmatch(r"(?:None|Ninguno|No aplica|N/?A)", verified_mapping, re.IGNORECASE)
+    ):
+        errors.append("Last verified mapping must reference MAP-* or explicitly say None.")
+
+    mapping_blocks = definition_blocks(files, "MAP")
+    required_mapping_fields = {
+        "canonical field": r"(?:Canonical field|Campo can[oó]nico)\s*:",
+        "provider": r"(?:Provider|Proveedor)\s*:",
+        "external field": r"(?:External field|Campo externo)\s*:",
+        "direction": r"(?:Direction|Direcci[oó]n)\s*:",
+        "transformation": r"(?:Transformation|Transformaci[oó]n)\s*:",
+        "conditions": r"(?:Conditions|Condiciones)\s*:",
+        "propagation": r"(?:Propagation|Propagaci[oó]n)\s*:",
+        "exclusions": r"(?:Exclusions|Exclusiones)\s*:",
+        "unsupported behavior": r"(?:Unsupported behavior|Comportamiento no soportado)\s*:",
+        "conflict policy": r"(?:Conflict policy|Pol[ií]tica de conflictos)\s*:",
+        "observability": r"(?:Observability|Observabilidad)\s*:",
+        "traceability": r"(?:Traceability|Trazabilidad)\s*:",
+    }
+    for map_id, block in sorted(mapping_blocks.items()):
+        missing = [
+            name
+            for name, pattern in required_mapping_fields.items()
+            if not re.search(pattern, block, re.IGNORECASE)
+        ]
+        if missing:
+            errors.append(f"{map_id} is missing mapping fields: {', '.join(missing)}")
+        direction = re.search(
+            r"(?:Direction|Direcci[oó]n)\s*:\s*`?([^`\n]+)", block, re.IGNORECASE
+        )
+        if direction and not re.search(
+            r"\b(?:Inbound|Outbound|Bilateral|Entrada|Salida|Bidireccional)\b",
+            direction.group(1),
+            re.IGNORECASE,
+        ):
+            errors.append(f"{map_id} must declare Inbound, Outbound or Bilateral direction.")
+
+    sync_terms = re.compile(
+        r"\b(?:sync\w*|synchroni[sz]\w*|sincroniz\w*|migration\w*|migraci[oó]n|"
+        r"import\w*|export\w*|propagat\w*|propagaci[oó]n|inbound|outbound|"
+        r"bidirectional|bidireccional)\b",
+        re.IGNORECASE,
+    )
+    for line in rules.splitlines():
+        if not line.startswith("|") or not ID_PATTERNS["BR"].search(line):
+            continue
+        if not re.search(r"\bConfirmed\b|\bConfirmad[ao]\b", line, re.IGNORECASE):
+            continue
+        if sync_terms.search(line) and not (
+            ID_PATTERNS["MAP"].search(line)
+            or re.search(
+                r"(?:Mapping|Mapeo)\s*:\s*(?:Not applicable|No aplica|Deferred|Diferido)",
+                line,
+                re.IGNORECASE,
+            )
+        ):
+            br_id = ID_PATTERNS["BR"].search(line).group()
+            errors.append(
+                f"{br_id} confirms integration/propagation behavior but has no MAP-* reference "
+                "or explicit deferred/not-applicable mapping."
+            )
+
+    if not mapping_blocks and sync_terms.search(rules):
+        warnings.append("Integration behavior is present but no MAP-* definition was found.")
+    return errors, warnings
+
+
 def strict_checks(root: Path, files: dict[Path, str]) -> tuple[list[str], list[str]]:
     errors: list[str] = []
     warnings: list[str] = []
     all_text = "\n".join(files.values())
+    state = files.get(root / "00-workflow-state.md", "")
+    rules = files.get(root / "02-rules-and-questions.md", "")
+    expanded_deltas = files.get(root / "10-design-and-spec-deltas.md", "")
+    delta_text = rules + "\n" + expanded_deltas
 
-    for match in RANGE_PATTERN.finditer(all_text):
+    ranged_definitions = set()
+    for line in rules.splitlines():
+        line = re.sub(r"`[^`]*`", "", line)
+        candidate = ""
+        if re.match(r"^#{1,6}\s+", line):
+            candidate = line
+        elif line.startswith("|"):
+            cells = [cell.strip() for cell in line.strip("|").split("|")]
+            candidate = cells[0] if cells else ""
+        ranged_definitions.update(match.group(0) for match in RANGE_PATTERN.finditer(candidate))
+    for item in sorted(ranged_definitions):
         warnings.append(
-            f"ID range must be expanded and each ID defined individually: {match.group(0)}"
+            f"ID range used as a definition; expand and define every ID individually: {item}"
         )
 
     master = acceptance_blocks(files.get(root / "05-user-stories.md", ""))
@@ -148,14 +285,12 @@ def strict_checks(root: Path, files: dict[Path, str]) -> tuple[list[str], list[s
         if next_ac:
             block = block[:next_ac.start()]
         when_count = len(re.findall(r"\*\*(?:When|Cuando)(?:\*\*)?\s*:?(?=\s|$)", block, re.IGNORECASE))
+        # NOTE (merge 2026-07-31): personal required exactly one primary When/Cuando per SC-*;
+        # staging relaxed this to "at least one". Kept personal's stricter behavior here because
+        # it wasn't in the explicitly authorized staging adoption list (DELTA/MAP patterns,
+        # definition_blocks(), decision_checkpoint_checks()) — flagged in REPORT.md for a decision.
         if when_count != 1:
             errors.append(f"{sc_id} must contain exactly one primary When/Cuando event; found {when_count}.")
-        strategy_required = [r"Estrategia QA|QA Strategy", r"Automatizaci[oó]n\s*:", r"Nivel recomendado\s*:", r"Prioridad\s*:", r"Raz[oó]n\s*:", r"Dependencias\s*:", r"Estado\s*:"]
-        if any(not re.search(pattern, block, re.IGNORECASE) for pattern in strategy_required):
-            errors.append(f"{sc_id} is missing its canonical QA strategy fields in the story.")
-        decision = re.search(r"Automatizaci[oó]n:\*\*\s*([^\n]+)", block, re.IGNORECASE)
-        if decision and decision.group(1).strip() not in {"Automate now", "Automate later", "Manual", "Blocked"}:
-            errors.append(f"{sc_id} has an unsupported canonical automation decision: {decision.group(1).strip()}.")
         given_match = re.search(
             r"(?im)^(?:-\s*)?\*\*(?:Given|Dado)\*\*\s*:?\s*([^\n]+)",
             block,
@@ -179,6 +314,12 @@ def strict_checks(root: Path, files: dict[Path, str]) -> tuple[list[str], list[s
                     "State the business context, relevant configuration, and representative values "
                     "in the scenario; move the dataset ID or link to a test-data line after the behavior."
                 )
+        strategy_required = [r"Estrategia QA|QA Strategy", r"Automatizaci[oó]n\s*:", r"Nivel recomendado\s*:", r"Prioridad\s*:", r"Raz[oó]n\s*:", r"Dependencias\s*:", r"Estado\s*:"]
+        if any(not re.search(pattern, block, re.IGNORECASE) for pattern in strategy_required):
+            errors.append(f"{sc_id} is missing its canonical QA strategy fields in the story.")
+        decision = re.search(r"Automatizaci[oó]n:\*\*\s*([^\n]+)", block, re.IGNORECASE)
+        if decision and decision.group(1).strip() not in {"Automate now", "Automate later", "Manual", "Blocked"}:
+            errors.append(f"{sc_id} has an unsupported canonical automation decision: {decision.group(1).strip()}.")
 
     for jira in (root / "jira").glob("US-*.md") if (root / "jira").is_dir() else []:
         jira_blocks = acceptance_blocks(jira.read_text(encoding="utf-8"))
@@ -246,6 +387,50 @@ def strict_checks(root: Path, files: dict[Path, str]) -> tuple[list[str], list[s
 
     if not re.search(r"Ready for Sprint|List[oa] para Sprint", all_text, re.IGNORECASE):
         errors.append("No Ready for Sprint assessment found.")
+
+    derived_field = re.search(
+        r"(?:Derived artifacts|Artefactos derivados)\s*:\s*([^\n]+)",
+        state,
+        re.IGNORECASE,
+    )
+    if derived_field:
+        derived_value = derived_field.group(1).strip()
+        has_derived = not re.fullmatch(
+            r"(?:none|ninguno|ninguna|no aplica|not applicable|n/?a)",
+            derived_value,
+            re.IGNORECASE,
+        )
+        if has_derived:
+            if not re.search(r"(?:Canonical base snapshot|Snapshot can[oó]nico base)\s*:", state, re.IGNORECASE):
+                errors.append("Derived-artifact review must declare the canonical base snapshot, including Unknown when unavailable.")
+            if not re.search(r"(?:Source inventory|Inventario (?:y autoridad )?de fuentes)", delta_text, re.IGNORECASE):
+                errors.append("Derived-artifact review is missing its source-role inventory.")
+            if not re.search(r"(?:Design and specification deltas|Deltas de dise[nñ]o y especificaci[oó]n)", delta_text, re.IGNORECASE):
+                errors.append("Derived-artifact review is missing its design/specification delta ledger.")
+            if not re.search(r"(?:Product Boundary|Frontera de producto)", delta_text, re.IGNORECASE):
+                errors.append("Derived-artifact review is missing a Product Boundary result.")
+
+            unresolved_rows = [
+                line for line in delta_text.splitlines()
+                if ID_PATTERNS["DELTA"].search(line)
+                and re.search(r"\b(Proposed|Contradicted|Unverifiable|Propuesto|Contradicho|No verificable)\b", line, re.IGNORECASE)
+            ]
+            ready_yes = re.search(
+                r"(?:Ready for Sprint|List[oa] para Sprint)\s*:\s*(?:Yes|S[ií])\b",
+                all_text,
+                re.IGNORECASE,
+            )
+            if unresolved_rows and ready_yes:
+                errors.append("Ready for Sprint cannot be Yes while a material DELTA is Proposed, Contradicted, or Unverifiable.")
+    elif expanded_deltas or re.search(
+        r"\b(?:prototype|prototipo|figma|html|generated spec|spec generad[ao])\b",
+        delta_text,
+        re.IGNORECASE,
+    ):
+        errors.append(
+            "Workflow state must declare Derived artifacts / Artefactos derivados when derived-artifact evidence is present."
+        )
+
     if not functional and not re.search(r"Duplicate|Duplicad", tests, re.IGNORECASE):
         warnings.append("No duplicate/combination review found before detailed test cases.")
     native = [*root.rglob("*.testcase.yml"), *root.rglob("*.testplan.yml"), *root.rglob("*.testrun.yml")]
@@ -283,9 +468,10 @@ def validate(root: Path, language: str, strict: bool = False) -> tuple[list[str]
             errors.append(f"Jira views ({len(jira_files)}) are fewer than story IDs ({len(story_defs)}).")
 
     all_text = "\n".join(files.values())
+    traceability_text = re.sub(r"`[^`\n]*`", "", all_text)
     defined = {kind: definitions(files, kind) for kind in ID_PATTERNS}
     for kind, pattern in ID_PATTERNS.items():
-        referenced = set(pattern.findall(all_text))
+        referenced = set(pattern.findall(traceability_text))
         missing = sorted(referenced - defined[kind])
         if missing:
             errors.append(f"Referenced {kind} IDs without a definition: {', '.join(missing)}")
@@ -326,6 +512,14 @@ def validate(root: Path, language: str, strict: bool = False) -> tuple[list[str]
         strict_errors, strict_warnings = strict_checks(root, files)
         errors.extend(strict_errors)
         warnings.extend(strict_warnings)
+        checkpoint_present = re.search(
+            r"(?:Decision Checkpoint|Checkpoint de decisiones)", state, re.IGNORECASE
+        )
+        mapping_present = ID_PATTERNS["MAP"].search(all_text)
+        if checkpoint_present or mapping_present:
+            checkpoint_errors, checkpoint_warnings = decision_checkpoint_checks(root, files)
+            errors.extend(checkpoint_errors)
+            warnings.extend(checkpoint_warnings)
     return errors, warnings
 
 
@@ -334,11 +528,20 @@ def main() -> int:
     parser.add_argument("folder", type=Path)
     parser.add_argument("--language", choices=("en", "es"), required=True)
     parser.add_argument("--strict", action="store_true", help="Enable readiness, parity, Gherkin, range, and full test-schema checks")
+    parser.add_argument(
+        "--decision-checkpoint",
+        action="store_true",
+        help="Validate only the latest decision checkpoint and MAP contracts; final artifacts are not required",
+    )
     args = parser.parse_args()
     if not args.folder.is_dir():
         print(f"ERROR: package folder does not exist: {args.folder}")
         return 2
-    errors, warnings = validate(args.folder.resolve(), args.language, args.strict)
+    if args.decision_checkpoint:
+        files = read_files(args.folder.resolve())
+        errors, warnings = decision_checkpoint_checks(args.folder.resolve(), files)
+    else:
+        errors, warnings = validate(args.folder.resolve(), args.language, args.strict)
     for message in errors:
         print(f"ERROR: {message}")
     for message in warnings:

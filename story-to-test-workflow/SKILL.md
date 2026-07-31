@@ -63,7 +63,7 @@ Do not ask about information already clear. Preserve universal IDs such as `BR-`
 
 ## Key Concepts
 
-### One Entry Point, Eight Specialist Skills
+### One Entry Point, Nine Specialist Skills
 
 Use these local skills as the source of truth for each phase:
 
@@ -75,6 +75,7 @@ Use these local skills as the source of truth for each phase:
 6. `skills/build-refinement-portal/SKILL.md`
 7. `skills/build-refinement-document/SKILL.md`
 8. `skills/publish-refinement-to-notion/SKILL.md`
+9. `skills/sync-refinement-package-notion/SKILL.md`
 
 Before executing a phase, read that skill completely and follow its current instructions. Do not copy its full methodology into this orchestrator.
 
@@ -100,6 +101,14 @@ BR-01 → US-MEM-01 → AC-MEM-01-01 → CHK-MEM-001 → FTC-MEM-01 / SC-MEM-01-
 
 Never renumber silently between phases. If an item changes, record the change and update its links. Run the deterministic package validator before final handoff.
 
+### Decision Capture Transaction
+
+After every material approval, read and execute
+`references/decision-capture.md` before asking the next question. Persist and read back the
+stable `BR-*`, update the checkpoint, mark stale consumers and validate incrementally.
+For cross-system behavior, also read `references/integration-mapping.md` and maintain its
+`MAP-*`. Give the user a concise receipt only after validation succeeds.
+
 Use one canonical scenario model: `US → AC → SC → CHK/evidence`, with `FTC` grouping those same `SC` items. Write each `SC-*` once under its primary `AC-*`; include its canonical QA strategy there: automation decision, level, priority, rationale, dependencies and implementation status. QA and publication views reuse these fields and must not invent or recalculate a parallel decision. Every approved criterion must own or explicitly reference at least one `SC-*`.
 
 ### Question Classification
@@ -121,8 +130,12 @@ If the user already indicates a preference, use it. Otherwise briefly offer thes
 2. **Fast draft:** generate a provisional end-to-end draft and stop only for blocking decisions
 3. **Review existing work:** audit supplied maps, stories, criteria, or tests and continue from the first weak or missing phase
 4. **Continue from a phase:** begin at mapping, splitting, stories, or test cases using approved earlier artifacts
+5. **Review derived artifacts:** reconcile canonical sources with an existing HTML, design or generated SPEC without generating or editing that prototype
+6. **Extend approved package:** add external scope to a registered, approved canon after a compatibility gate and before assigning IDs or writing stories
 
 Recommend Guided for a new or poorly understood project. Do not repeatedly ask for the mode once selected.
+
+For mode 6, read `references/extend-approved-package.md` in Phase 0 and pass Gate C before Phase 3 without replacing canonical decisions, IDs or `MAP-*`.
 
 ## Markdown Output
 
@@ -163,6 +176,28 @@ Writing rules:
 
 Read `references/markdown-package.md` before creating or updating the package.
 
+When the user asks for shared team context, has no local files, wants to resume a registered
+Notion project, or workflow state records Notion synchronization, read and invoke
+`sync-refinement-package-notion`. Use `start` before editing and do not require a teammate
+to reconstruct prior chats.
+
+When creating or migrating local work, route it before writing:
+
+- canonical project package → `artifacts/<project-slug>/`;
+- authoritative cross-project contract → `artifacts/_shared/<shared-package-slug>/`;
+- audit, review or historical delta → `artifacts/_reviews/<review-group>/`;
+- executable generator or publication helper → `artifacts/_local/tooling/<tool-group>/`.
+
+Do not create new loose files directly under `artifacts/`. Read
+`references/local-organization-contract.md` before reorganizing files. Local normalization
+must not modify Notion.
+
+For every `_shared` package, resolve ownership before publication. If one feature creates
+and governs the contract, publish its visible shared page inside that feature's canonical
+Notion project while keeping the Markdown under `_shared/` and registering a separate
+manifest. Use a shared-standards hub only when no feature owns the behavior. Consumer
+projects link to the shared page and must not copy it as independent truth.
+
 ## Interaction Rules
 
 1. Ask one to three related questions at a time.
@@ -179,6 +214,8 @@ Read `references/interaction-protocol.md` for detailed question and gate behavio
 When payments are present, read `references/payment-consistency.md` during Phase 1. Resolve or visibly defer authorization, capture, void, refund, completion, partial failure, duplicates, unknown results, compensation failure, customer communication, and support evidence.
 
 Read `references/rule-governance.md` during Phase 1 and `references/readiness-and-approvals.md` before Gates 2 and 3.
+When HTML, designs, prototypes or generated SPECs are supplied, read
+`references/derived-artifact-governance.md` during Phase 1.
 
 ## Application
 
@@ -194,6 +231,10 @@ State:
 - Immediate objective
 - Markdown project name and approved output location
 - Artifact language, audiences, destination, detail level, and sizing convention
+- Shared storage mode and registered Notion root/page manifest when configured
+- Source roles and canonical base snapshot when derived artifacts are present
+
+For mode 6, complete `extend-approved-package.md`, then continue at Phase 3 using Decision Capture normally.
 
 ### Phase 1: Understand the Project
 
@@ -208,6 +249,17 @@ Use `user-story-mapping` to identify:
 - Candidate first delivery
 
 For every rule, record its plain-language behavior, source, decision authority, status, and affected flows. Consolidate rules that express one behavior instead of creating an ID for every sentence. Record conflicting sources in the contradiction log; never silently choose one.
+
+After each material approval, execute the Decision Capture Transaction. For cross-system
+behavior, do not accept phrases such as "sync the address" or "update the household" as a
+complete rule. The related `MAP-*` must name both entities and fields, direction,
+conditions, propagation, exclusions, unsupported-data behavior, conflict policy and
+observability.
+
+For derived artifacts, perform the required static review and interactive browser review
+when behavior depends on interaction. Compare canon ↔ SPEC ↔ observed prototype, record
+material `DELTA-*` items and treat unmatched behavior as Proposed or Unverifiable. This
+workflow reviews and reconciles HTML/SPEC; it does not generate or edit them.
 
 If designs or a Figma link exist, offer an optional design checkpoint before Gate 3. Its absence blocks readiness only when observable behavior depends on an unresolved design decision.
 
@@ -240,6 +292,10 @@ After approval, write or update:
 ### Phase 2: Map and Split the Work
 
 Complete the story map, then use `user-story-splitting` to evaluate all relevant split patterns. Prefer a thin end-to-end customer outcome before advanced variations.
+
+Run the Product Boundary Check for every material capability introduced by a derived
+artifact. Route it explicitly to Same project, Feature area, Separate canonical project,
+Shared contract or Discovery only before selecting scope.
 
 Separate:
 
@@ -358,8 +414,15 @@ Read `references/artifact-contract.md` and verify:
 - No high risk is reported as covered without evidence
 - Artifact language matches the confirmed output contract
 - Project and delivery statuses are not conflated
+- Derived artifacts declare source role/snapshot, material deltas are decided, and new capabilities are routed to an owner package
 
-Run `scripts/validate-package.py <artifact-folder> --language <code> --strict` and fix errors. Strict validation checks ID ranges, Gherkin clarity, Jira/master parity, readiness, check-to-scenario traceability, and the functional-case schema.
+Run `scripts/validate-package.py <artifact-folder> --language <code> --decision-checkpoint`
+after material decisions. Before final handoff, run
+`scripts/validate-package.py <artifact-folder> --language <code> --strict` and fix errors.
+Incremental validation checks decision persistence, workflow freshness and complete
+integration mappings. Strict validation also checks ID ranges, Gherkin clarity,
+Jira/master parity, readiness, check-to-scenario traceability, and the functional-case
+schema.
 
 After deterministic validation succeeds, invoke `refinement-judge` as an independent adversarial gate. Give it the original sources, approved decisions, current Markdown package, confirmed language, and intended next action. Do not give it the generating skill's conclusions or suspected findings. Require `11-refinement-judge-report.md` and a validated verdict.
 
@@ -443,7 +506,12 @@ Read `references/examples-and-pitfalls.md` only when the user requests an exampl
 - `references/interaction-protocol.md` — How to ask, adapt, pause, and resume
 - `references/artifact-contract.md` — Required handoff and traceability between phases
 - `references/markdown-package.md` — File structure, statuses, and update rules
+- `references/local-organization-contract.md` — Notion availability classification and local-draft normalization
 - `references/rule-governance.md` — Sources, authority, contradictions, and rule consolidation
+- `references/decision-capture.md` — Mandatory persistence, readback, stale-impact tracking and capture receipt after approvals
+- `references/integration-mapping.md` — Required `MAP-*` contract for sync, migration, propagation and cross-system fields
+- `references/derived-artifact-governance.md` — HTML/SPEC review, delta reconciliation and product-boundary routing
+- `references/extend-approved-package.md` — Gate C, semantic compatibility and ID assignment when extending an approved canon
 - `references/readiness-and-approvals.md` — Backlog states, role readiness, and block approvals
 - `references/qa-design-handoff.md` — Boundary between QA design and downstream TestManager artifacts
 - `references/matrix-decision.md` — Deterministic rule for creating matrices without making scenarios depend on them
@@ -456,6 +524,7 @@ Read `references/examples-and-pitfalls.md` only when the user requests an exampl
 - `skills/build-refinement-portal/SKILL.md` — Optional final portal generation from approved artifacts
 - `skills/build-refinement-document/SKILL.md` — Optional Word document generation and visual verification
 - `skills/publish-refinement-to-notion/SKILL.md` — Optional native Notion publication or local export fallback
+- `skills/sync-refinement-package-notion/SKILL.md` — Optional ongoing sync, concurrency and recovery after an initial Notion publication
 
 ### Outside This Orchestrator's Scope
 

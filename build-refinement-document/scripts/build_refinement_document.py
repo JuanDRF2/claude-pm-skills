@@ -51,6 +51,27 @@ def parse_rules(text: str) -> dict[str, str]:
     return rules
 
 
+def expand_rule_references(value: str) -> list[str]:
+    """Expand BR namespace ranges while preserving first-seen order."""
+    result: list[str] = []
+    token_pattern = re.compile(
+        r"\b(BR-(?:(?P<namespace>[A-Z0-9]+)-)?(?P<start>\d{2,}))"
+        r"(?:\s*[–—-]\s*(?:(?:BR-)?(?:(?P<end_namespace>[A-Z0-9]+)-)?(?P<end>\d{2,})))?"
+    )
+    for match in token_pattern.finditer(value):
+        prefix = f"BR-{match.group('namespace')}-" if match.group("namespace") else "BR-"
+        start = int(match.group("start"))
+        end = int(match.group("end") or start)
+        width = max(len(match.group("start")), len(match.group("end") or ""))
+        if end < start or end - start > 500:
+            continue
+        for number in range(start, end + 1):
+            rule_id = f"{prefix}{number:0{width}d}"
+            if rule_id not in result:
+                result.append(rule_id)
+    return result
+
+
 def parse_checks(text: str) -> dict[str, dict[str, str]]:
     checks = {}
     headers = []
@@ -74,6 +95,22 @@ def blocks(text: str, pattern: str) -> list[tuple[str, str, str]]:
     return result
 
 
+SCENARIO_FIELD_ALIASES = {
+    "dado": "dado", "given": "dado",
+    "cuando": "cuando", "when": "cuando",
+    "entonces": "entonces", "then": "entonces",
+    "automatización": "automatización", "automation": "automatización",
+    "razón de automatización": "razón de automatización", "automation rationale": "razón de automatización",
+    "prioridad de automatización": "prioridad de automatización", "automation priority": "prioridad de automatización",
+    "nivel de automatización recomendado": "nivel de automatización recomendado",
+    "recommended automation level": "nivel de automatización recomendado",
+    "dependencias de automatización": "dependencias de automatización",
+    "automation dependencies": "dependencias de automatización",
+    "cobertura automatizada": "cobertura automatizada", "automated coverage": "cobertura automatizada",
+}
+SCENARIO_FIELD_PATTERN = "|".join(re.escape(label) for label in SCENARIO_FIELD_ALIASES)
+
+
 def parse_scenarios(text: str) -> dict[str, dict[str, str]]:
     result = {}
     matches = list(re.finditer(r"^###\s+(SC-[A-Z0-9-]+)\s+[—-]\s+(.+)$", text, re.M))
@@ -86,10 +123,11 @@ def parse_scenarios(text: str) -> dict[str, dict[str, str]]:
         fields = {"title": title, "body": body}
         lines = body.splitlines()
         for line_idx, line in enumerate(lines):
-            field = re.match(r"^\s*(?:-\s*)?\*\*(Dado|Cuando|Entonces|Automatización|Razón de automatización|Prioridad de automatización|Nivel de automatización recomendado|Dependencias de automatización|Cobertura automatizada):\*\*\s*(.*)$", line)
+            field = re.match(rf"^\s*(?:-\s*)?\*\*({SCENARIO_FIELD_PATTERN}):\*\*\s*(.*)$", line, re.I)
             if not field:
                 continue
-            label, value = field.group(1).lower(), field.group(2).strip()
+            label = SCENARIO_FIELD_ALIASES[field.group(1).lower()]
+            value = field.group(2).strip()
             if label == "entonces" and not value:
                 following = []
                 for extra in lines[line_idx + 1:]:
@@ -118,19 +156,30 @@ def section(body: str, heading: str) -> str:
     return match.group(1).strip() if match else ""
 
 
+def story_section(body: str, heading: str) -> str:
+    match = re.search(
+        rf"^\*\*{re.escape(heading)}\*\*\s*$\n(.*?)(?=^\*\*[^*\n]+\*\*\s*$|^###\s+|\Z)",
+        body,
+        re.M | re.S,
+    )
+    return match.group(1).strip() if match else section(body, heading)
+
+
 def parse_criteria(story_body: str) -> list[dict[str, object]]:
-    area = section(story_body, "Criterios de aceptación")
+    area = section(story_body, "Criterios de aceptación") or section(story_body, "Acceptance criteria")
     if not area:
         area = story_body
+    story_rule_match = re.search(r"\*\*(?:Reglas|Rules):\*\*\s*([^\n]+)", story_body)
+    story_rules = expand_rule_references(story_rule_match.group(1)) if story_rule_match else []
     result = []
     criterion_pattern = r"^#{3,4}\s+(AC-[A-Z0-9-]+)\s+[—-]\s+(.+)$"
     for code, title, body in blocks(area, criterion_pattern):
-        rule_match = re.search(r"\*\*Reglas:\*\*\s*([^\n]+)", body)
-        rules = re.findall(r"BR-[A-Z0-9-]+", rule_match.group(1)) if rule_match else []
+        rule_match = re.search(r"\*\*(?:Reglas|Rules):\*\*\s*([^\n]+)", body)
+        rules = expand_rule_references(rule_match.group(1)) if rule_match else story_rules
         condition_match = re.search(r"\*\*(?:Condición de aceptación|Acceptance condition):\*\*\s*([^\n]+)", body)
         gherkin = []
         for line in body.splitlines():
-            match = re.match(r"\*\*(Dado que|Dado|Y|Cuando|Entonces|Pero)\*\*\s*(.+?)\s*$", line)
+            match = re.match(r"\*\*(Dado que|Dado|Given that|Given|Y|And|Cuando|When|Entonces|Then|Pero|But)\*\*\s*(.+?)\s*$", line, re.I)
             if match:
                 gherkin.append((match.group(1), match.group(2)))
         result.append({"code": code, "title": title, "rules": rules, "condition": condition_match.group(1).strip() if condition_match else "", "gherkin": gherkin})
@@ -219,12 +268,26 @@ def add_story(doc: Document, story, rules, checks, scenarios, cases) -> None:
     font(p.add_run(f"Historia de usuario · {code}"), 9.5, True, BLUE)
     doc.add_paragraph(title, style="Title")
 
-    history = section(body, "Historia de usuario")
-    history_text = ", ".join(re.sub(r"^-\s*", "", line) for line in history.splitlines() if line.startswith("-"))
+    history = (
+        story_section(body, "Historia")
+        or story_section(body, "Historia de usuario")
+        or story_section(body, "User story")
+        or story_section(body, "Use Case")
+    )
+    history_text = " ".join(
+        re.sub(r"^-\s*", "", line).strip()
+        for line in history.splitlines()
+        if line.strip()
+    )
     callout(doc, "Historia", history_text or "Descripción no disponible en la fuente.")
 
     doc.add_paragraph("Alcance y decisiones", style="Heading 1")
-    scope = section(body, "Alcance y dependencias")
+    scope = (
+        story_section(body, "Alcance y dependencias")
+        or story_section(body, "Alcance")
+        or story_section(body, "Scope and dependencies")
+        or story_section(body, "Scope")
+    )
     for line in scope.splitlines():
         if line.startswith("-"):
             value = line[1:].strip()
@@ -247,7 +310,7 @@ def add_story(doc: Document, story, rules, checks, scenarios, cases) -> None:
             labeled(doc, f"Regla de negocio · {rule_id}:", rules.get(rule_id, "Definición no disponible."))
         doc.add_paragraph("Cómo se comprobará", style="Heading 3")
         for check in related_checks(str(criterion["code"]), checks):
-            callout(doc, f"Comprobación de cobertura · {check.get('Check', '')}", row_value(check, "Qué debe comprobarse", "Qué debe probarse"), green=True)
+            callout(doc, f"Comprobación de cobertura · {check.get('Check', '')}", row_value(check, "Qué debe comprobarse", "Qué debe probarse", "What must be proven"), green=True)
             labeled(doc, "Riesgo:", row_value(check, "Riesgo", "Risk"))
             labeled(doc, "Nivel recomendado:", row_value(check, "Nivel", "Level"))
             labeled(doc, "Evidencia esperada:", row_value(check, "Evidencia", "Evidence"))

@@ -32,7 +32,7 @@
 - **And:** I am told that the payment was not completed
 ```
 
-The next skill preserves these IDs when creating `TC-MEM-*` test cases.
+The next skill preserves these IDs when creating `FTC-MEM-*` functional cases and `SC-*` scenarios.
 
 ---
 
