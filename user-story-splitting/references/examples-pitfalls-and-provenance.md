@@ -1,10 +1,11 @@
-# Story Splitting Examples and Pitfalls
+# Story Splitting Examples, Pitfalls, and Provenance
 
 ## Contents
 
 - Running membership example
 - Additional splitting example
 - Seven common pitfalls and fixes
+- Related skills, frameworks, and provenance
 
 ### Running Membership Example
 
@@ -103,3 +104,27 @@ As a team admin, I want to manage team members so that I can control access.
 **Fix:** Keep dependencies visible, sequence them deliberately, and distinguish stories from enablers and discovery work.
 
 ---
+
+## References
+
+### Related Skills
+- `skills/user-story/SKILL.md` — Format for writing the split stories
+
+### External Frameworks
+- Richard Lawrence & Peter Green, *The Humanizing Work Guide to Splitting User Stories* — Origin of the 8 splitting patterns
+- Bill Wake, *INVEST in Good Stories* (2003) — Criteria for well-formed stories (Independent, Negotiable, Valuable, Estimable, Small, Testable)
+- Mike Cohn, *User Stories Applied* (2004) — Story decomposition techniques
+
+### Dean's Work
+- User Story Splitting Prompt Template (based on Humanizing Work framework)
+
+### Provenance
+- Adapted from `prompts/user-story-splitting-prompt-template.md` in the `https://github.com/deanpeters/product-manager-prompts` repo.
+
+---
+
+**Skill type:** Component
+**Suggested filename:** `user-story-splitting.md`
+**Suggested placement:** `/skills/components/`
+**Dependencies:** References `skills/user-story/SKILL.md`
+**Applies to:** User stories, epics, and any work that's too large to complete in a single sprint

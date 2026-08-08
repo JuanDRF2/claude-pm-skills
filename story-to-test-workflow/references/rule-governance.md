@@ -4,7 +4,16 @@ Write rules for people first and traceability second. A reader should understand
 
 ## Rule record
 
-For each rule record: ID, plain-language behavior, source, decision authority, status, affected flows, and last decision. Allowed statuses are Confirmed, Proposed, Contradicted, Deferred, and Superseded.
+For each rule record: ID, plain-language behavior, source, decision authority, status,
+affected flows, last decision, superseded rule when applicable, and affected downstream
+artifacts. Allowed statuses are Confirmed, Proposed, Contradicted, Deferred, and
+Superseded.
+
+After a material approval, follow `decision-capture.md` before continuing the
+conversation. If the rule involves sync, migration, propagation, import, export or
+cross-system field behavior, also create or update the `MAP-*` contract required by
+`integration-mapping.md`. A broad entity-level statement never substitutes for an
+entity-and-field mapping.
 
 Authority order, unless the project defines another one:
 
@@ -16,6 +25,10 @@ Authority order, unless the project defines another one:
 6. AI proposal
 
 An authority order helps identify who must decide; it does not authorize the skill to discard a conflict.
+
+When HTML, designs, generated SPECs or other derived artifacts are present, read
+`derived-artifact-governance.md`. A derived artifact may reveal evidence or propose a rule,
+but it cannot confirm one. Record its source role, base snapshot and every material delta.
 
 ## Contradiction log
 

@@ -1,4 +1,4 @@
-# Plantilla canónica de portada
+# Plantilla editorial de portada
 
 Usar esta estructura para toda página principal de refinamiento en Notion. Conservar exactamente el orden y los títulos. El contenido cambia por proyecto; la arquitectura de lectura no.
 
@@ -52,7 +52,7 @@ Usar esta estructura para toda página principal de refinamiento en Notion. Cons
 - **Escenarios canónicos:** [total].
 - **Comprobaciones de cobertura:** [total].
 - **Casos funcionales:** [total].
-- **Automatización:** [Automate now, Automate later, Blocked y Not planned].
+- **Automatización:** [Automate now, Automate later, Manual y Blocked].
 
 ## 5. Alcance
 
@@ -103,7 +103,7 @@ Omitir solamente los grupos sin elementos; conservar la sección `Índice de his
 
 Mostrar como máximo diez elementos combinados. Enlazar la página detallada cuando existan más.
 
-## 9. Material de refinamiento
+## 9. Paquete Markdown
 
 - [Reglas, decisiones y preguntas](url)
 - [Plan funcional de pruebas](url)
@@ -111,8 +111,11 @@ Mostrar como máximo diez elementos combinados. Enlazar la página detallada cua
 - [Pendientes, riesgos y preparación](url)
 - [Handoff DEV](url)
 - [Handoff QA](url)
+- [Paquete Markdown reflejado 1:1](url)
+- [Historial de sincronización](url)
 
-En una publicación completa, estos seis enlaces son obligatorios cuando sus fuentes canónicas existen. No usar `No aplica` por la simple ausencia previa de una página en Notion.
+La vista colaborativa conserva los seis materiales habituales y ofrece acceso al espejo
+técnico y a su auditoría operativa. No combinar ni sustituir los archivos del espejo.
 
 ## 10. Próximo paso
 
@@ -133,6 +136,11 @@ En una publicación completa, estos seis enlaces son obligatorios cuando sus fue
 <page url="URL_DE_NOTION">Pendientes, riesgos y preparación</page>
 <page url="URL_DE_NOTION">Handoff DEV</page>
 <page url="URL_DE_NOTION">Handoff QA</page>
+<page url="URL_DE_NOTION">Paquete Markdown</page>
+
+### Operación y auditoría
+
+<page url="URL_DE_NOTION">Historial de sincronización</page>
 
 </details>
 ```
@@ -156,7 +164,9 @@ En una publicación completa, estos seis enlaces son obligatorios cuando sus fue
 - El desplegable existe para preservar la relación padre-hijo en Notion; no es navegación primaria.
 - Mantenerlo cerrado por defecto y después de `## 10. Próximo paso`.
 - Incluir una sola vez cada subpágina real.
-- Agrupar historias y material con subtítulos humanos.
+- Agrupar historias, material y operación con subtítulos humanos.
+- `Historial de sincronización` debe aparecer una sola vez bajo `Operación y auditoría`;
+  nunca bajo `Material de refinamiento` ni dentro de `Paquete Markdown`.
 - Las secciones 7 y 9 conservan los enlaces visibles. El contenedor no debe aparecer como una segunda lista editorial.
 - No mostrar bloques `<page>` fuera de este contenedor.
 

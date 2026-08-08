@@ -104,4 +104,4 @@ Adapted from `prompts/user-story-prompt-template.md` in the `https://github.com/
 - Split distinct selection, navigation, save, validation, failure, recovery, cancellation, and retry paths into separately titled scenarios when their primary action or outcome differs.
 - Do not use symbols or shorthand to compress behavior (`+`, `→`, `/`, `=`, semicolon chains). Put internal model and integration details under **Technical consideration**.
 - Keep detailed scenario execution in the QA artifact. A derived interactive reader may show it inline without duplicating the authoritative Markdown.
-- Create stable `SC-*` scenarios under every `AC-*`. Directly below every scenario include `QA strategy` with automation decision, level, priority, reason, dependencies and status. The QA artifact reuses those same IDs, behavior and strategy; `FTC-*` only groups and enriches them.
+- Create stable `SC-*` scenarios under every `AC-*`. Directly below every scenario include `Estrategia QA` with automation decision, level, priority, reason, dependencies and status. The QA artifact reuses those same IDs, behavior and strategy; `FTC-*` only groups and enriches them.

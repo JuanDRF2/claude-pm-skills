@@ -1,10 +1,6 @@
 ---
 name: user-story-splitting
-argument-hint: "[story or epic to split]"
 description: Break a large story or epic into smaller deliverable stories using proven split patterns. Use when backlog items are too big for estimation, sequencing, or independent release.
-intent: >-
-  Break down large user stories, epics, or features into smaller, independently deliverable stories using systematic splitting patterns. Use this to make work more manageable, reduce risk, enable faster feedback cycles, and maintain flow in agile development. This skill applies to user stories, epics, and any work that's too large to complete in a single sprint.
-type: component
 ---
 
 
@@ -94,12 +90,18 @@ Based on Richard Lawrence and Peter Green's "Humanizing Work Guide to Splitting 
 ## Application
 
 ### Step 1: Identify the Original Story
-Start with the story/epic/feature that needs splitting. Ensure it's written using the user story format (reference `skills/user-story/SKILL.md`).
+Start with the story, epic, or feature that needs splitting. Express its actor, desired outcome, value, scope, rules, and unresolved dependencies; use `skills/user-story/SKILL.md` when a formal story is needed.
 
 ```markdown
 ### Original Story:
 [Story formatted with use case and acceptance criteria]
 ```
+
+Before applying split patterns, confirm that the original item is one cohesive product
+outcome. If it bundles capabilities with independent actors, surfaces, lifecycles,
+permissions, ownership, release paths or material risk, run the Product Boundary Check.
+Route the result as Same project, Feature area, Separate canonical project, Shared contract
+or Discovery only. Splitting cannot legitimize unrelated products inside one epic.
 
 ---
 
@@ -260,35 +262,10 @@ Ask these questions:
 5. **Do the splits, when combined, equal the original?** (Nothing lost in translation)
 6. **Does each confirmed business rule appear in at least one split?**
 7. **Does the first slice exercise the real end-to-end architecture where risk warrants it?**
+8. **Do all splits still belong to the recorded product boundary?**
 
 If any answer is "no," revise.
 
-## Examples and Pitfalls
+## Examples, Pitfalls, and Provenance
 
-Read `references/examples-pitfalls-and-provenance.md` only when a concrete example is useful or a review detects one of its failure patterns. Preserve the splitting patterns, validation questions, and enabler/TAD distinctions defined above.
-
----
-
-## References
-
-### Related Skills
-- `skills/user-story/SKILL.md` — Format for writing the split stories
-
-### External Frameworks
-- Richard Lawrence & Peter Green, *The Humanizing Work Guide to Splitting User Stories* — Origin of the 8 splitting patterns
-- Bill Wake, *INVEST in Good Stories* (2003) — Criteria for well-formed stories (Independent, Negotiable, Valuable, Estimable, Small, Testable)
-- Mike Cohn, *User Stories Applied* (2004) — Story decomposition techniques
-
-### Dean's Work
-- User Story Splitting Prompt Template (based on Humanizing Work framework)
-
-### Provenance
-- Adapted from `prompts/user-story-splitting-prompt-template.md` in the `https://github.com/deanpeters/product-manager-prompts` repo.
-
----
-
-**Skill type:** Component
-**Suggested filename:** `user-story-splitting.md`
-**Suggested placement:** `/skills/components/`
-**Dependencies:** References `skills/user-story/SKILL.md`
-**Applies to:** User stories, epics, and any work that's too large to complete in a single sprint
+Read `references/examples-pitfalls-and-provenance.md` only when a concrete example is needed, a pattern is being misapplied, a review detects one of its failure patterns, or provenance is requested. Preserve the split-pattern logic, value, scope, dependency, and INVEST checks defined above.

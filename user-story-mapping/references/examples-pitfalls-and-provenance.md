@@ -1,10 +1,11 @@
-# Story Mapping Examples and Pitfalls
+# Story Mapping Examples, Pitfalls, and Provenance
 
 ## Contents
 
 - Running membership example
 - Additional mapping example
 - Seven common pitfalls and fixes
+- Related skills, frameworks, and provenance
 
 ### Running Membership Example
 
@@ -18,7 +19,7 @@ BR-03: A rejected payment does not create or activate a membership.
 Candidate story: US-MEM-01 — Guest buys an individual membership end to end.
 ```
 
-The splitting skill decides whether `US-MEM-01` is small enough. The user-story skill turns it into accepted behavior. The test-case skill later produces `FTC-MEM-*` functional cases and `SC-*` scenarios as evidence.
+The splitting skill decides whether `US-MEM-01` is small enough. The user-story skill turns it into accepted behavior. The test-case skill later produces `TC-MEM-*` evidence.
 
 ---
 
@@ -92,3 +93,25 @@ See `examples/sample.md` for a full story map example.
 **Fix:** Label each item as confirmed, proposed, assumed, or unknown and assign a decision owner.
 
 ---
+
+## References
+
+### Related Skills
+- `skills/user-story/SKILL.md` — Tasks from the map become user stories
+
+### External Frameworks
+- Jeff Patton, *User Story Mapping* (2014) — Origin of the story mapping technique
+- Teresa Torres, *Continuous Discovery Habits* (2021) — Opportunity solution trees (complementary to story maps)
+
+### Dean's Work
+- User Story Mapping Prompt (adapted from Jeff Patton's methodology)
+
+### Provenance
+- Adapted from `prompts/user-story-mapping.md` in the `https://github.com/deanpeters/product-manager-prompts` repo.
+
+---
+
+**Skill type:** Component
+**Suggested filename:** `user-story-mapping.md`
+**Suggested placement:** `/skills/components/`
+**Dependencies:** References `skills/user-story/SKILL.md`; persona, problem, and desired progress may be supplied directly

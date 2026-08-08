@@ -1,10 +1,6 @@
 ---
 name: user-story-mapping
-argument-hint: "[product or workflow]"
 description: Create a user story map that lays out activities, steps, tasks, and release slices. Use when planning a workflow, backlog, or MVP around the user journey.
-intent: >-
-  Visualize the user journey by creating a hierarchical map that breaks down high-level activities into steps and tasks, organized left-to-right as a narrative flow. Use this to build shared understanding across product, design, and engineering, prioritize features based on user workflows, and identify gaps or opportunities in the user experience.
-type: component
 ---
 
 
@@ -146,10 +142,14 @@ For multi-actor workflows, identify the primary actor and supporting actors. Kee
 
 Before defining the backbone, record confirmed rules and unresolved decisions. Assign IDs to rules and questions so later stories and tests can trace back to them. If a material rule is unknown, preserve it as a question; do not infer an answer.
 
+When a prototype, design or generated specification introduces behavior, classify its
+source authority and record material differences from the canonical snapshot before
+mapping them. A derived artifact may propose a task; it cannot confirm one.
+
 ---
 
 #### Persona
-Provide details about the persona within this segment.
+Describe the specific person or role in this segment, including the context that changes their journey.
 
 ```markdown
 ### Persona:
@@ -162,7 +162,7 @@ Provide details about the persona within this segment.
 ---
 
 ### Step 2: Define the Narrative
-What is the user trying to accomplish? Frame this as a Jobs-to-be-Done statement.
+What is the user trying to accomplish? State the situation, desired progress, and expected outcome in plain language.
 
 ```markdown
 ### Narrative:
@@ -266,6 +266,14 @@ Review the map and ask:
 - Are alternate, failure, abandonment, and recovery paths represented?
 - Does every task trace to a confirmed rule, a discovery question, or an explicit product hypothesis?
 
+### Step 7A: Check Product Boundaries
+
+For every material new capability, assess whether it has an independent outcome, actor,
+surface, lifecycle/release, permissions, data ownership, integrations, risk or substantial
+backlog. Record one result: Same project, Feature area, Separate canonical project, Shared
+contract or Discovery only. Do not decide by item count. Keep a separate project as a
+dependency/link in this map rather than copying its behavior into the current package.
+
 ### Step 8: Produce the Handoff
 
 Output the story map together with:
@@ -275,31 +283,8 @@ Output the story map together with:
 3. Release slices
 4. Candidate vertical stories
 5. Gaps requiring PM, QA, design, or engineering decisions
+6. Product-boundary decisions and owner/consumer relationships
 
-## Examples and Pitfalls
+## Examples, Pitfalls, and Provenance
 
-Read `references/examples-pitfalls-and-provenance.md` only when a concrete example is useful or a review detects one of its failure patterns. Preserve the discovery ledger, journey hierarchy, variations, gaps, and release-slice contract defined above.
-
----
-
-## References
-
-### Related Skills
-- `skills/user-story/SKILL.md` — Tasks from the map become user stories
-
-### External Frameworks
-- Jeff Patton, *User Story Mapping* (2014) — Origin of the story mapping technique
-- Teresa Torres, *Continuous Discovery Habits* (2021) — Opportunity solution trees (complementary to story maps)
-
-### Dean's Work
-- User Story Mapping Prompt (adapted from Jeff Patton's methodology)
-
-### Provenance
-- Adapted from `prompts/user-story-mapping.md` in the `https://github.com/deanpeters/product-manager-prompts` repo.
-
----
-
-**Skill type:** Component
-**Suggested filename:** `user-story-mapping.md`
-**Suggested placement:** `/skills/components/`
-**Dependencies:** References `skills/user-story/SKILL.md`
+Read `references/examples-pitfalls-and-provenance.md` only when a concrete example is useful, a review detects one of its failure patterns, or provenance is requested. Preserve the discovery ledger, journey hierarchy, variations, gaps, and release-slice contract defined above.

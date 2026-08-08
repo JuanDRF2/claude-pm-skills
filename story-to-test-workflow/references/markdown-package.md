@@ -34,6 +34,38 @@ Use relative links between documents:
 
 Keep stable IDs in headings so text search remains useful.
 
+## Shared storage
+
+Markdown defines the package structure. For Notion-connected teamwork, mirror every
+included Markdown file as one native page and preserve relative directories through
+container pages. Verified Notion pages are the shared official copy; the local folder is a
+snapshot-bound checkout with the same paths.
+
+Treat numbered project documents as canonical unless the workflow contract marks one
+otherwise. Treat `jira/*.md` and `handoffs/*.md` as generated views: publish them for
+consumers, but regenerate them from canonical units and do not accept independent edits as
+new product truth.
+
+Record the Notion root, page manifest, loaded snapshot and synchronized snapshot in
+`00-workflow-state.md` and `09-package-index.md`. Use
+`publish-refinement-to-notion` for initial creation and
+`sync-refinement-package-notion` thereafter. Preserve historical storage links only as
+evidence; they do not participate in the active workflow.
+
+## Shared packages
+
+Keep cross-project contracts under `artifacts/_shared/<slug>/`. Do not move a shared
+contract into the owner's local project folder merely because its Notion presentation is
+owned by that project.
+
+For a feature-owned contract, publish its visible page inside the canonical Notion page of
+the owner feature. Under that page, maintain a `Paquete Markdown` mirror for the shared
+package and register it independently from the owner's main refinement package. Consumer
+projects link to the readable shared-contract page.
+
+For a global standard without a feature owner, require a confirmed shared-standards hub.
+Never reuse a prior project's destination as the default.
+
 ## Updating Existing Files
 
 1. Read the current file completely.
@@ -41,6 +73,11 @@ Keep stable IDs in headings so text search remains useful.
 3. Update affected links when an ID is superseded.
 4. Record important scope or rule changes in a short Decision History section.
 5. Avoid duplicating the same authoritative rule in multiple files; link to `02-rules-and-questions.md` instead.
+
+When prototypes, HTML, designs or generated SPECs exist, keep their source-role inventory
+and material delta ledger in `02-rules-and-questions.md`. Use
+`10-design-and-spec-deltas.md` only when the expanded ledger would make `02` difficult to
+review; link both directions and keep one definition per `DELTA-*`.
 
 ## Draft Handling
 

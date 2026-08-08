@@ -27,6 +27,7 @@ Pass:
 - Variation matrix
 - Main and recovery paths
 - Release goals and material risks
+- Source-role inventory, derived-artifact deltas and Product Boundary results when applicable
 
 ### Splitting to Story Writing
 
@@ -69,7 +70,7 @@ Never label an item Covered merely because a document exists. Coverage requires 
 
 | File | Primary content | Written after |
 |---|---|---|
-| `00-workflow-state.md` | Current phase, approvals, questions, next action | Every approved gate |
+| `00-workflow-state.md` | Current phase, approvals, decision checkpoint, stale consumers, questions, next action | Every approved gate and material decision |
 | `01-project-understanding.md` | Objective, actors, scope, known systems | Gate 1 |
 | `02-rules-and-questions.md` | Rules, sources, questions, assumptions, owners | Gate 1 |
 | `03-story-map.md` | Journey, variations, alternate and recovery paths | Gate 1 |
@@ -79,6 +80,7 @@ Never label an item Covered merely because a document exists. Coverage requires 
 | `07-functional-test-cases.md` | Grouped functional cases and QA-reviewable scenarios | Gate 4 |
 | `08-traceability-and-risks.md` | Rule-to-test coverage and remaining risk | Gate 4/final audit |
 | `09-package-index.md` | Project/delivery status and navigation | Gate 4/final audit |
+| `10-design-and-spec-deltas.md` | Optional expanded ledger for derived artifacts; `02` remains the entry point | Gate 1 and every material prototype/SPEC review |
 | `jira/<US-ID>.md` | Copy-ready story view with inline traceability | Gate 3, refreshed Gate 4 |
 | `handoffs/dev-handoff.md` | DEV-focused approved behavior and dependencies | Gate 4 |
 | `handoffs/qa-handoff.md` | Approved QA design ready for downstream test-management generation | Gate 4 |

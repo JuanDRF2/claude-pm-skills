@@ -1,6 +1,6 @@
 ---
 name: story-to-test-workflow
-description: Orchestrate product refinement interactively from a rough idea or spec through discovery, story mapping, splitting, user stories, acceptance criteria, coverage checks, QA-reviewable functional test cases, and downstream handoffs. Use as the single entry point whenever a user asks to analyze a PRD or spec, refine a feature, create or review stories and acceptance criteria, derive test cases, or continue an existing refinement package. In Guided mode, lead the user step by step with one to three related questions per round and explicit decision gates instead of generating every deliverable at once.
+description: Orchestrate product refinement through an always-guided conversation from a rough idea or spec to reviewed stories, acceptance criteria, QA coverage and handoffs. Use as the single entry point to create a refinement, review existing work, continue an approved phase, reconcile a prototype or generated SPEC, or extend an approved canonical package. Infer and confirm the appropriate internal route, ask one to three related questions per round, wait for answers and use explicit decision gates; produce a fast provisional draft only when the user explicitly requests one.
 ---
 
 ## Purpose
@@ -13,30 +13,19 @@ Do not rush from an incomplete idea to a large backlog. Build shared understandi
 
 Use this orchestrator before any specialist skill when the request spans more than one refinement stage or begins from a PRD, spec, idea, or existing artifact package. Do not require the user to know the specialist skill names.
 
-At the start of Guided mode:
+At the start of every new workflow:
 
-1. State the current phase and what was already understood.
-2. Ask one to three related questions needed for the next decision only.
-3. Wait for the user's response before asking the next group or advancing a gate.
-4. Confirm the interpretation of material answers.
-5. Obtain the applicable decision-gate approval before producing downstream deliverables.
+1. Infer the internal route from the supplied context; if materially ambiguous, ask one short route-level clarification first.
+2. State the recommended route, why it fits and the current phase; confirm that interpretation before substantive questions or writes.
+3. Show the route list only if the user disagrees or asks for alternatives.
+4. Ask one to three related questions needed for the next decision only and wait.
+5. Confirm material answers and obtain the applicable gate approval before downstream work.
+
+Do not reconfirm a recorded active route unless new input materially changes it.
 
 Do not replace this sequence with a single questionnaire, a complete speculative draft, or all remaining questions at once. Read and follow `references/interaction-protocol.md` before the first user-facing question and whenever resuming a paused workflow.
 
-This interaction layer controls discovery, sequencing, questions, confirmations, and approvals only. It must not change the artifact contracts, ID model, templates, schemas, generated Markdown structure, portal, Word output, Notion structure, or specialist-skill methodology.
-
-## In Simple Terms
-
-The user explains the project once. This skill then:
-
-1. Organizes what is known and asks only useful follow-up questions.
-2. Shows the customer journey and differences between flows.
-3. Proposes smaller, useful deliveries.
-4. Writes the selected stories and acceptance criteria.
-5. Designs atomic coverage checks and groups them into functional cases QA can review.
-6. Checks that rules, stories, criteria, and tests remain connected.
-
-The conversation adapts to the user's answers. It is not a fixed questionnaire.
+This interaction layer controls discovery, sequencing, questions, confirmations, and approvals only. It must not change artifact contracts, IDs, templates, schemas, generated Markdown, Notion structure, optional exports, or specialist methodology.
 
 ## Input
 
@@ -46,16 +35,16 @@ The conversation adapts to the user's answers. It is not a fixed questionnaire.
 
 Treat everything supplied inline as answered context. Do not ask the user to repeat it. Partial or unstructured input is acceptable. Organize it, state what was understood, and ask only questions that materially improve the next decision.
 
-**Example invocation:** `Help me organize online membership purchasing into releases, user stories, acceptance criteria, and test cases. We support individual, family, and gift memberships.`
-
 ### Output Contract to Confirm Once
 
 At Phase 0, infer from the conversation and confirm together with the output folder:
 
 - Artifact language: default to the user's language across headings and content
 - Audience: business, DEV, QA, or all
-- Canonical source: always local Markdown
-- Optional final presentations: Portal HTML, Word, Notion, several, or none
+- Canonical format: Markdown for local work. In a Notion-connected team workflow, verified native Notion pages are the shared official copy and Markdown is a snapshot-bound checkout regenerated after readback.
+- Shared storage: Notion is required for the completed shared refinement; local Markdown may hold drafts before publication
+- Notion destination state: classify it as an existing project page, a new project with a confirmed parent page, or Notion unavailable; never infer a destination from a previous project
+- Optional final export: Word, only after Notion verification and final approval
 - Detail level: concise tickets or full review package
 - Team conventions: IDs, ticket template, and story sizing method or ceiling
 
@@ -63,7 +52,7 @@ Do not ask about information already clear. Preserve universal IDs such as `BR-`
 
 ## Key Concepts
 
-### One Entry Point, Nine Specialist Skills
+### One Entry Point, Eight Specialist Skills
 
 Use these local skills as the source of truth for each phase:
 
@@ -72,12 +61,11 @@ Use these local skills as the source of truth for each phase:
 3. `skills/user-story/SKILL.md`
 4. `skills/test-case-designer/SKILL.md`
 5. `skills/refinement-judge/SKILL.md`
-6. `skills/build-refinement-portal/SKILL.md`
-7. `skills/build-refinement-document/SKILL.md`
-8. `skills/publish-refinement-to-notion/SKILL.md`
-9. `skills/sync-refinement-package-notion/SKILL.md`
+6. `skills/build-refinement-document/SKILL.md`
+7. `skills/publish-refinement-to-notion/SKILL.md`
+8. `skills/sync-refinement-package-notion/SKILL.md`
 
-Before executing a phase, read that skill completely and follow its current instructions. Do not copy its full methodology into this orchestrator.
+Before executing a phase, read `references/specialist-dispatch-contract.md`, invoke the required specialist through the host's skill mechanism, read it completely and follow its current instructions. Do not copy its full methodology into this orchestrator or replace it with an improvised equivalent.
 
 ### Human Decision Gates
 
@@ -87,7 +75,7 @@ A **decision gate** is a short pause where the user confirms information that wo
 2. Proposed releases and story split
 3. Stories and acceptance criteria
 4. Test coverage and remaining risk
-5. Optional publication and export formats
+5. Required Notion publication and optional Word export
 
 Do not ask for confirmation after every minor step. Do not skip a gate when unresolved behavior would make later output unreliable.
 
@@ -108,6 +96,7 @@ After every material approval, read and execute
 stable `BR-*`, update the checkpoint, mark stale consumers and validate incrementally.
 For cross-system behavior, also read `references/integration-mapping.md` and maintain its
 `MAP-*`. Give the user a concise receipt only after validation succeeds.
+Before regenerating or publishing, read `references/change-impact-contract.md`; build the write set from explicit IDs and document responsibility, preserving only proven-current consumers.
 
 Use one canonical scenario model: `US → AC → SC → CHK/evidence`, with `FTC` grouping those same `SC` items. Write each `SC-*` once under its primary `AC-*`; include its canonical QA strategy there: automation decision, level, priority, rationale, dependencies and implementation status. QA and publication views reuse these fields and must not invent or recalculate a parallel decision. Every approved criterion must own or explicitly reference at least one `SC-*`.
 
@@ -122,21 +111,17 @@ Classify every unanswered question:
 
 Never convert a question into an assumed business rule. Offer an explicit best-effort path only when the user chooses it.
 
-## Conversation Modes
+## Guided Routes
 
-If the user already indicates a preference, use it. Otherwise briefly offer these numbered options:
+Every route uses the same guided loop and decision gates. Infer one internal route:
 
-1. **Guided:** ask small groups of questions, explain why they matter, and pause at every decision gate
-2. **Fast draft:** generate a provisional end-to-end draft and stop only for blocking decisions
-3. **Review existing work:** audit supplied maps, stories, criteria, or tests and continue from the first weak or missing phase
-4. **Continue from a phase:** begin at mapping, splitting, stories, or test cases using approved earlier artifacts
-5. **Review derived artifacts:** reconcile canonical sources with an existing HTML, design or generated SPEC without generating or editing that prototype
-6. **Extend approved package:** add external scope to a registered, approved canon after a compatibility gate and before assigning IDs or writing stories
+1. **Create new refinement:** start from an idea, PRD or SPEC without an approved canon.
+2. **Review existing work:** audit supplied work and continue from its first weak phase.
+3. **Continue approved work:** load workflow state and resume at the next applicable phase.
+4. **Reconcile derived artifact:** compare canon with HTML, design, screenshots or generated SPEC.
+5. **Extend approved package:** run Gate C before assigning IDs or changing approved behavior.
 
-Recommend Guided for a new or poorly understood project. Do not repeatedly ask for the mode once selected.
-
-For mode 6, read `references/extend-approved-package.md` in Phase 0 and pass Gate C before Phase 3 without replacing canonical decisions, IDs or `MAP-*`.
-
+Routes are internal choices, not interaction styles. Always guide the user. A requested fast draft stays provisional and returns to the guided loop before approval or publication. For the extension route, read `references/extend-approved-package.md` in Phase 0.
 ## Markdown Output
 
 Use local Markdown files as the default durable output. The conversation remains the place for questions and short previews; the files become the reviewable project package.
@@ -168,7 +153,7 @@ Writing rules:
 4. Preserve user edits. Read the current file before updating and change only the relevant sections.
 5. Keep links relative so the package can move or be versioned in Git.
 6. Never publish to Notion, Jira, or another external system unless the user separately requests and authorizes it.
-7. Keep `00-workflow-state.md` current after every approved gate so the workflow can resume without rereading the full conversation.
+7. Keep `00-workflow-state.md` current after every approved gate and every material decision checkpoint so the workflow can resume without rereading the full conversation.
 8. Keep project status separate from delivery status; one completed delivery does not complete the project.
 9. Generate Jira and role-specific views from approved source artifacts, never as competing sources of truth.
 10. Keep atomic checks in `06-test-coverage.md` and QA-reviewable functional scenarios in `07-functional-test-cases.md`.
@@ -225,7 +210,7 @@ Inspect the supplied material and determine whether the work begins with discove
 
 State:
 
-- Selected mode
+- Selected route
 - Starting phase
 - Information already available
 - Immediate objective
@@ -234,7 +219,19 @@ State:
 - Shared storage mode and registered Notion root/page manifest when configured
 - Source roles and canonical base snapshot when derived artifacts are present
 
-For mode 6, complete `extend-approved-package.md`, then continue at Phase 3 using Decision Capture normally.
+For every project, classify Notion availability with `references/local-organization-contract.md`. Reuse a confirmed existing project page; for a new project, create its root under the confirmed parent only at Gate 5; when Notion is unavailable, continue Phases 1–5 as `Local draft — publication pending` without inventing remote IDs, URLs or snapshots. Only shared completion remains blocked.
+
+For an existing registered Notion project with no local package, use
+`sync-refinement-package-notion start` before interpreting phase status. For existing
+local artifacts that the user wants to share, preserve their current approval and Judge
+state during the initial native publication.
+
+For the extension route, complete `extend-approved-package.md`, then continue at Phase 3 using Decision Capture normally.
+
+For a workspace containing multiple existing packages or loose refinement files, inventory
+and normalize locally first under the local organization contract. Obtain separate
+approval for local moves, validate every normalized package, and only then open a Notion
+publication gate. Do not combine local moves and remote writes in one approval.
 
 ### Phase 1: Understand the Project
 
@@ -251,7 +248,7 @@ Use `user-story-mapping` to identify:
 For every rule, record its plain-language behavior, source, decision authority, status, and affected flows. Consolidate rules that express one behavior instead of creating an ID for every sentence. Record conflicting sources in the contradiction log; never silently choose one.
 
 After each material approval, execute the Decision Capture Transaction. For cross-system
-behavior, do not accept phrases such as "sync the address" or "update the household" as a
+behavior, do not accept phrases such as “sync the address” or “update the household” as a
 complete rule. The related `MAP-*` must name both entities and fields, direction,
 conditions, propagation, exclusions, unsupported-data behavior, conflict policy and
 observability.
@@ -260,8 +257,6 @@ For derived artifacts, perform the required static review and interactive browse
 when behavior depends on interaction. Compare canon ↔ SPEC ↔ observed prototype, record
 material `DELTA-*` items and treat unmatched behavior as Proposed or Unverifiable. This
 workflow reviews and reconciles HTML/SPEC; it does not generate or edit them.
-
-If designs or a Figma link exist, offer an optional design checkpoint before Gate 3. Its absence blocks readiness only when observable behavior depends on an unresolved design decision.
 
 Ask business questions before detailed implementation questions. Route questions naturally:
 
@@ -355,8 +350,6 @@ After approval, write or update `05-user-stories.md` and `00-workflow-state.md`.
 
 Also generate one Jira-ready file per approved story. Include title, user outcome, concise context, included/excluded scope, criteria, dependencies, questions, and an `AC → BR → CHK → FTC/SC` table. Before Gate 4, test links may be pending.
 
-This file is a preview, not a live Jira issue — it does not create anything in Jira. Once a story clears Gate 4 (or Gate 3, if the team files tickets before test design finishes), use `skills/jira-story-publisher/SKILL.md` to estimate it and create the real issue.
-
 The Jira view must reproduce the approved acceptance criteria without shortening or changing their meaning. Show the user story and scope before `Comportamiento acordado`; keep `BR-*` as secondary traceability. After test design, add `Pruebas relacionadas`: criterion, checks, functional case/scenario, status, and a relative link.
 
 Make every story Markdown human-first: user story, scope, agreed behavior, dependencies/questions, acceptance criteria, and QA coverage. Put status metadata in its own section, keep IDs secondary to readable titles, and use whitespace plus heading hierarchy instead of dense uninterrupted lists. Never add CSS or platform-specific markup to authoritative Markdown. Preserve every approved statement when reorganizing an existing artifact.
@@ -364,8 +357,6 @@ Make every story Markdown human-first: user story, scope, agreed behavior, depen
 Within each criterion, create one or more stable `SC-*` headings, then render related rules as metadata and the behavioral flow as separate lines with bold `Given/Dado`, `When/Cuando`, `Then/Entonces`, `And/Y`, and `But/Pero` labels. Do not present rules and behavior as peers in one bullet list. QA reuses these exact scenarios and adds metadata without changing their meaning.
 
 Write acceptance criteria in product language before technical language. A reader must understand the actor, action, outcome, validation and consequence without knowing internal object names or architecture. Put required terms such as `Subscription`, `Commitment`, Agreements, events, idempotency or correlation IDs in a separate `Consideración técnica` or `Evidencia técnica` line. Do not use compressed shorthand such as `Draft+Commitment`, `Payments→Canceled`, `preview=cronograma`, “no deja parcial”, or slash-separated outcomes.
-
-Read `references/matrix-decision.md` when requirements contain interacting settings, states, permissions, calculations, boundaries, or reusable datasets. Apply its deterministic matrix assessment before creating a decision table or parameterized dataset. A matrix is optional supporting evidence and must never replace the business context, representative values, action, or expected outcome in a canonical `SC-*`.
 
 ### Phase 4: Design Test Coverage
 
@@ -379,6 +370,8 @@ Use `test-case-designer` on approved stories and criteria. Produce:
 - Rules-to-tests coverage table
 - Remaining questions and risk
 
+Read `references/matrix-decision.md` when requirements contain interacting settings, states, permissions, calculations, boundaries, or reusable datasets. Apply its deterministic matrix assessment before creating a decision table or parameterized dataset. A matrix is optional supporting evidence and must never replace the business context, representative values, action, or expected outcome in a canonical `SC-*`.
+
 Before writing functional cases, cluster checks by primary business behavior. Create a separate scenario only when the flow, precondition, trigger, primary rule, or user-visible outcome changes materially. Otherwise add the check as another expected result in the same scenario.
 
 Do not compress a workflow walkthrough into one scenario by listing several actions in one `When` or several unrelated outcomes in one `Then`. If a case covers selection, navigation, saving, validation and recovery, render each as a distinct `SC-*` product scenario and group them under the same `FTC-*` when appropriate. Use natural nouns such as “empleado”, “miembro”, “membresía”, “pago” and “plan”; explain test fixtures and internal records only in Preconditions, Data or Evidence.
@@ -387,7 +380,7 @@ Read `references/qa-design-handoff.md`. Treat `CHK-*` as coverage units, not exe
 
 Apply the `test-case-designer` Gherkin clarity and executability gates before Gate 4 approval. Keep those checks internal rather than adding a repeated checklist to the artifacts. For existing approved or automated scenarios, preserve IDs, traceability, behavior and automation metadata; propose clarifications and obtain approval instead of rewriting them silently. Do not call a scenario QA-ready merely because Given/When/Then headings exist.
 
-Keep scenario executability and automation separate. For every `SC-*`, record `Automate`, `Manual`, `Later`, or `To define`; include the reason, priority, lowest useful level, dependencies, and `Not started`, `Planned`, or `Implemented` coverage status. Never report execution results in this workflow.
+For every new or changed high-risk scenario, persist the compact execution contract required by `test-case-designer` and let strict validation enforce it; do not retroactively invalidate unchanged approved scenarios, but require migration when they are edited. If a material value or expected outcome lacks an owner decision, stop at `Needs refinement` because Product approval alone does not make the scenario executable. Keep scenario executability and automation separate. For every `SC-*`, record `Automate now`, `Automate later`, `Manual`, or `Blocked`; include the reason, priority, lowest useful level, dependencies, and `Not started`, `Planned`, or `Implemented` coverage status. Never report execution results in this workflow.
 
 #### Gate 4: Review Coverage
 
@@ -434,68 +427,49 @@ Do not publish externally, create or update Jira tickets, or represent the final
 
 Return a concise handoff containing completed artifacts, Judge verdict, decisions, open questions, owners, and the recommended next action.
 
-### Phase 6: Choose Final Presentations
+### Phase 6: Publish to Notion and Optionally Export Word
 
-After deterministic validation succeeds and the Judge returns `PASS` or `PASS WITH OBSERVATIONS` / `PASS CON OBSERVACIONES`, confirm that the canonical Markdown package is complete. Then open **Gate 5: Publication and export** and ask what additional presentation the user wants:
+After deterministic validation succeeds and the Judge returns `PASS` or `PASS WITH OBSERVATIONS` / `PASS CON OBSERVACIONES`, open **Gate 5: Notion publication**. Confirm the workspace, exact parent page and write set; Notion publication is required before the refinement is complete and shared.
 
-1. Portal HTML local
-2. Documento Word
-3. Página o estructura de Notion
-4. Varias de las anteriores
-5. Ninguna; finalizar con Markdown
+If Notion is unavailable, record the reason and next action, stop before remote publication, and hand off the validated local package as `Local draft — publication pending`. Resume at Gate 5 when a compatible connection, permission and confirmed destination exist; do not rerun approved phases unless their source changed.
 
-Do not imply that one optional presentation is required. If the user already selected a format, execute it without asking again.
-
-Route each selected output:
-
-- **Portal:** use `build-refinement-portal`; generate a self-contained local HTML, recommended as `10-refinement-portal.html` when available.
-- **Word:** use `build-refinement-document`; generate and visually verify a `.docx`, choosing the next free numbered filename.
-- **Notion:** use `publish-refinement-to-notion`; confirm workspace and destination, publish only with authorization, then verify by reading the result. Classify the action as:
-  - `Publicación completa` when the user asks to publish or republish the refinement without limiting pages. Require the portada, every story page and the six native auxiliary pages.
+Invoke `publish-refinement-to-notion` through the host skill mechanism and complete its dispatch preflight; if the specialist or a compatible Notion connection cannot be resolved, stop with publication pending instead of designing or writing an alternative page. Publish only with authorization and verify by full readback. Classify the action as:
+  - `Publicación completa` when the user asks to publish or republish the refinamiento without limiting pages. Generate both the collaborative refinement view (cover, story pages and auxiliary pages) and a 1:1 Markdown mirror that preserves relative paths and roles.
   - `Actualización localizada` when the user explicitly names affected stories, sections or pages. Preserve the rest and update cover facts whose truth changed.
 
-Generate every presentation from approved Markdown, never from another derived presentation. A user may select several formats; produce them independently so HTML, Word and Notion cannot silently drift through chained conversion.
+After initial publication and registration, use `sync-refinement-package-notion` for every
+`status`, `start`, `publish`, `reconcile` or `recover`. Notion becomes the shared official
+copy only after complete readback; regenerate the local Markdown checkout from that
+verified result.
 
-When the package contains a canonical matrix, every selected presentation must render it as navigable content or provide a valid destination-native link. Consumer stories still include the relevant input and expected values, so a reviewer can understand and approve each scenario without opening the matrix. Never leave a local filesystem path as the only matrix reference in Notion, Word, Portal, Jira, or another derived view.
+The Notion hierarchy must follow `references/markdown-package.md`. Keep the established
+human refinement view as the primary review experience, including its cover, story pages
+and auxiliary pages. Also maintain a technical 1:1 mirror for safe synchronization;
+publication and sync skills must not consolidate, rename, omit or reclassify its files.
+Jira files, handoffs and the human view are generated views, not competing canonical
+sources.
+
+After readback, synchronization and presentation-parity Judge succeed, ask once whether a
+Word export is needed. If requested, use `build-refinement-document` and generate it from
+the snapshot-bound Markdown checkout that matches verified Notion, never by scraping or
+copying a derived page. A later Notion change makes the Word stale and requires regeneration.
+
+When the package contains a canonical matrix, Notion and any Word export must render it as navigable content or provide a valid destination-native link. Consumer stories still include the relevant input and expected values, so a reviewer can understand and approve each scenario without opening the matrix. Never leave a local filesystem path as the only matrix reference in Notion, Word, Jira, or another derived view.
 
 For external publication, preserve safety:
 
-- Notion: create a private page by default when no destination is specified; do not edit the PRD original.
-- Hosted portal: offer private hosting only after validating the local HTML; require informed confirmation before public hosting.
+- Notion: require a confirmed parent page; allow an explicitly requested private standalone page without making it a future default. Do not edit the PRD original.
 - Word: do not deliver internal render PNGs unless requested.
 
-Update `00-workflow-state.md` and `09-package-index.md` with every selected format, local path or URL, generation date, publication mode, scope, status and page manifest. Record declined outputs as `Not requested`, not as missing work. Do not mark the project incomplete because the user declines optional presentations.
+Update `00-workflow-state.md` and `09-package-index.md` with the Notion URL, page manifest, synchronized snapshot and any Word path. Record a declined Word export as `Not requested`; it does not make the project incomplete.
 
 After a Notion publication, rerun `refinement-judge` in presentation-parity mode against the same canonical snapshot and the pages just verified. A complete publication must fail parity when a required auxiliary page is absent, stale, duplicated, incorrectly linked or marked `No aplica` despite an applicable canonical source. A localized update is judged against its declared scope and the cover facts it changed.
 
 ## State and Resumption
 
-At each gate, maintain a compact state summary. The instant a gate is approved, append one line to the Gate approval log below — who approved it (the user, by name if known, otherwise "the user") and today's date — before moving on. Don't infer or backfill a missing log line later; if a gate isn't logged, treat it as not actually approved yet.
-
-```markdown
-## Workflow State
-- Mode:
-- Current phase:
-- Approved through:
-- Gate approval log:
-  - Gate 1 (Understanding): [approved by <name>, <date>] or [pending]
-  - Gate 2 (Scope): [approved by <name>, <date>] or [pending]
-  - Gate 3 (Behavior): [approved by <name>, <date>] or [pending]
-  - Gate 4 (Coverage): [approved by <name>, <date>] or [pending]
-  - Gate 5 (Publication): [approved by <name>, <date>] or [pending] or [not requested]
-- Confirmed rules:
-- Open blocking questions:
-- Selected scope:
-- Next action:
-- Markdown package path:
-- Artifact language/audiences:
-- Optional presentations selected:
-- Presentation paths or URLs:
-- Notion publication mode and page manifest:
-- Project status and delivery statuses:
-```
-
-When the user returns later, continue from this state instead of restarting. If source material changed, identify what downstream artifacts may now be stale.
+Read `references/workflow-state.md` when creating, updating or resuming workflow state.
+Continue from that state instead of restarting and identify downstream artifacts made stale
+by changed sources.
 
 ## Examples and Pitfalls
 
@@ -504,9 +478,9 @@ Read `references/examples-and-pitfalls.md` only when the user requests an exampl
 ## References
 
 - `references/interaction-protocol.md` — How to ask, adapt, pause, and resume
+- `references/workflow-state.md` — Compact state contract for gates and resumption
 - `references/artifact-contract.md` — Required handoff and traceability between phases
 - `references/markdown-package.md` — File structure, statuses, and update rules
-- `references/local-organization-contract.md` — Notion availability classification and local-draft normalization
 - `references/rule-governance.md` — Sources, authority, contradictions, and rule consolidation
 - `references/decision-capture.md` — Mandatory persistence, readback, stale-impact tracking and capture receipt after approvals
 - `references/integration-mapping.md` — Required `MAP-*` contract for sync, migration, propagation and cross-system fields
@@ -515,21 +489,11 @@ Read `references/examples-and-pitfalls.md` only when the user requests an exampl
 - `references/readiness-and-approvals.md` — Backlog states, role readiness, and block approvals
 - `references/qa-design-handoff.md` — Boundary between QA design and downstream TestManager artifacts
 - `references/matrix-decision.md` — Deterministic rule for creating matrices without making scenarios depend on them
-- `references/examples-and-pitfalls.md` — Worked examples and common interaction failure patterns
 - `skills/refinement-judge/SKILL.md` — Independent adversarial gate before consequential actions
 - `skills/user-story-mapping/SKILL.md` — Journey, rules, variations, and release slices
 - `skills/user-story-splitting/SKILL.md` — Vertical decomposition and sequencing
 - `skills/user-story/SKILL.md` — User stories and acceptance criteria
 - `skills/test-case-designer/SKILL.md` — Risk-based coverage and test cases
-- `skills/build-refinement-portal/SKILL.md` — Optional final portal generation from approved artifacts
 - `skills/build-refinement-document/SKILL.md` — Optional Word document generation and visual verification
-- `skills/publish-refinement-to-notion/SKILL.md` — Optional native Notion publication or local export fallback
-- `skills/sync-refinement-package-notion/SKILL.md` — Optional ongoing sync, concurrency and recovery after an initial Notion publication
-
-### Outside This Orchestrator's Scope
-
-- `skills/idea-to-ship/SKILL.md` — The router above this one: decides whether an initiative should even be here yet (the Define/Shape stage), or belongs at an earlier/later stage. If a user arrives unsure where to start, point them there first.
-- `skills/prd-writer/SKILL.md`, `skills/product-spec-agent/SKILL.md`, `skills/mini-spec-writer/SKILL.md` — Upstream: produce the spec, PRD, or approved feature scope this orchestrator's Phase 0 expects as input. Do not re-litigate business-case or bet decisions already made there.
-- `skills/jira-story-publisher/SKILL.md` — Downstream: the only skill that actually creates a Jira issue from an approved story; this orchestrator's `jira/US-[ID].md` files are previews, not live tickets.
-- `skills/weekly-product-pulse/SKILL.md` — Downstream: reports on stories once they're filed in Jira and enter the team's tracked workflow.
-- `skills/artifact-sync/SKILL.md` — Downstream: propagates a changed decision back into already-published Jira/Notion/design artifacts after this package has been approved and published.
+- `skills/publish-refinement-to-notion/SKILL.md` — Required native publication for completed shared refinements, with local fallback while disconnected
+- `skills/sync-refinement-package-notion/SKILL.md` — Active shared synchronization, concurrency and recovery

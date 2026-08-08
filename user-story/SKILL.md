@@ -1,19 +1,6 @@
 ---
 name: user-story
-argument-hint: "[feature or user need]"
 description: Create user stories with Mike Cohn format and focused Gherkin acceptance criteria written in clear product language, with technical considerations separated from observable behavior. Use when turning user needs into development-ready or Jira-ready work with understandable outcomes and testable conditions.
-intent: >-
-  Create clear, concise user stories that combine Mike Cohn's user story format with Gherkin-style acceptance criteria. Use this to translate user needs into actionable development work that focuses on outcomes, ensures shared understanding between product and engineering, and provides testable success criteria.
-type: component
-theme: pm-artifacts
-best_for:
-  - "Writing user stories with proper acceptance criteria"
-  - "Converting requirements into development-ready stories"
-  - "Establishing story quality standards across your team"
-scenarios:
-  - "I need to write a user story for a new notification system in our B2B SaaS app"
-  - "Convert this PRD requirement into a properly formatted user story with Gherkin acceptance criteria"
-estimated_time: "5-10 min"
 ---
 
 
@@ -112,8 +99,8 @@ A user story combines:
 
 ### Step 1: Gather Context
 Before writing a story, ensure you have:
-- **User persona:** Who is this for?
-- **Problem understanding:** What need does this address?
+- **User persona:** Who specifically benefits or acts?
+- **Problem understanding:** What confirmed user need or problem does this address?
 - **Desired outcome:** What does success look like?
 - **Constraints:** Technical, time, or scope limitations
 - **Business rules:** Confirmed rules with stable IDs and sources
@@ -185,7 +172,7 @@ Fill in the template:
 
 **Quality checks:**
 - **Multiple Givens are okay:** Preconditions stack up (e.g., "Given I'm logged in" + "Given I have items in my cart")
-- **Only one When:** If you need multiple "When" statements, you likely have multiple stories—split them
+- **One primary business event:** Require at least one `When`. Multiple `When` steps are valid only when they are inseparable parts of that event; split independent events into separate scenarios
 - **One behavior per scenario:** Multiple inseparable `Then/And` results are valid when they prove one coherent business outcome
 - **Multiple scenarios are expected:** Add success, validation, alternate-rule, or material-failure scenarios required for acceptance
 - **Alignment:** Does "When" match "I want to"? Does "Then" match "so that"?
@@ -267,8 +254,6 @@ For payment stories, never use “approved” ambiguously. Distinguish authorize
 
 Read `references/examples-and-pitfalls.md` only when a concrete example is needed or a review detects one of its quality failure patterns. Apply those examples without changing the output contract above.
 
----
-
 ## References
 
 ### Related Skills
@@ -282,15 +267,5 @@ Read `references/examples-and-pitfalls.md` only when a concrete example is neede
 - Gherkin (Cucumber) — "Given/When/Then" acceptance criteria format
 - INVEST criteria (Independent, Negotiable, Valuable, Estimable, Small, Testable)
 
-### Dean's Work
-- [Link to relevant Dean Peters' Substack articles if applicable]
-
 ### Provenance
 - Adapted from `prompts/user-story-prompt-template.md` in the `https://github.com/deanpeters/product-manager-prompts` repo.
-
----
-
-**Skill type:** Component
-**Suggested filename:** `user-story.md`
-**Suggested placement:** `/skills/components/`
-**Used by:** `skills/user-story-splitting/SKILL.md`
