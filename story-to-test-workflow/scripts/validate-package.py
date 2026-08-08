@@ -204,7 +204,7 @@ def decision_checkpoint_checks(
 
     sync_terms = re.compile(
         r"\b(?:sync\w*|synchroni[sz]\w*|sincroniz\w*|migration\w*|migraci[oó]n|"
-        r"import\w*|export\w*|propagat\w*|propagaci[oó]n|inbound|outbound|"
+        r"import(?:s|ed|ing|ation)?|export\w*|propagat\w*|propagaci[oó]n|inbound|outbound|"
         r"bidirectional|bidireccional)\b",
         re.IGNORECASE,
     )
@@ -285,10 +285,6 @@ def strict_checks(root: Path, files: dict[Path, str]) -> tuple[list[str], list[s
         if next_ac:
             block = block[:next_ac.start()]
         when_count = len(re.findall(r"\*\*(?:When|Cuando)(?:\*\*)?\s*:?(?=\s|$)", block, re.IGNORECASE))
-        # NOTE (merge 2026-07-31): personal required exactly one primary When/Cuando per SC-*;
-        # staging relaxed this to "at least one". Kept personal's stricter behavior here because
-        # it wasn't in the explicitly authorized staging adoption list (DELTA/MAP patterns,
-        # definition_blocks(), decision_checkpoint_checks()) — flagged in REPORT.md for a decision.
         if when_count != 1:
             errors.append(f"{sc_id} must contain exactly one primary When/Cuando event; found {when_count}.")
         given_match = re.search(
@@ -320,6 +316,65 @@ def strict_checks(root: Path, files: dict[Path, str]) -> tuple[list[str], list[s
         decision = re.search(r"Automatizaci[oó]n:\*\*\s*([^\n]+)", block, re.IGNORECASE)
         if decision and decision.group(1).strip() not in {"Automate now", "Automate later", "Manual", "Blocked"}:
             errors.append(f"{sc_id} has an unsupported canonical automation decision: {decision.group(1).strip()}.")
+
+        # High-risk scenarios need a compact, concrete execution contract. Narrative
+        # quality alone cannot prove that QA can reproduce financial or scheduled work.
+        critical_domain = re.search(
+            r"\b(payment|pago|charge|cobro|installment|cuota|retry|reintento|"
+            r"schedule(?:d|r)?|programad[oa]|refund|reembolso|void|duplicate|duplicad[oa]|"
+            r"idempoten|balance|saldo|token|delete|delet|elimin|destruct|identity|identidad|"
+            r"permission|permiso|authorization|autorizaci[oó]n|cross[ -]system|entre sistemas|"
+            r"salesforce|integration|integraci[oó]n|sync|sincroniz\w*)\b",
+            block,
+            re.IGNORECASE,
+        )
+        explicit_high_risk = re.search(
+            r"(?:Priority(?:/Risk)?|Prioridad(?:/Riesgo)?)\s*:\s*\*\*?\s*"
+            r"(?:High|Critical|Alta|Cr[ií]tica)",
+            block,
+            re.IGNORECASE,
+        )
+        high_risk = bool(critical_domain or explicit_high_risk)
+        readiness = re.search(
+            r"(?:Executability|Ejecutabilidad)\s*:\s*\*\*?\s*"
+            r"(Ready|Needs refinement|Blocked)",
+            block,
+            re.IGNORECASE,
+        )
+        automate_now = bool(re.search(r"Automate now", block, re.IGNORECASE))
+        claims_ready = bool(readiness and readiness.group(1).lower() == "ready")
+        contract_adopted = bool(re.search(
+            r"(?:Executability|Ejecutabilidad|Controlled example|Ejemplo controlado|"
+            r"Initial state|Estado inicial|Controlled outcome|Resultado controlado|"
+            r"Observable evidence|Evidencia observable|Combination coverage|Cobertura de combinaciones)\s*:",
+            block,
+            re.IGNORECASE,
+        ))
+        if high_risk and contract_adopted and automate_now and not claims_ready:
+            errors.append(f"{sc_id} cannot use Automate now without Executability: Ready.")
+        if high_risk and (claims_ready or (automate_now and contract_adopted)):
+            required_execution = {
+                "controlled example": r"(?:Controlled example|Ejemplo controlado)\s*:",
+                "initial state": r"(?:Initial state|Estado inicial)\s*:",
+                "controlled outcome": r"(?:Controlled outcome|Resultado controlado)\s*:",
+                "observable evidence": r"(?:Observable evidence|Evidencia observable)\s*:",
+            }
+            missing = [
+                name for name, pattern in required_execution.items()
+                if not re.search(pattern, block, re.IGNORECASE)
+            ]
+            if missing:
+                errors.append(
+                    f"{sc_id} is high risk and claims Ready/Automate now but lacks its concrete execution contract: "
+                    f"{', '.join(missing)}. Use Needs refinement when an owner decision is missing."
+                )
+            if re.search(r"\b(partial|parciales?|oldest|más antigu|mas antigu|accumulat\w*|acumulad\w*)\b", block, re.IGNORECASE):
+                if not re.search(r"(?:Combination coverage|Cobertura de combinaciones)\s*:", block, re.IGNORECASE):
+                    errors.append(
+                        f"{sc_id} has interacting recovery outcomes but no Combination coverage/Cobertura de combinaciones."
+                    )
+            if automate_now and missing:
+                errors.append(f"{sc_id} cannot use Automate now while its execution contract is incomplete.")
 
     for jira in (root / "jira").glob("US-*.md") if (root / "jira").is_dir() else []:
         jira_blocks = acceptance_blocks(jira.read_text(encoding="utf-8"))

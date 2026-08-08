@@ -2,7 +2,7 @@
 
 ## Required Guided Loop
 
-In Guided mode, repeat this loop until the current decision gate is ready:
+Use this loop for every route until the current decision gate is ready:
 
 1. Summarize only the confirmed context relevant to the current phase.
 2. Ask one to three related questions required for the next decision.
@@ -56,12 +56,21 @@ Before asking a question:
 
 Tailor the choices. Do not show irrelevant options.
 
-## Guided Versus Fast
+## Route Confirmation
 
-- **Guided:** use the Required Guided Loop, explain the purpose of each question when useful, wait between rounds, and show each gate.
-- **Fast draft:** infer structure, never business rules; group non-blocking questions in the provisional output.
-- **Review:** preserve approved artifacts and report defects before rewriting.
-- **Continue:** load current state and begin at the requested phase.
+For a new workflow, infer the route; if it is materially ambiguous, ask one short route-level
+clarification first. Explain the recommendation in one or two sentences and ask whether the
+interpretation is correct. Do not begin discovery questions, assign IDs or write artifacts
+until the user confirms. Show the route list only when asked or when the user rejects the
+recommendation. When resuming a recorded route, continue without another confirmation
+unless the new request changes the nature of the work.
+
+## Fast Draft Exception
+
+Use a fast draft only when explicitly requested. Infer structure but never business rules,
+mark the output provisional and group non-blocking questions visibly. A fast draft does not
+skip the guided review, Decision Capture, gates, strict validation or Judge required before
+approval, handoff or publication.
 
 ## Pause and Resume
 
