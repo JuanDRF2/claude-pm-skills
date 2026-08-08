@@ -59,9 +59,25 @@ el snapshot cuando se incorpora al contenido canónico.
 3. Respaldar cada página afectada.
 4. Aplicar cambios localizados cuando sea posible.
 5. Actualizar el registro/snapshot actual al final.
-6. Leer todo nuevamente y reconstruir local.
+6. En actualización localizada, leer nuevamente cada unidad escrita y reconstruir el paquete
+   completo con los hashes verificados de las unidades `preserve`. En publicación inicial,
+   leer todas las unidades.
 7. Si falla, mantener el snapshot anterior y ofrecer `recover`.
 8. Después del readback, generar un ZIP del checkout verificado y su manifiesto SHA-256.
+
+### Plan de escritura eficiente
+
+Clasificar cada unidad modificada como:
+
+- `patch`: delta pequeño o página grande; aplicar únicamente bloques con anclas únicas;
+- `replace`: contenido acotado cuya sustitución completa es más segura;
+- `preserve`: sin cambio final; excluir del write set y conservar su hash verificado;
+- `blocked`: conflicto, base no confiable, ancla ambigua o impacto incompleto.
+
+El motor recomienda la estrategia usando tamaño y proporción del delta, pero el conector
+debe degradar a `replace` o detenerse si no puede aplicar un patch inequívoco. Después de
+cualquier estrategia, leer la página completa y exigir equivalencia con el archivo final.
+Un patch no cambia el estándar de resultado ni permite verificación parcial.
 
 ## Reconciliación
 
@@ -109,3 +125,19 @@ visible del contrato propietario.
 El historial visible queda fuera del snapshot canónico. El receipt local conserva hashes,
 IDs, backup, outbox y rollback. Si la publicación se verificó pero falla la entrada de
 Notion, marcar `pending_notion_entry` y reintentar sin repetir la publicación.
+
+Cuando el write set afecte `05-user-stories.md` o `jira/*.md`, marcar el evento como
+`pending_editorial_verification`. No cambiarlo a `complete` hasta que:
+
+1. cada historia afectada tenga readback completo;
+2. `verify-editorial-parity.mjs` confirme `AC`, `SC`, `CHK`, `FTC` y cláusulas de escenario;
+3. el Judge posterior a Notion emita un veredicto permitido;
+4. el receipt editorial cubra todas las historias esperadas.
+
+El cierre debe recibir el reporte del Judge, comprobar `PASS` o `PASS WITH OBSERVATIONS`,
+la acción de paridad/publicación de Notion y el mismo snapshot final. La instrucción textual
+de ejecutar el Judge no sustituye esta evidencia determinista.
+Un `FAIL` solo puede cerrar el evento con una excepción humana explícita ya registrada que
+nombre acción de Notion, hallazgos aceptados, responsable, motivo y fecha.
+
+Un resumen, un enlace o una comprobación de presencia no satisface este gate.
