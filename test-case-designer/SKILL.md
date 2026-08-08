@@ -173,11 +173,6 @@ Apply a readability gate before the executability gate: hide traceability metada
 
 Read `references/executability-gate.md`. Apply its Gherkin clarity check before approving a scenario: require a concrete initial state, one recognizable primary business event, specific observable results, relevant exact values, and explicit unchanged behavior when regression risk makes it material. Reject vague outcomes such as “works correctly”, “processes successfully”, “updates the information”, or equivalent wording unless the scenario names the resulting state and evidence. Multiple inseparable actions are allowed; do not enforce exactly one `When` keyword as a universal rule.
 
-For high-risk scenarios, apply the compact execution contract from that reference. Never
-mark it `Ready` or `Automate now` when required data, controlled outcome, evidence, or
-interacting-result coverage is missing. `Automate now` also requires `Executability: Ready`;
-otherwise use `Needs refinement` and name the decision owner.
-
 Keep this quality control internal to test design. Do not add a repeated clarity checklist below every scenario or change the output schema.
 
 For existing packages, audit progressively:
@@ -188,11 +183,6 @@ For existing packages, audit progressively:
 - Do not rewrite an approved or automated scenario without showing the current wording, proposed wording, reason, and impact, then obtaining the applicable approval.
 
 Classify automation for every `SC-*` as **Automate now**, **Automate later**, **Manual**, or **Blocked**. Write that strategy directly below the canonical scenario under its acceptance criterion so the story is self-contained. Include rationale, priority, lowest useful level, dependencies, and implementation status. Derived FTC, Jira and publication views must reuse those fields verbatim and must never recalculate the decision. Keep this separate from executability: `Ready` means QA can execute the scenario reproducibly, not that automation is valuable or already implemented. Default implementation status to `Not started`; execution results remain downstream.
-
-Treat `Automate now`, `Automate later`, `Manual`, `Blocked`, `Not started`, `Planned`, and
-`Implemented` as language-neutral controlled values for validation and tool exchange. Keep
-the value unchanged in every artifact language; translate its field label and optionally
-add a human explanation beside it.
 
 For payments, distinguish authorization, capture, void, refund, settlement, and completed purchase. Test compensation failure or record it as residual risk with an owner; do not assume compensation always succeeds.
 

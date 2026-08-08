@@ -35,19 +35,6 @@ Do not invalidate or rewrite an existing approved package merely because this ga
 
 Apply all checks obligatorily to new scenarios and to existing scenarios when they are modified, prepared for execution, or selected for automation.
 
-## Compact high-risk contract
-
-For explicitly High/Critical risk scenarios, payments, scheduling, retries, duplicate
-prevention, destructive actions, identity, permissions, or cross-system consistency, a
-`Ready` or `Automate now` scenario must add four short fields:
-`Executability: Ready`, `Controlled example`, `Initial state`, `Controlled outcome`, and `Observable evidence`.
-Use representative dates, amounts, states and provider results only where they affect the
-outcome. For partial or accumulated recovery, also add `Combination coverage` as a compact
-decision table or named set of outcomes. Do not repeat setup that is identical across a
-functional case; reference its controlled dataset and state only the values material to the
-scenario. `Automate now` also requires `Executability: Ready` and is invalid while this
-contract is incomplete.
-
 ## Basis
 
 - ISTQB Advanced Test Analyst v4.0 distinguishes abstract high-level cases from concrete low-level cases and emphasizes traceability, precision, completeness, required data, and clear expected results: https://www.istqb.org/wp-content/uploads/sdm-uploads/ISTQB-CTAL-TA-Syllabus-v4.0-EN.pdf

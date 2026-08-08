@@ -59,17 +59,15 @@ Inferir la operación. Preguntar solo cuando dos opciones impliquen escrituras d
 
 Usar `refinement-sync` disponible en `PATH`; si no está en `PATH`, ejecutar
 `scripts/refinement-sync.mjs` desde esta skill. Con un conector de IA, leer cada
-`notion_page_id` del manifiesto, guardar el Markdown remoto en un directorio temporal
-operativo por `unit.id` y pasarlo al motor con `--remote-dir`. El directorio no es una
-segunda fuente de verdad y puede descartarse después del snapshot.
+`notion_page_id` del manifiesto y guardar el Markdown remoto en un directorio temporal
+operativo, replicando para cada unidad la misma ruta relativa que declara `local_path`
+(por ejemplo `jira/US-DEMO-01.md`) y, para cada presentación, la misma ruta que declara
+`remote_path` (por ejemplo `_presentation/cover/<id>.md`). El motor resuelve cada página
+por esa ruta, no por `unit.id`; un directorio organizado por `unit.id` no será encontrado
+y se reportará como `remote_missing`. Pasar el directorio al motor con `--remote-dir`. No
+es una segunda fuente de verdad y puede descartarse después del snapshot.
 Serializar cada lectura como `notion-inner-markdown-lf-v1` según `sync-contract.md`: solo
 el interior de `<content>`, UTF-8, LF y exactamente un salto final.
-
-Cuando el conector devuelva el envoltorio completo `<page>` y tablas HTML, pasar cada
-respuesta por `scripts/serialize-notion-fetch.mjs --out <ruta-remota>`. El serializador
-extrae un `<content>` completo, convierte tablas y continuaciones a Markdown estable y
-restaura la separación de bloques; se detiene ante respuestas truncadas. No copiar la
-respuesta cruda ni implementar esta normalización de forma ad hoc en cada IA.
 
 Para registrar un proyecto existente, construir el manifiesto según
 `page-manifest-contract.md` y guardar por separado evidencia fresca de la jerarquía leída
@@ -130,9 +128,6 @@ refinement-sync publish <project> --preview --remote-dir <lectura-del-conector>
 ```
 
 Mostrar páginas, cambios, base/remoto/nuevo snapshot, contradicciones, respaldo y rollback.
-El preview debe incluir la estrategia recomendada por unidad: `patch` para cambios pequeños
-o páginas grandes y `replace` para reemplazos acotados. `preserve` nunca entra al write set.
-La estrategia optimiza transporte; el readback final siempre compara la unidad completa.
 Solicitar autorización para el write set exacto. Después:
 
 ```bash
@@ -157,25 +152,9 @@ autorización genérica o por una aprobación emitida antes del preview.
 Después de `--verify`, crear con el conector la subpágina indicada por `audit_event` y
 cerrar el receipt con:
 
-Para cada historia editorial afectada, guardar su readback completo y construir un plan:
-
-```json
-{"project":"mi-proyecto","stories":[{"story_id":"US-01","canonical_path":"jira/US-01.md","presentation_path":"readback/US-01.md","notion_page_id":"uuid"}]}
-```
-
-Ejecutar `scripts/verify-editorial-parity.mjs --plan <plan.json> --out
-<editorial-receipt.json>`. El comando exige IDs y comportamiento completo por escenario;
-un resumen no pasa. Rerun `refinement-judge` con ese receipt como evidencia posterior a
-Notion y guardar su reporte contra el snapshot final. Solo entonces cerrar auditoría:
-
 ```bash
-refinement-sync audit <project> --complete --event <audit-event.json> \
-  --entry-page-id <uuid> --editorial-receipt <editorial-receipt.json> \
-  --judge-report <11-refinement-judge-report.md>
+refinement-sync audit <project> --complete --event <audit-event.json> --entry-page-id <uuid>
 ```
-
-Un `FAIL` bloquea. Solo una excepción humana ya registrada en el reporte puede usar además
-`--accept-judge-override`; debe nombrar acción de Notion, hallazgos, responsable, motivo y fecha.
 
 No crear historial para `status`, previews, `start` sin publicación o intentos fallidos.
 Crear cada entrada únicamente como hija de `audit_log_page_id`; nunca insertar eventos en
@@ -215,9 +194,6 @@ Antes de escribir:
 1. Comparar el snapshot remoto con la base local.
 2. Ejecutar el validador estricto de `story-to-test-workflow`.
 3. Ejecutar `refinement-judge` para la acción solicitada.
-   En una actualización localizada, exigir además la validación de completitud del plan de
-   impacto: consumidores omitidos, derivados stale o páginas editoriales contradictorias
-   bloquean la publicación.
 4. Bloquear ante contradicción semántica, cambio concurrente sobre la misma unidad o Judge
    `FAIL`.
 5. Crear respaldo de las páginas afectadas.
@@ -228,22 +204,10 @@ Después de escribir:
 2. Normalizar y comparar contenido e IDs.
 3. Regenerar los Markdown locales desde el Notion verificado.
 4. Ejecutar otra vez validación y paridad.
-5. Ejecutar paridad editorial por historia y el Judge posterior a Notion.
-6. Generar ZIP del checkout verificado y manifiesto SHA-256.
-7. Marcar el nuevo snapshot como actual y cerrar auditoría únicamente al final.
+5. Generar ZIP del checkout verificado y manifiesto SHA-256.
+6. Marcar el nuevo snapshot como actual al final.
 
 Una respuesta HTTP exitosa no completa una publicación.
-
-## Eficiencia segura
-
-- Leer y escribir en lotes pequeños cuando las unidades sean independientes.
-- Reintentar timeouts transitorios sin ampliar el write set.
-- Preferir `patch` cuando el cambio sea localizado o la página sea grande; usar `replace`
-  cuando sea más seguro y acotado.
-- Reusar hashes verificados para unidades `preserve`; no volver a enviarlas. Mantenerlas en
-  el snapshot final y bloquear si su base ya no es confiable.
-- No reducir lectura previa de unidades afectadas, validación estricta, Judge, respaldo,
-  readback completo de cada unidad escrita, auditoría, snapshot ni ZIP.
 
 ## Conflictos
 

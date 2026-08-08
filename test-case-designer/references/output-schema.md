@@ -68,10 +68,6 @@ Keep these in `07-functional-test-cases.md`.
 
 **Evidence location:** [Exact screen, object/record, message, report, or support view]
 
-For explicit High/Critical risk or critical-domain scenarios only, add the compact fields defined in
-`executability-gate.md`: **Controlled example**, **Initial state**, **Controlled outcome**,
-**Observable evidence**, and—when outcomes interact—**Combination coverage**.
-
 - **Automation:** Automate now/Automate later/Manual/Blocked
 - **Automation rationale:** [Why this scenario should or should not be automated now]
 - **Automation priority:** High/Medium/Low/To define
@@ -97,10 +93,6 @@ Do not mark a scenario Ready when it uses placeholders such as “appropriate da
 |---|---|---|---|---|---|---|---|
 
 ## 7. QA Handoff
-
-Use `Automate now`, `Automate later`, `Manual`, `Blocked`, `Not started`, `Planned`, and
-`Implemented` as language-neutral controlled values. Translate field labels, not these
-stored values; add a localized explanation when it improves readability.
 
 Include project/release, epic and stories, approved functional cases, scenarios, checks, preconditions, data/environment, risk, level, evidence, automation guidance, blockers, residual risk, and requested downstream artifact language.
 

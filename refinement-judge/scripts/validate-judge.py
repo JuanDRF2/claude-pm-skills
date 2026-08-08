@@ -22,7 +22,6 @@ CANONICAL_FILES = [
     "07-functional-test-cases.md",
     "08-traceability-and-risks.md",
     "09-package-index.md",
-    "10-design-and-spec-deltas.md",
 ]
 
 VERDICT_RE = re.compile(

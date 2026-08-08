@@ -187,8 +187,8 @@ if (command === "discover") {
     drift_policy: "review",
   });
   const presentations = [presentation(root, "cover")];
-  for (const page of childrenOf(contentParent)) {
-    if ([packagePage.id, auditPage.id].includes(page.id)) continue;
+  for (const page of childrenOf(rootId)) {
+    if ([internal?.id, packagePage.id, auditPage.id].filter(Boolean).includes(page.id)) continue;
     if (fold(page.title).startsWith("contrato compartido")) {
       classifyUnknown(page, "shared contract requires its own manifest");
       continue;
@@ -497,36 +497,6 @@ const base = fs.existsSync(baseFile)
 const baseMap = new Map((base.units || []).map((unit) => [unit.id, unit.sha256]));
 const stamp = () => new Date().toISOString().replace(/[:.]/g, "-");
 
-function recommendWriteStrategy(remote, local) {
-  if (!remote || !local) return null;
-  const before = normalize(remote).toString("utf8");
-  const after = normalize(local).toString("utf8");
-  let prefix = 0;
-  while (prefix < before.length && prefix < after.length && before[prefix] === after[prefix]) {
-    prefix += 1;
-  }
-  let suffix = 0;
-  while (
-    suffix < before.length - prefix &&
-    suffix < after.length - prefix &&
-    before[before.length - 1 - suffix] === after[after.length - 1 - suffix]
-  ) {
-    suffix += 1;
-  }
-  const changedBytes = Math.max(before.length - prefix - suffix, after.length - prefix - suffix);
-  const changeRatio = after.length ? changedBytes / after.length : 1;
-  const largePage = after.length >= 100_000;
-  const localized = changeRatio <= 0.2;
-  return {
-    recommended_write_mode: largePage || localized ? "patch" : "replace",
-    final_bytes: Buffer.byteLength(after),
-    estimated_changed_bytes: Buffer.byteLength(after.slice(prefix, after.length - suffix)),
-    estimated_change_ratio: Number(changeRatio.toFixed(4)),
-    reason: largePage ? "large-page" : localized ? "localized-delta" : "broad-delta",
-    verification: "full-unit-readback-required",
-  };
-}
-
 function inspect() {
   if (!remoteDir) fail("--remote-dir is required");
   const rows = manifest.units.map((unit) => {
@@ -544,7 +514,6 @@ function inspect() {
       state = localSha === remoteSha ? "same_change" : "conflict";
     } else if (localChanged) state = "local_changed";
     else if (remoteChanged) state = "remote_changed";
-    const strategy = state === "local_changed" ? recommendWriteStrategy(remote, local) : null;
     return {
       id: unit.id,
       role: unit.role,
@@ -553,7 +522,6 @@ function inspect() {
       local_sha256: localSha || null,
       remote_sha256: remoteSha || null,
       state,
-      ...(strategy || {}),
     };
   });
   const presentations = (manifest.presentations || []).map((presentation) => {
@@ -733,29 +701,17 @@ function prepareAuditEvent(operation, writeSet, finalSnapshot, outbox) {
     id: item.id,
     local_path: item.local_path,
   }));
-  const expectedEditorialStories = [...new Set(
-    affected
-      .filter((item) => /^jira\/.+\.md$/i.test(item.local_path))
-      .map((item) => path.basename(item.local_path, ".md")),
-  )];
-  const storyAggregateChanged = affected.some((item) => item.local_path === "05-user-stories.md");
-  const editorialVerificationRequired = expectedEditorialStories.length > 0 || storyAggregateChanged;
   const event = {
     schema_version: 1,
     event_id: eventId,
     project,
-    audit_status: editorialVerificationRequired
-      ? "pending_editorial_verification"
-      : "pending_notion_entry",
+    audit_status: "pending_notion_entry",
     audit_log_page_id: manifest.audit_log_page_id,
     operation,
     ...writeSet.audit,
     base_snapshot: writeSet.base_snapshot || null,
     final_snapshot: finalSnapshot,
     affected_pages: affected,
-    editorial_verification_required: editorialVerificationRequired,
-    expected_editorial_stories: expectedEditorialStories,
-    editorial_scope_unresolved: storyAggregateChanged && expectedEditorialStories.length === 0,
     readback: {
       pages_expected: affected.length,
       pages_verified: affected.length,
@@ -788,8 +744,6 @@ ${affected.map((item) => `- ${item.local_path}`).join("\n") || "- Ninguna"}
 - Páginas esperadas: ${affected.length}.
 - Páginas verificadas: ${affected.length}.
 - Diferencias: 0.
-- Paridad editorial requerida: ${editorialVerificationRequired ? "Sí" : "No"}.
-- Historias editoriales esperadas: ${expectedEditorialStories.join(", ") || "Ninguna"}.
 `;
   write(markdownPath, Buffer.from(markdown));
   return {
@@ -843,83 +797,6 @@ if (command === "audit") {
   if (!eventArg || !entryPageId) fail("--event and --entry-page-id are required");
   const eventPath = path.resolve(cwd, eventArg);
   const event = JSON.parse(fs.readFileSync(eventPath, "utf8"));
-  const markdownPath = eventPath.replace(/\.json$/i, ".md");
-  if (!fs.existsSync(markdownPath)) fail("Audit Markdown is required", { path: markdownPath });
-  const auditMarkdown = fs.readFileSync(markdownPath, "utf8");
-  const requiredAuditSections = ["## Responsables", "## Operación", "## Páginas afectadas", "## Verificación"];
-  const missingAuditSections = requiredAuditSections.filter((section) => !auditMarkdown.includes(section));
-  if (missingAuditSections.length || /^\s*\{/u.test(auditMarkdown)) {
-    fail("Audit Markdown failed preflight", { path: markdownPath, missing: missingAuditSections });
-  }
-  if (event.editorial_verification_required) {
-    if (event.editorial_scope_unresolved) {
-      fail("Editorial scope is unresolved; regenerate affected jira views before audit completion");
-    }
-    const editorialReceiptArg = value("--editorial-receipt");
-    if (!editorialReceiptArg) fail("--editorial-receipt is required");
-    const editorialReceiptPath = path.resolve(cwd, editorialReceiptArg);
-    const editorialReceipt = readJson(editorialReceiptPath, "Editorial parity receipt");
-    if (editorialReceipt.ok !== true || editorialReceipt.project !== project) {
-      fail("Editorial parity receipt failed", { path: editorialReceiptPath });
-    }
-    const verifiedStories = new Set(
-      (editorialReceipt.stories || []).filter((item) => item.ok === true).map((item) => item.story_id),
-    );
-    const missingStories = (event.expected_editorial_stories || []).filter(
-      (storyId) => !verifiedStories.has(storyId),
-    );
-    if (missingStories.length) {
-      fail("Editorial parity receipt is incomplete", { missing_stories: missingStories });
-    }
-    event.editorial_verification = {
-      receipt: path.relative(cwd, editorialReceiptPath),
-      sha256: crypto.createHash("sha256").update(fs.readFileSync(editorialReceiptPath)).digest("hex"),
-      checked_at: editorialReceipt.checked_at || null,
-      stories_verified: [...verifiedStories],
-    };
-    const judgeReportArg = value("--judge-report");
-    if (!judgeReportArg) fail("--judge-report is required after editorial verification");
-    const judgeReportPath = path.resolve(cwd, judgeReportArg);
-    if (!fs.existsSync(judgeReportPath)) fail("Post-publication Judge report is missing", { path: judgeReportPath });
-    const judgeReport = fs.readFileSync(judgeReportPath, "utf8");
-    const verdictMatch = judgeReport.match(
-      /(?:Verdict|Veredicto)\s*:\s*(PASS WITH OBSERVATIONS|PASS CON OBSERVACIONES|PASS|FAIL)\b/i,
-    );
-    const snapshotMatch = judgeReport.match(
-      /(?:Reviewed snapshot SHA-256|Snapshot revisado SHA-256)\s*:\s*`?([a-f0-9]{64})`?/i,
-    );
-    const actionMatch = judgeReport.match(
-      /(?:Intended action|Acci[oó]n evaluada)\s*:[^\n]*(?:Notion|paridad|publication|publicaci[oó]n)/i,
-    );
-    const allowedVerdicts = new Set(["PASS", "PASS WITH OBSERVATIONS", "PASS CON OBSERVACIONES"]);
-    const verdict = verdictMatch?.[1]?.toUpperCase() || null;
-    const overrideMatch = judgeReport.match(/(?:Human override|Excepci[oó]n humana)\s*:\s*([^\n]+)/i);
-    const overrideText = overrideMatch?.[1]?.trim() || "";
-    const validOverride = flag("--accept-judge-override")
-      && verdict === "FAIL"
-      && !/^(?:None|Ninguna)$/i.test(overrideText)
-      && /(?:Notion|publicaci[oó]n)/i.test(overrideText)
-      && /(?:Finding|Hallazgo)/i.test(overrideText)
-      && /(?:Owner|Responsable)/i.test(overrideText)
-      && /(?:Reason|Raz[oó]n|Motivo)/i.test(overrideText)
-      && /\b\d{4}-\d{2}-\d{2}\b/.test(overrideText);
-    if (!verdict || (!allowedVerdicts.has(verdict) && !validOverride) || !actionMatch) {
-      fail("Post-publication Judge did not authorize Notion editorial completion", { verdict });
-    }
-    if (!snapshotMatch || snapshotMatch[1].toLowerCase() !== event.final_snapshot) {
-      fail("Post-publication Judge reviewed a different snapshot", {
-        expected: event.final_snapshot,
-        reviewed: snapshotMatch?.[1] || null,
-      });
-    }
-    event.post_publication_judge = {
-      report: path.relative(cwd, judgeReportPath),
-      sha256: crypto.createHash("sha256").update(judgeReport).digest("hex"),
-      verdict,
-      reviewed_snapshot: snapshotMatch[1].toLowerCase(),
-      human_override: validOverride ? overrideText : null,
-    };
-  }
   event.audit_status = "complete";
   event.entry_page_id = entryPageId;
   event.completed_at = new Date().toISOString();

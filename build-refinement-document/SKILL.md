@@ -1,15 +1,15 @@
 ---
 name: build-refinement-document
-description: Genera o actualiza un documento Word (.docx) claro y navegable desde el checkout Markdown verificado de un refinamiento de producto y QA publicado en Notion. Usar únicamente como exportación final opcional cuando una persona quiera compartir, imprimir o archivar historias, criterios, reglas, checks, casos funcionales, escenarios, automatización, pendientes y riesgos.
+description: Genera o actualiza un documento Word (.docx) claro y navegable desde un paquete Markdown aprobado de refinamiento de producto y QA. Usar cuando una persona quiera revisar, compartir, aprobar, imprimir o archivar historias, criterios, reglas, checks, casos funcionales, escenarios, automatización, pendientes y riesgos sin usar el portal HTML; también cuando el orquestador ofrezca Word como salida opcional final.
 ---
 
 # Build Refinement Document
 
-Crear una vista documental derivada desde el checkout Markdown ligado al último readback verificado de Notion. Notion es la copia oficial compartida; el checkout conserva el snapshot canónico para generar el documento sin alterar decisiones de producto.
+Crear una vista documental derivada. Mantener los Markdown como fuente de verdad y no alterar decisiones de producto durante la publicación.
 
 ## Flujo
 
-1. Identificar la carpeta de artefactos aprobados, comprobar que su snapshot coincide con el último readback verificado de Notion y definir el `.docx` destino.
+1. Identificar la carpeta de artefactos aprobados y el `.docx` destino.
 2. Leer [references/document-contract.md](references/document-contract.md).
 3. Ejecutar primero el validador del paquete del orquestador en modo estricto. Detenerse ante relaciones rotas o contenido no aprobado que impida una publicación confiable.
 4. Generar el documento con una capacidad DOCX nativa de la IA cuando esté disponible. Aplicar el contrato editorial de esta skill.
@@ -22,7 +22,7 @@ Crear una vista documental derivada desde el checkout Markdown ligado al último
    El fallback requiere Python 3 y `python-docx`. Informar la dependencia si no está instalada; no instalar software sin autorización.
 6. Renderizar el DOCX a imágenes de página con LibreOffice o la herramienta documental disponible. Inspeccionar todas las páginas y corregir cortes, tablas rotas, encabezados huérfanos, tipografía pequeña y bloques amontonados.
 7. Confirmar por extracción o inspección que todas las historias aprobadas aparecen. Comparar también conteos de `US`, `AC`, `CHK`, `FTC` y `SC` con el paquete fuente. Para cada `SC-*`, verificar que Word conserva literalmente decisión de automatización, nivel, prioridad, razón, dependencias y estado.
-8. Guardar el documento dentro de la carpeta de artefactos como `refinement-document.docx`, salvo que el usuario confirme otro nombre.
+8. Guardar el documento dentro de la carpeta de artefactos, recomendado como `10-refinement-document.docx` si ese número está libre; si existe el portal en `10-`, usar `11-refinement-document.docx`.
 9. Actualizar `00-workflow-state.md` y `09-package-index.md` con la ruta, fecha, alcance y estado de generación.
 
 ## Reglas de lectura

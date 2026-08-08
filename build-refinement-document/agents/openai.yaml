@@ -1,4 +1,4 @@
 interface:
   display_name: "Build Refinement Document"
-  short_description: "Generate a clear Word refinement document"
-  default_prompt: "Use $build-refinement-document to turn this approved Markdown refinement package into a readable, validated Word document."
+  short_description: "Genera un documento Word de refinamiento claro"
+  default_prompt: "Usa $build-refinement-document para convertir este paquete Markdown de refinamiento aprobado en un documento Word legible y validado."

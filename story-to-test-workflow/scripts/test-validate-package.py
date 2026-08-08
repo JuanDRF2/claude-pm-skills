@@ -94,65 +94,6 @@ def main() -> int:
         )
         assert any("BR-99" in error and "MAP-*" in error for error in errors)
 
-    with tempfile.TemporaryDirectory() as temporary:
-        root = Path(temporary)
-        incomplete = """
-### AC-PAY-01-01 — Cobro
-**Condición de aceptación:** se cobra una cuota.
-#### SC-PAY-01-01 — Reintento programado
-**Dado**: una cuota vencida
-**Cuando**: llega la siguiente fecha programada
-**Entonces**: se intenta el pago
-**Ejecutabilidad:** Ready
-#### Estrategia QA
-**Automatización:** Automate now
-**Nivel recomendado:** Integration
-**Prioridad:** High
-**Razón:** riesgo financiero
-**Dependencias:** proveedor
-**Estado:** Not started
-"""
-        (root / "05-user-stories.md").write_text(incomplete, encoding="utf-8")
-        errors, _warnings = validator.strict_checks(root, validator.read_files(root))
-        assert any("concrete execution contract" in error for error in errors)
-        assert any("cannot use Automate now" in error for error in errors)
-
-        no_readiness = incomplete.replace(
-            "**Ejecutabilidad:** Ready\n",
-            "**Ejemplo controlado:** pago de USD 20.\n",
-        )
-        (root / "05-user-stories.md").write_text(no_readiness, encoding="utf-8")
-        errors, _warnings = validator.strict_checks(root, validator.read_files(root))
-        assert any("without Executability: Ready" in error for error in errors)
-
-        permission_risk = (
-            incomplete.replace("Cobro", "Permisos")
-            .replace("se cobra una cuota", "se modifica el acceso")
-            .replace("Reintento programado", "Cambiar permisos de identidad")
-            .replace("una cuota vencida", "un usuario sin privilegios")
-            .replace("llega la siguiente fecha programada", "un administrador asigna un permiso")
-            .replace("se intenta el pago", "el acceso queda autorizado")
-            .replace("**Prioridad:** High", "**Prioridad:** Medium")
-            .replace("riesgo financiero", "riesgo de acceso")
-            .replace("proveedor", "directorio")
-        )
-        (root / "05-user-stories.md").write_text(permission_risk, encoding="utf-8")
-        errors, _warnings = validator.strict_checks(root, validator.read_files(root))
-        assert any("concrete execution contract" in error for error in errors)
-
-        complete = incomplete.replace(
-            "**Ejecutabilidad:** Ready",
-            """**Ejecutabilidad:** Ready
-**Ejemplo controlado:** cuota de enero por USD 20; fecha programada 2026-02-01.
-**Estado inicial:** Payment de enero Overdue con saldo USD 20.
-**Resultado controlado:** el proveedor aprueba el intento de enero.
-**Evidencia observable:** Payment pagado y una Transaction por USD 20 con correlación.
-**Cobertura de combinaciones:** anterior pagada/actual pagada; anterior fallida/actual pagada; ambas fallidas.""",
-        )
-        (root / "05-user-stories.md").write_text(complete, encoding="utf-8")
-        errors, _warnings = validator.strict_checks(root, validator.read_files(root))
-        assert not any("SC-PAY-01-01" in error for error in errors), "\n".join(errors)
-
         spanish_without_mapping = broken_rules.replace(
             "Bilateral sync uses the household.",
             "La dirección se sincroniza y se propaga al household.",

@@ -32,10 +32,8 @@ Require:
 3. Approved decisions and explicit open questions.
 4. Confirmed artifact language.
 5. Intended next action.
-6. Derived-artifact inventory, base snapshot and delta ledger when prototypes, HTML,
-   designs or generated SPECs are in scope.
 
-Do not treat derived HTML, Word, Notion, or Jira presentations as canonical sources. Use them only for parity checks.
+Do not treat derived Portal, Word, Notion, or Jira presentations as canonical sources. Use them only for parity checks.
 
 If original evidence is unavailable, do not claim source fidelity. Record the limitation as a blocking finding when the intended action depends on fidelity.
 
@@ -80,20 +78,8 @@ Try to find counterexamples across these dimensions:
 6. Traceability and ID parity
 7. Readiness and approval ownership
 8. Cross-presentation parity
-9. Derived-artifact and product-boundary integrity
-
-For each high-risk scenario marked `Ready`, require the compact execution contract defined
-by the package and independently test whether another QA reviewer could reproduce it without
-inventing product behavior. Missing material decisions require `FAIL` or `Needs refinement`;
-a structurally valid Gherkin block is insufficient.
 
 For Notion, obtain the declared publication mode and page manifest. In `Publicación completa`, inspect the portada, every story page and all six required auxiliary pages; do not use sampling. In `Actualización localizada`, inspect every page in scope plus any cover facts or links that changed, and verify that unrelated pages were preserved.
-
-After a Notion write, run a second Judge pass against the actual readback before audit
-completion. Require an editorial-parity receipt for every affected story and independently
-confirm that each visible story contains its complete applicable `AC`, `SC`, `CHK`, `FTC`
-and scenario behavior. A summary or link is not parity. Emit `FAIL` when a required story
-is missing, abbreviated or only present in the technical Markdown mirror.
 
 Do not infer that absence of a finding proves completeness. State what was actually inspected and what could not be verified.
 
@@ -136,11 +122,6 @@ A `FAIL` may still allow a local draft preview if it is visibly labeled non-appr
 Do not override `FAIL` yourself. A human may explicitly accept the risk by naming the action, accepted findings, owner, reason, and date. Record the override in the report; it does not convert the verdict to `PASS`.
 
 When the intended action is a Notion publication, a missing, stale, duplicated or incorrectly linked required page is a parity defect. Marking an auxiliary page `No aplica` does not resolve the defect when its applicable canonical source exists.
-
-Do not let a pre-publication package `PASS` authorize audit completion. The Notion
-publication remains `pending_editorial_verification` until the post-publication Judge pass
-reviews the connector readback and its deterministic parity receipts. Persist the report
-with the final snapshot so `sync-refinement-package-notion` can verify it before audit completion.
 
 ## Correction Loop
 

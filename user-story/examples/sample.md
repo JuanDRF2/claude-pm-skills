@@ -27,7 +27,7 @@
 - Action is clear ("log in using my Google account")
 - Outcome explains motivation ("without creating a new password")
 - Acceptance criteria are testable (QA can verify each step)
-- One primary business event and one observable result (appropriately scoped)
+- Only one When, one Then (appropriately scoped)
 
 > A single `Then` is sufficient here, but it is not a universal limit. Use additional `And` outcomes when they are inseparable evidence of the same business result.
 

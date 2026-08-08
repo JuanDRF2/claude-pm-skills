@@ -8,7 +8,6 @@
 4. Sampling prohibition
 5. Parity review
 6. Completion boundary
-7. Derived artifacts and product boundaries
 
 ## Evidence hierarchy
 
@@ -87,11 +86,6 @@ Check that:
 - Functional cases group scenarios without duplicating or changing their behavior.
 - Automation decisions are scenario-level, justified and technically plausible.
 - “Covered” does not mean “executed” or “automated.”
-- For each high-risk scenario marked `Ready`, independently verify its controlled example,
-  exact initial state, controlled outcome and observable evidence. When recovery outcomes
-  interact, verify explicit combination coverage; do not accept a generic dataset reference.
-- Reject `Automate now` when QA or Engineering must invent a material value, provider result,
-  retry policy, state transition, evidence source or expected outcome.
 
 ### 6. Traceability
 
@@ -122,7 +116,7 @@ Readiness requires the appropriate Product, Engineering and QA ownership. Produc
 When derived outputs exist, compare them with canonical Markdown:
 
 - Jira-ready files
-- HTML presentation or prototype
+- Portal HTML
 - Word
 - Notion
 - Handoffs
@@ -136,37 +130,7 @@ For Notion, read the publication mode and manifest:
 
 For a complete publication, confirm that each auxiliary page derives from its assigned Markdown source, uses the reviewed snapshot, is linked from the cover and has no competing duplicate title. Treat `No aplica` or `No generado` as a defect when the applicable canonical source exists.
 
-For every affected story presentation, compare the full Notion readback with its
-`jira/<US-ID>.md` projection. Require all applicable acceptance criteria, scenarios,
-checks, functional cases and Given/When/Then behavior. Treat a summary-only update as a
-high-severity parity defect. Review the deterministic editorial receipt as evidence, but
-independently inspect every failed or high-risk story; never infer parity from the receipt
-alone.
-
 Also verify that sections 7 and 9 provide the visible navigation while every native `<page>` block appears exactly once inside the final collapsed container `Subpáginas internas del proyecto`. Report loose native page blocks or a second visible page list as a presentation-parity defect.
-
-### 9. Derived artifacts and product boundaries
-
-When HTML, prototypes, designs or generated SPECs are in scope, check that:
-
-- every artifact declares its source role and canonical base snapshot, or explicitly says
-  `Unknown`;
-- static inspection covers structure, states, calculations, traceability and unreachable
-  behavior;
-- interactive behavior was actually exercised in a browser when fidelity depends on it;
-- canon, SPEC and observed behavior were compared without treating agreement between two
-  derived artifacts as approval;
-- every material difference has one `DELTA-*`, classification, owner and affected IDs;
-- Proposed, Contradicted or Unverifiable behavior did not enter approved stories or
-  readiness;
-- accepted changes were incorporated into the owner canonical package before derived views
-  were regenerated;
-- every material new capability has a Product Boundary result and is not copied across
-  independent packages;
-- shared contracts have one owner and consumers link rather than duplicate them.
-
-Treat missing reconciliation as a scope/source-integrity defect. Treat a material
-contradiction or unapproved scope injection as blocking.
 
 ## Sampling prohibition
 
