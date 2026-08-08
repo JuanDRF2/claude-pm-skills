@@ -77,7 +77,7 @@ Use these local skills as the source of truth for each phase:
 8. `skills/publish-refinement-to-notion/SKILL.md`
 9. `skills/sync-refinement-package-notion/SKILL.md`
 
-Before executing a phase, read that skill completely and follow its current instructions. Do not copy its full methodology into this orchestrator.
+Before executing a phase, read `references/specialist-dispatch-contract.md`, invoke the required specialist through the host's skill mechanism, read it completely and follow its current instructions. Do not copy its full methodology into this orchestrator or replace it with an improvised equivalent.
 
 ### Human Decision Gates
 
@@ -108,6 +108,7 @@ After every material approval, read and execute
 stable `BR-*`, update the checkpoint, mark stale consumers and validate incrementally.
 For cross-system behavior, also read `references/integration-mapping.md` and maintain its
 `MAP-*`. Give the user a concise receipt only after validation succeeds.
+Before regenerating or publishing, read `references/change-impact-contract.md`; build the write set from explicit IDs and document responsibility, preserving only proven-current consumers.
 
 Use one canonical scenario model: `US → AC → SC → CHK/evidence`, with `FTC` grouping those same `SC` items. Write each `SC-*` once under its primary `AC-*`; include its canonical QA strategy there: automation decision, level, priority, rationale, dependencies and implementation status. QA and publication views reuse these fields and must not invent or recalculate a parallel decision. Every approved criterion must own or explicitly reference at least one `SC-*`.
 
@@ -387,7 +388,7 @@ Read `references/qa-design-handoff.md`. Treat `CHK-*` as coverage units, not exe
 
 Apply the `test-case-designer` Gherkin clarity and executability gates before Gate 4 approval. Keep those checks internal rather than adding a repeated checklist to the artifacts. For existing approved or automated scenarios, preserve IDs, traceability, behavior and automation metadata; propose clarifications and obtain approval instead of rewriting them silently. Do not call a scenario QA-ready merely because Given/When/Then headings exist.
 
-Keep scenario executability and automation separate. For every `SC-*`, record `Automate`, `Manual`, `Later`, or `To define`; include the reason, priority, lowest useful level, dependencies, and `Not started`, `Planned`, or `Implemented` coverage status. Never report execution results in this workflow.
+For every new or changed high-risk scenario, persist the compact execution contract required by `test-case-designer` and let strict validation enforce it; do not retroactively invalidate unchanged approved scenarios, but require migration when they are edited. If a material value or expected outcome lacks an owner decision, stop at `Needs refinement` because Product approval alone does not make the scenario executable. Keep scenario executability and automation separate. For every `SC-*`, record `Automate now`, `Automate later`, `Manual`, or `Blocked`; include the reason, priority, lowest useful level, dependencies, and `Not started`, `Planned`, or `Implemented` coverage status. Never report execution results in this workflow.
 
 #### Gate 4: Review Coverage
 
@@ -504,6 +505,8 @@ Read `references/examples-and-pitfalls.md` only when the user requests an exampl
 ## References
 
 - `references/interaction-protocol.md` — How to ask, adapt, pause, and resume
+- `references/specialist-dispatch-contract.md` — Resolution order, preflight receipt and hard stops before invoking a specialist skill
+- `references/change-impact-contract.md` — Consumer graph, per-unit update/preserve/blocked plan and gates before regenerating or publishing
 - `references/artifact-contract.md` — Required handoff and traceability between phases
 - `references/markdown-package.md` — File structure, statuses, and update rules
 - `references/local-organization-contract.md` — Notion availability classification and local-draft normalization
