@@ -8,6 +8,32 @@ See [`ACTION-TIERS.md`](./ACTION-TIERS.md) for the shared `allow`/`ask`/`block` 
 
 ---
 
+## Want the whole rhythm, not just individual skills?
+
+The skills below are useful on their own, but they were built to run inside **Cadence** — a
+solo delivery rhythm (Shape → Build → Verify → Ship) they already speak the language of under
+generic names, whether or not you know it exists. See [`CADENCE.md`](./CADENCE.md) for the
+one-screen version, [`CADENCE-REFERENCE.md`](./CADENCE-REFERENCE.md) for the fuller write-up with
+sources cited for every idea in it.
+
+If you also want to set up your own version of the *workspace* this all runs from — not copying
+anyone's personal folder, just the structural pattern — it's simple and has no dependencies:
+
+1. **One folder per project**, each with its own short `CLAUDE.md` (or `AGENTS.md`) stating that
+   project's specific rules — keep the shared/global rules in a parent-level file instead of
+   repeating them per project.
+2. **A guided entry point** — a short, plain-language "how to start a session" reference (project
+   names, a one-line starter phrase per project, what happens after you say it) beats expecting
+   anyone — including future-you — to remember exact skill names or vocabulary.
+3. **`idea-to-ship` as the default front door** for anything that doesn't obviously belong to one
+   project yet — it infers the phase and routes for you, so a new workspace doesn't need every
+   other skill memorized on day one.
+
+That's the whole pattern. No scaffolding tool required — a few Markdown files and the skills
+below are enough to start.
+
+---
+
 ## Skills
 
 | Skill | Description |
