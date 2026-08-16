@@ -225,7 +225,7 @@ Inspect the supplied material and determine whether the work begins with discove
 
 State:
 
-- Selected mode
+- Selected route
 - Starting phase
 - Information already available
 - Immediate objective
@@ -234,7 +234,7 @@ State:
 - Shared storage mode and registered Notion root/page manifest when configured
 - Source roles and canonical base snapshot when derived artifacts are present
 
-For mode 6, complete `extend-approved-package.md`, then continue at Phase 3 using Decision Capture normally.
+For the Extend approved package route, complete `extend-approved-package.md`, then continue at Phase 3 using Decision Capture normally.
 
 ### Phase 1: Understand the Project
 
@@ -474,7 +474,7 @@ At each gate, maintain a compact state summary. The instant a gate is approved, 
 
 ```markdown
 ## Workflow State
-- Mode:
+- Route:
 - Current phase:
 - Approved through:
 - Gate approval log:

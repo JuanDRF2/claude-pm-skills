@@ -4,7 +4,7 @@ At each gate, maintain:
 
 ```markdown
 ## Workflow State
-- Mode:
+- Route:
 - Current phase:
 - Approved through:
 - Confirmed rules:
