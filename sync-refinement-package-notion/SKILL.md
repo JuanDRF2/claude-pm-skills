@@ -5,6 +5,12 @@ description: Sincroniza de forma segura paquetes Markdown de refinamiento con p�
 
 # Sync Refinement Package Notion
 
+> **Nota de mantenimiento:** el autor de esta librería no usa Notion en su propio trabajo y
+> no valida este skill contra un workspace de Notion real. Su motor (`refinement-sync` y
+> scripts asociados) sí tiene cobertura de pruebas local extensa, pero enteramente contra
+> fixtures simuladas — nunca contra Notion real. Revísalo a fondo antes de confiar en él
+> para un flujo de equipo real.
+
 Mantener Notion como fuente compartida y Markdown como copia local de trabajo. Usar la
 conexión de Notion autenticada en la IA activa como transporte y el CLI neutral
 `refinement-sync` como motor de snapshots y conflictos. No exigir que todas las personas o

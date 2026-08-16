@@ -5,6 +5,11 @@ description: Publica o actualiza un paquete Markdown aprobado de refinamiento co
 
 # Publish Refinement To Notion
 
+> **Nota de mantenimiento:** el autor de esta librería no usa Notion en su propio trabajo y
+> no valida este skill contra un workspace de Notion real. No tiene pruebas automatizadas
+> propias (es instrucción en prosa, sin scripts) — revísalo a fondo antes de confiar en él
+> para un flujo de equipo real.
+
 Crear una vista colaborativa derivada. Los Markdown continúan siendo la fuente de verdad; Notion no debe introducir decisiones ni relaciones nuevas.
 
 ## Flujo
