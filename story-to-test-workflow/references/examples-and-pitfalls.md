@@ -10,7 +10,7 @@ User:
 
 Good response:
 
-> I recommend Guided mode because several flows share a checkout but differ in membership ownership and communication rules. I understand that all three are online purchases. To map them correctly:
+> I recommend the Create new refinement route because several flows share a checkout but differ in membership ownership and communication rules. I understand that all three are online purchases. Is that interpretation correct? Once confirmed, I will begin with these questions:
 >
 > 1. Can each type be purchased as a guest, after login, or both?
 > 2. For an individual membership, is the buyer always the holder?

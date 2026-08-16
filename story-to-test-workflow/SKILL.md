@@ -1,6 +1,6 @@
 ---
 name: story-to-test-workflow
-description: Orchestrate product refinement interactively from a rough idea or spec through discovery, story mapping, splitting, user stories, acceptance criteria, coverage checks, QA-reviewable functional test cases, and downstream handoffs. Use as the single entry point whenever a user asks to analyze a PRD or spec, refine a feature, create or review stories and acceptance criteria, derive test cases, or continue an existing refinement package. In Guided mode, lead the user step by step with one to three related questions per round and explicit decision gates instead of generating every deliverable at once.
+description: Orchestrate product refinement through an always-guided conversation from a rough idea or spec to reviewed stories, acceptance criteria, QA coverage and handoffs. Use as the single entry point to create a refinement, review existing work, continue an approved phase, reconcile a prototype or generated SPEC, or extend an approved canonical package. Infer and confirm the appropriate internal route, ask one to three related questions per round, wait for answers and use explicit decision gates; produce a fast provisional draft only when the user explicitly requests one.
 ---
 
 ## Purpose
@@ -13,17 +13,19 @@ Do not rush from an incomplete idea to a large backlog. Build shared understandi
 
 Use this orchestrator before any specialist skill when the request spans more than one refinement stage or begins from a PRD, spec, idea, or existing artifact package. Do not require the user to know the specialist skill names.
 
-At the start of Guided mode:
+At the start of every new workflow:
 
-1. State the current phase and what was already understood.
-2. Ask one to three related questions needed for the next decision only.
-3. Wait for the user's response before asking the next group or advancing a gate.
-4. Confirm the interpretation of material answers.
-5. Obtain the applicable decision-gate approval before producing downstream deliverables.
+1. Infer the internal route from the supplied context; if materially ambiguous, ask one short route-level clarification first.
+2. State the recommended route, why it fits and the current phase; confirm that interpretation before substantive questions or writes.
+3. Show the route list only if the user disagrees or asks for alternatives.
+4. Ask one to three related questions needed for the next decision only and wait.
+5. Confirm material answers and obtain the applicable gate approval before downstream work.
+
+Do not reconfirm a recorded active route unless new input materially changes it.
 
 Do not replace this sequence with a single questionnaire, a complete speculative draft, or all remaining questions at once. Read and follow `references/interaction-protocol.md` before the first user-facing question and whenever resuming a paused workflow.
 
-This interaction layer controls discovery, sequencing, questions, confirmations, and approvals only. It must not change the artifact contracts, ID model, templates, schemas, generated Markdown structure, portal, Word output, Notion structure, or specialist-skill methodology.
+This interaction layer controls discovery, sequencing, questions, confirmations, and approvals only. It must not change artifact contracts, IDs, templates, schemas, generated Markdown, Notion structure, optional exports, or specialist methodology.
 
 ## In Simple Terms
 
@@ -123,20 +125,17 @@ Classify every unanswered question:
 
 Never convert a question into an assumed business rule. Offer an explicit best-effort path only when the user chooses it.
 
-## Conversation Modes
+## Guided Routes
 
-If the user already indicates a preference, use it. Otherwise briefly offer these numbered options:
+Every route uses the same guided loop and decision gates. Infer one internal route:
 
-1. **Guided:** ask small groups of questions, explain why they matter, and pause at every decision gate
-2. **Fast draft:** generate a provisional end-to-end draft and stop only for blocking decisions
-3. **Review existing work:** audit supplied maps, stories, criteria, or tests and continue from the first weak or missing phase
-4. **Continue from a phase:** begin at mapping, splitting, stories, or test cases using approved earlier artifacts
-5. **Review derived artifacts:** reconcile canonical sources with an existing HTML, design or generated SPEC without generating or editing that prototype
-6. **Extend approved package:** add external scope to a registered, approved canon after a compatibility gate and before assigning IDs or writing stories
+1. **Create new refinement:** start from an idea, PRD or SPEC without an approved canon.
+2. **Review existing work:** audit supplied work and continue from its first weak phase.
+3. **Continue approved work:** load workflow state and resume at the next applicable phase.
+4. **Reconcile derived artifact:** compare canon with HTML, design, screenshots or generated SPEC.
+5. **Extend approved package:** run Gate C before assigning IDs or changing approved behavior.
 
-Recommend Guided for a new or poorly understood project. Do not repeatedly ask for the mode once selected.
-
-For mode 6, read `references/extend-approved-package.md` in Phase 0 and pass Gate C before Phase 3 without replacing canonical decisions, IDs or `MAP-*`.
+Routes are internal choices, not interaction styles. Always guide the user. A requested fast draft stays provisional and returns to the guided loop before approval or publication. For the extension route, read `references/extend-approved-package.md` in Phase 0.
 
 ## Markdown Output
 

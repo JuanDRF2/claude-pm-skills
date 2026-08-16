@@ -1,4 +1,4 @@
 interface:
   display_name: "Story to Test Workflow"
   short_description: "Create stories and a QA-ready test-design handoff"
-  default_prompt: "Use $story-to-test-workflow in Guided mode to refine this product work interactively. Lead me step by step, ask one to three related questions per round, wait for my answers and approvals, then create the reviewed stories, criteria, QA coverage, Jira views, and handoffs."
+  default_prompt: "Use $story-to-test-workflow to refine this product work interactively. Infer the right route, confirm it with me, lead me step by step with one to three related questions per round, wait for my answers and approvals, then create the reviewed stories, criteria, QA coverage, Jira views, and handoffs."
