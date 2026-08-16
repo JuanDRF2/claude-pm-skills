@@ -56,6 +56,16 @@ Deterministic preflight failure → FAIL
 
 Do not average severity or offset one defect with strengths elsewhere.
 
+Keep `Blocks action / Bloquea acción` consistent with this algorithm for every open finding:
+
+- `Critical`, `High` or `Medium` → `Yes / Sí`.
+- `Low` or `Observation` → `No`.
+
+If a low item truly blocks the intended action, its severity is understated. If an
+observation only blocks final parity or audit completion, describe that boundary in its
+consequence instead of marking the current action as blocked. A verdict with observations
+requires at least one open `Low` or `Observation`; with no open findings use `PASS`.
+
 ## Action gate
 
 With `FAIL`, block:

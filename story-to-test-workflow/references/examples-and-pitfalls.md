@@ -75,7 +75,15 @@ Good behavior:
 
 **Fix:** Read and apply the relevant local skill at each phase; keep this skill focused on sequence, interaction, state, and gates.
 
-### Pitfall 6: Approval Becomes Bureaucracy
+### Pitfall 6: Specialist Is Named but Not Invoked
+
+**Symptom:** Claim to follow the Notion, Judge or test-design skill while using a custom process.
+
+**Consequence:** The result looks plausible but bypasses contracts, verification and current specialist improvements.
+
+**Fix:** Apply `specialist-dispatch-contract.md`; resolve the exact skill through the host mechanism and stop when it or a required capability is unavailable.
+
+### Pitfall 7: Approval Becomes Bureaucracy
 
 **Symptom:** Stop after every small detail or require all roles to be present synchronously.
 

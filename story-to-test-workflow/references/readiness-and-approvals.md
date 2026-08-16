@@ -18,6 +18,11 @@ Set `Ready for Sprint: Yes` only when every required role is ready and no blocki
 
 For many stories, review coherent blocks such as one flow, release slice, or risk area. Show the IDs in each block and allow Approve, Revise, Defer, or Block. Record decisions per item; a block approval must not silently approve stories omitted from its list.
 
-## Optional design checkpoint
+## Design and derived-artifact checkpoint
 
-Before Gate 3, ask for design review when layouts, content, accessibility, responsive behavior, or interaction choices affect acceptance. Record Approved, Review needed, Not required, or Blocked.
+Before Gate 3, ask for design review when layouts, content, accessibility, responsive
+behavior or interaction choices affect acceptance. Make the checkpoint mandatory when a
+design, prototype or generated SPEC changes journeys, rules, required data, calculations,
+permissions, integrations, payments, communications or scope. Reconcile material deltas
+under `derived-artifact-governance.md`. Record Approved, Review needed, Not required or
+Blocked.

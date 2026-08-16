@@ -204,7 +204,7 @@ def decision_checkpoint_checks(
 
     sync_terms = re.compile(
         r"\b(?:sync\w*|synchroni[sz]\w*|sincroniz\w*|migration\w*|migraci[oó]n|"
-        r"import\w*|export\w*|propagat\w*|propagaci[oó]n|inbound|outbound|"
+        r"import(?:s|ed|ing|ation)?|export\w*|propagat\w*|propagaci[oó]n|inbound|outbound|"
         r"bidirectional|bidireccional)\b",
         re.IGNORECASE,
     )
