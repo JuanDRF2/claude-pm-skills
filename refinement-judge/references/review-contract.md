@@ -127,28 +127,53 @@ When derived outputs exist, compare them with canonical Markdown:
 - Notion
 - Handoffs
 
+Build the complete consumer closure before judging preservation. Canonical story sources
+may be split across `05-user-stories*.md`; compare every affected source with its Jira
+derivative, technical payload and editorial presentation. Treat formatting that protects
+meaning or transport—inline code, list hierarchy, fences and link targets—as part of that
+closure. A consumer cannot remain preserved without exact evidence that it still derives
+from the current canonical source.
+
 Report omitted, shortened, stale or contradictory behavior. A polished presentation never outranks canonical evidence.
 
-For Notion, read the publication mode and manifest:
+For Notion, read the native-page manifest, baseline and human-page manifest.
 
-- `Publicación completa`: verify the canonical ten-section cover, every story and these six native pages: Reglas, decisiones y preguntas; Plan funcional de pruebas; Matriz de cobertura y automatización; Pendientes, riesgos y preparación; Handoff DEV; Handoff QA.
-- `Actualización localizada`: verify every declared page in scope, affected cover counts/status/links and preservation of unrelated pages.
+- Initial publication or `full-audit`: verify every registered technical and editorial page.
+- `Actualización localizada`: verify every selected technical and human page, affected cover facts and the complete consumer closure. Prove locally why unrelated pages are excluded; do not download them merely to reconfirm preservation.
+- Interrupted legacy runs: apply their frozen recovery contract until clean closure, then adopt `native-pages-fast-v1` separately.
 
-For a complete publication, confirm that each auxiliary page derives from its assigned Markdown source, uses the reviewed snapshot, is linked from the cover and has no competing duplicate title. Treat `No aplica` or `No generado` as a defect when the applicable canonical source exists.
+For a complete publication, confirm that each auxiliary page derives from the verified
+Markdown snapshot, is linked from the cover and has no competing duplicate title. Treat
+`No aplica` or `No generado` as a defect when the applicable canonical source exists.
 
-For every affected story presentation, compare the full Notion readback with its
-`jira/<US-ID>.md` projection. Require all applicable acceptance criteria, scenarios,
-checks, functional cases and Given/When/Then behavior. Treat a summary-only update as a
-high-severity parity defect. Review the deterministic editorial receipt as evidence, but
-independently inspect every failed or high-risk story; never infer parity from the receipt
-alone.
+For every affected story presentation, compare the full Notion readback semantically with
+its `jira/<US-ID>.md` projection from the validated checkout. Require all applicable
+acceptance criteria, scenarios, checks, functional cases and Given/When/Then behavior.
+Treat a summary-only update as a high-severity parity defect. Notion serialization changes
+such as safe URL expansion, escaping, spacing or block formatting are acceptable only when
+the comparator proves no behavior, identity or destination changed. Review the
+deterministic editorial receipt as evidence, but independently inspect every failed or
+high-risk story; never infer parity from the receipt alone.
+
+Require `notion-presentation-format` receipts from the frozen payload and actual readback.
+Confirm that their presentation identities equal the authorized scope and every item is
+`ok: true`. Independently inspect any prior failed item; a rerun cannot erase unexplained
+format drift.
 
 For every affected non-story presentation, compare its frozen expected payload with the
 complete readback and require the expected IDs, headings, links and responsibility-specific
 content. Validate internal destinations by Notion page ID; a URL with form `https://*.md`
 is a broken link, not a harmless serialization difference.
 
-Also verify that sections 7 and 9 provide the visible navigation while every native `<page>` block appears exactly once inside the final collapsed container `Subpáginas internas del proyecto`. Report loose native page blocks or a second visible page list as a presentation-parity defect.
+For legacy recovery, distinguish writes from `verification-only` pages. Verify no-op
+suppression, disjoint checkpoint states, immutable receipt supersession and exact evidence
+hashes. Judge action scope counts only pages that can be written; verification-only pages
+must still have readback evidence and must never be hidden inside the write count.
+
+Also verify that sections 7 and 9 provide visible navigation to the native package, stories
+and supporting material. Native child pages may remain grouped in the final collapsed
+container `Subpáginas internas del proyecto`; do not confuse this human hierarchy with a
+canonical Markdown mirror.
 
 ### 9. Derived artifacts and product boundaries
 

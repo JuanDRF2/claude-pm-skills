@@ -58,11 +58,12 @@ def package_validator() -> Path:
     return candidate
 
 
-def snapshot_files(root: Path) -> list[Path]:
+def snapshot_files(root: Path, package_kind: str = "project") -> list[Path]:
     files = [
         path
         for path in root.glob("*.md")
-        if path.name != JUDGE_REPORT and ROOT_PRODUCT_MARKDOWN_RE.fullmatch(path.name)
+        if path.name != JUDGE_REPORT
+        and (package_kind == "shared-contract" or ROOT_PRODUCT_MARKDOWN_RE.fullmatch(path.name))
     ]
     for folder in ("jira", "handoffs"):
         directory = root / folder
@@ -82,7 +83,7 @@ def snapshot_hash(root: Path, files: list[Path]) -> str:
     return digest.hexdigest()
 
 
-def run_preflight(root: Path, language: str, phase: str) -> int:
+def run_preflight(root: Path, language: str, phase: str, package_kind: str) -> int:
     if not root.is_dir():
         print(f"ERROR: package folder does not exist: {root}")
         return 2
@@ -97,12 +98,13 @@ def run_preflight(root: Path, language: str, phase: str) -> int:
         command.append("--decision-checkpoint")
     else:
         command.append("--strict")
+        command.extend(["--package-kind", package_kind])
     result = subprocess.run(command, text=True, capture_output=True, check=False)
     if result.stdout:
         print(result.stdout.rstrip())
     if result.stderr:
         print(result.stderr.rstrip(), file=sys.stderr)
-    files = snapshot_files(root)
+    files = snapshot_files(root, package_kind)
     if not files:
         print("ERROR: no canonical files available for snapshot")
         return 1
@@ -139,7 +141,8 @@ def run_report(report: Path, required_stage: str | None) -> int:
             )
         if not ACTION_SCOPE_RE.search(text):
             errors.append(
-                f"{required_stage} validation requires Action scope/Alcance de acción: technical=N; editorial=N."
+                f"{required_stage} validation requires Action scope/Alcance de acción: "
+                "technical=N; editorial=N."
             )
 
     required_sections = [
@@ -235,23 +238,30 @@ def main() -> int:
     preflight.add_argument("folder", type=Path)
     preflight.add_argument("--language", choices=("en", "es"), required=True)
     preflight.add_argument("--phase", choices=("final", "gate-c"), default="final")
+    preflight.add_argument(
+        "--package-kind",
+        choices=("project", "shared-contract"),
+        default="project",
+    )
 
     report = subparsers.add_parser("report")
     report.add_argument("file", type=Path)
     report.add_argument(
         "--publication",
         action="store_true",
-        help="Require an exact Publication stage and technical/editorial action scope.",
+        help="Require an exact Publication stage and technical/editorial scope.",
     )
     report.add_argument(
         "--post-publication",
         action="store_true",
-        help="Require an exact Post-publication stage and technical/editorial action scope.",
+        help="Require an exact Post-publication stage and technical/editorial scope.",
     )
 
     args = parser.parse_args()
     if args.command == "preflight":
-        return run_preflight(args.folder.resolve(), args.language, args.phase)
+        return run_preflight(
+            args.folder.resolve(), args.language, args.phase, args.package_kind
+        )
     if args.publication and args.post_publication:
         parser.error("--publication and --post-publication are mutually exclusive")
     required_stage = "Publication" if args.publication else "Post-publication" if args.post_publication else None

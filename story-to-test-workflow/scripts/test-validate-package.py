@@ -187,6 +187,105 @@ def main() -> int:
         )
         assert any("BR-99" in error and "MAP-*" in error for error in errors)
 
+    # Split canonical story volumes must remain authoritative for Jira-derived views.
+    with tempfile.TemporaryDirectory() as temporary:
+        root = Path(temporary)
+        (root / "jira").mkdir()
+        (root / "05-user-stories.md").write_text("# Índice de historias\n", encoding="utf-8")
+        split_story = """
+## US-HH-01 — Sincronizar teléfono
+
+### AC-HH-01-01 — Campo protegido
+**Condición de aceptación:** el sistema conserva `Account.Phone` como campo de negocio.
+#### SC-HH-01-01 — Sincronización
+**Dado:** un contacto con teléfono conocido
+**Cuando:** se sincroniza el contacto
+**Entonces:** se conserva el teléfono en `Account.Phone`
+#### Estrategia QA
+**Ejecutabilidad:** Needs refinement
+**Automatización:** Manual
+**Nivel recomendado:** Integration
+**Prioridad:** Medium
+**Razón:** integración externa
+**Dependencias:** cuenta controlada
+**Estado:** Not started
+"""
+        volume = root / "05-user-stories-contact-points.md"
+        volume.write_text(split_story, encoding="utf-8")
+        jira = root / "jira" / "US-HH-01.md"
+        jira.write_text(split_story.replace("`Account.Phone`", "Account.Phone"), encoding="utf-8")
+        errors, _warnings = validator.strict_checks(root, validator.read_files(root))
+        assert any("Jira/master acceptance criterion differs" in error for error in errors)
+
+        jira.write_text(split_story, encoding="utf-8")
+        errors, _warnings = validator.strict_checks(root, validator.read_files(root))
+        assert not any("Jira/master acceptance criterion differs" in error for error in errors)
+
+    # A shared contract has a smaller explicit contract; project mode must stay strict.
+    with tempfile.TemporaryDirectory() as temporary:
+        root = Path(temporary)
+        (root / "00-workflow-state.md").write_text(
+            """# Estado del workflow — Contrato compartido
+
+- Estado: Aprobado por Producto
+- Package kind: `shared-contract`
+- Owner project: `payments`
+- Consumer projects: `donations`, `memberships`
+- Change-impact rule: revisar consumidores antes de sincronizar
+""",
+            encoding="utf-8",
+        )
+        (root / "shared-payment-contract.md").write_text(
+            """# Contrato compartido de pagos
+
+- Estado: Aprobado por Producto
+
+## Autoridad y alcance
+
+El proyecto Payments gobierna este contrato.
+
+## Paquetes consumidores
+
+- Donations
+- Memberships
+
+## Gobierno de cambios
+
+Revisar ambos consumidores antes de publicar.
+""",
+            encoding="utf-8",
+        )
+        (root / "09-package-index.md").write_text(
+            """# Índice del paquete
+
+- Estado: Aprobado por Producto
+- Tipo: `shared-contract`
+
+## Contenido canónico
+
+- [Estado](./00-workflow-state.md)
+- [Contrato](./shared-payment-contract.md)
+""",
+            encoding="utf-8",
+        )
+        errors, warnings = validator.validate(
+            root, "es", strict=True, package_kind="shared-contract"
+        )
+        assert not errors, "\n".join(errors)
+        assert not warnings, "\n".join(warnings)
+
+        project_errors, _warnings = validator.validate(root, "es", strict=True)
+        assert any("Missing expected artifact" in error for error in project_errors)
+
+        (root / "09-package-index.md").write_text(
+            "# Índice del paquete\n\n- Estado: Aprobado por Producto\n- Tipo: `shared-contract`\n",
+            encoding="utf-8",
+        )
+        errors, _warnings = validator.validate(
+            root, "es", strict=True, package_kind="shared-contract"
+        )
+        assert any("does not link canonical shared contract" in error for error in errors)
+
     if args.real_package:
         errors, _warnings = validator.validate(
             args.real_package.resolve(),

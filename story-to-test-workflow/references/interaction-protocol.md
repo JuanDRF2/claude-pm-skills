@@ -88,3 +88,20 @@ Track ownership with: Proposed by AI, Product confirmed, Engineering review need
 ## Change-Only Gate Previews
 
 After the first gate, show changes since the previous approval, affected IDs, new questions, and the required decision. Link to unchanged approved material instead of repeating it.
+
+## Evidence Before Approval
+
+When approval changes wording, hierarchy, links or presentation, show the exact before and
+after plus the visible structural effect. A summary alone is insufficient when the user must
+choose between alternatives. Keep rejected candidates or mark their bytes as unavailable;
+never reuse an unexplained hash from a discarded candidate.
+
+## Efficient Authorization
+
+- Group related, reversible local updates in one exact plan and one validation result.
+- Keep local adoption separate from external writes.
+- Once an external dossier is exact and validated, ask directly for authorization to execute
+  it. Do not ask for approval merely to prepare another authorization request.
+- Reuse an authorization while scope, payloads, remote metadata and digest remain unchanged.
+  A write, rollback, concurrent remote change or digest change consumes it and requires a new
+  exact authorization.

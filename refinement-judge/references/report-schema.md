@@ -74,9 +74,10 @@ Write the report in the package language. Use the translated headings shown belo
 ```
 
 `Action stage` y `Action scope` son obligatorios cuando el Judge evalúa una publicación
-localizada en Notion. `Publication` significa el write set remoto exacto; no usarlo para la
-mera preparación de un preview. En otros gates pueden omitirse cuando no aplican páginas
-técnicas/editoriales.
+localizada en Notion. Usar `technical=N; editorial=N`; contar solo páginas que pueden
+escribirse y declarar `verification-only` por separado. `Publication` significa el write
+set remoto exacto; no usarlo para la mera preparación de un preview. En otros gates pueden
+omitirse cuando no aplica una publicación externa.
 
 ## Empty findings
 
@@ -98,4 +99,4 @@ On every rerun:
 4. Update snapshot hash and date.
 5. Recalculate the verdict from open findings.
 6. Keep accepted-risk entries visible.
-7. For Notion publication, update the action stage and exact page counts.
+7. For Notion publication, update the action stage and exact technical/editorial counts.

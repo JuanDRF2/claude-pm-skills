@@ -49,6 +49,16 @@ For a complete package before publication, Jira or final handoff, run the strict
 python3 scripts/validate-judge.py preflight <artifact-folder> --language <es|en>
 ```
 
+Cuando el manifiesto registrado declare `package_kind: shared-contract`, conserva ese tipo:
+
+```bash
+python3 scripts/validate-judge.py preflight <artifact-folder> --language <es|en> \
+  --package-kind shared-contract
+```
+
+No selecciones este modo solo por el tamaño del paquete. Un proyecto normal conserva el
+contrato completo aunque le falten archivos.
+
 For the extension-route Gate C that occurs before Gate 2 stories exist, run:
 
 ```bash
@@ -103,14 +113,22 @@ by the package and independently test whether another QA reviewer could reproduc
 inventing product behavior. Missing material decisions require `FAIL` or `Needs refinement`;
 a structurally valid Gherkin block is insufficient.
 
-For Notion, obtain the declared publication mode and page manifest. In `Publicación completa`, inspect the portada, every story page and all six required auxiliary pages; do not use sampling. In `Actualización localizada`, inspect every page in scope plus any cover facts or links that changed, and verify that unrelated pages were preserved.
+For Notion, obtain the native-page manifest, baseline and human-page manifest. In an initial
+publication or explicit full audit, inspect every registered page. In `Actualización
+localizada`, inspect every technical and human page in the proven impact scope, plus any
+cover facts or links that changed. Confirm from the local graph that unrelated pages were
+correctly excluded; do not require downloading them. Require valid prewrite and
+post-readback `notion-presentation-format` receipts for affected presentations.
 
 After a Notion write, run a second Judge pass against the actual readback before audit
-completion. Require presentation-parity receipts for every affected cover, story and
-auxiliary page, plus the detailed editorial receipt for every affected story. Independently
-confirm that each visible story contains its complete applicable `AC`, `SC`, `CHK`, `FTC`
-and scenario behavior. A summary or link is not parity. Emit `FAIL` when a required
-presentation is missing, abbreviated, incorrectly linked or only present in the mirror.
+completion. Require Markdown-equivalence receipts for every affected technical page, plus
+semantic presentation-parity receipts for every affected cover, story and auxiliary page,
+and the structural format receipt produced from the same readback. Independently confirm
+that each visible story contains its complete applicable `AC`, `SC`, `CHK`, `FTC` and
+scenario behavior. A summary
+or link is not parity. Emit `FAIL` when an affected technical page differs materially from
+its authorized target, or when a required human presentation is missing, abbreviated or
+incorrectly linked.
 
 Do not infer that absence of a finding proves completeness. State what was actually inspected and what could not be verified.
 
@@ -168,7 +186,14 @@ A `FAIL` may still allow a local draft preview if it is visibly labeled non-appr
 
 Do not override `FAIL` yourself. A human may explicitly accept the risk by naming the action, accepted findings, owner, reason, and date. Record the override in the report; it does not convert the verdict to `PASS`.
 
-When the intended action is a Notion publication, a missing, stale, duplicated or incorrectly linked required page is a parity defect. Marking an auxiliary page `No aplica` does not resolve the defect when its applicable canonical source exists.
+When the intended action is a Notion publication, a missing, stale, duplicated or
+incorrectly linked required human page is a parity defect. A missing, altered or ambiguous
+affected native page is a source-integrity defect. Marking an auxiliary page `No aplica` does not
+resolve the defect when its applicable canonical source exists.
+
+A missing or failed Notion format receipt blocks publication completion even when all IDs
+and semantic clauses are present. Content completeness does not excuse broken navigation,
+flat criteria, loose child pages or duplicated coverage tables.
 
 Do not let a pre-publication package `PASS` authorize audit completion. The Notion
 publication remains `pending_post_publication_verification` until the post-publication Judge

@@ -44,6 +44,11 @@ EXPECTED = [
     "handoffs/qa-handoff.md",
 ]
 
+SHARED_EXPECTED = [
+    "00-workflow-state.md",
+    "09-package-index.md",
+]
+
 AUDIT_ARTIFACTS = {
     "11-refinement-judge-report.md",
 }
@@ -111,6 +116,25 @@ def acceptance_blocks(text: str) -> dict[str, str]:
             normalized = re.sub(r"\s+", " ", block).strip()
             blocks.setdefault(hit.group(), normalized)
     return blocks
+
+
+def canonical_acceptance_blocks(
+    root: Path, files: dict[Path, str], errors: list[str]
+) -> dict[str, str]:
+    """Merge AC blocks from split story volumes and reject conflicting definitions."""
+    merged: dict[str, str] = {}
+    origins: dict[str, str] = {}
+    for volume in sorted(root.glob("05-user-stories*.md"), key=lambda item: item.name):
+        for ac_id, block in acceptance_blocks(files.get(volume, "")).items():
+            if ac_id in merged and merged[ac_id] != block:
+                errors.append(
+                    f"Conflicting canonical acceptance criterion: {ac_id} in "
+                    f"{origins[ac_id]} and {volume.name}"
+                )
+                continue
+            merged[ac_id] = block
+            origins[ac_id] = volume.name
+    return merged
 
 
 def definition_blocks(files: dict[Path, str], prefix: str) -> dict[str, str]:
@@ -256,7 +280,7 @@ def strict_checks(root: Path, files: dict[Path, str]) -> tuple[list[str], list[s
             f"ID range used as a definition; expand and define every ID individually: {item}"
         )
 
-    master = acceptance_blocks(files.get(root / "05-user-stories.md", ""))
+    master = canonical_acceptance_blocks(root, files, errors)
     for ac_id, block in master.items():
         when_count = len(re.findall(r"(?:^|\s)(?:-\s*)?(?:\*\*)?(?:When|Cuando)(?:\*\*)?\s*:?", block, re.IGNORECASE))
         if when_count < 1:
@@ -264,6 +288,8 @@ def strict_checks(root: Path, files: dict[Path, str]) -> tuple[list[str], list[s
         if re.search(r"\b(correctly|properly|successfully|correctamente|adecuadamente|exitosamente)\b", block, re.IGNORECASE):
             warnings.append(f"{ac_id} may contain an ambiguous expected result.")
 
+    # Preserve the package's established primary-volume quality checks. Split volumes are
+    # additionally authoritative for consumer parity through `master` above.
     stories_text = files.get(root / "05-user-stories.md", "")
     ac_headings = list(re.finditer(r"^###\s+(AC-[A-Z0-9]+-\d{2,}-\d{2,})\b", stories_text, re.MULTILINE))
     for index, hit in enumerate(ac_headings):
@@ -506,7 +532,79 @@ def strict_checks(root: Path, files: dict[Path, str]) -> tuple[list[str], list[s
     return errors, warnings
 
 
-def validate(root: Path, language: str, strict: bool = False) -> tuple[list[str], list[str]]:
+def validate_shared_contract(
+    root: Path, language: str, strict: bool = False
+) -> tuple[list[str], list[str]]:
+    """Validate the smaller, explicit contract used by cross-project shared packages."""
+    errors: list[str] = []
+    warnings: list[str] = []
+    files = read_files(root)
+
+    for relative in SHARED_EXPECTED:
+        path = root / relative
+        if not path.is_file():
+            errors.append(f"Missing expected shared-contract artifact: {relative}")
+        elif not path.read_text(encoding="utf-8").strip():
+            errors.append(f"Empty shared-contract artifact: {relative}")
+
+    contract_files = sorted(
+        path
+        for path in root.glob("*.md")
+        if path.name not in {*SHARED_EXPECTED, *AUDIT_ARTIFACTS}
+    )
+    if not contract_files:
+        errors.append("Shared contract must contain at least one canonical contract Markdown.")
+
+    state = files.get(root / "00-workflow-state.md", "")
+    index = files.get(root / "09-package-index.md", "")
+    if not re.search(r"(?:Package kind|Tipo)\s*:\s*`?shared-contract`?", state + "\n" + index, re.IGNORECASE):
+        errors.append("Shared contract must declare package_kind: shared-contract.")
+    for label, pattern in (
+        ("owner", r"(?:Owner project|Propietario(?: funcional)?)\s*:"),
+        ("consumers", r"(?:Consumer projects|Consumidores(?: locales)?)\s*:|^##\s+(?:Consumidores|Paquetes consumidores)"),
+        ("change-impact rule", r"(?:Change-impact rule|Regla de cambio)\s*:|^##\s+Gobierno de cambios"),
+    ):
+        if not re.search(pattern, state + "\n" + "\n".join(files.get(path, "") for path in contract_files), re.IGNORECASE | re.MULTILINE):
+            errors.append(f"Shared contract does not declare {label}.")
+
+    for path in contract_files:
+        text = files.get(path, "")
+        if not text.strip():
+            errors.append(f"Empty shared-contract artifact: {path.name}")
+            continue
+        if not re.search(r"(?im)^-\s*(?:Status|Estado)\s*:\s*\S", text):
+            errors.append(f"Shared-contract artifact does not declare status: {path.name}")
+        if not re.search(r"(?im)^##\s+(?:Authority|Autoridad|Scope|Alcance|Authority and scope|Autoridad y alcance)\b", text):
+            errors.append(f"Shared-contract artifact does not declare authority or scope: {path.name}")
+        relative = path.relative_to(root).as_posix()
+        if not re.search(rf"\[[^]]+\]\((?:\./)?{re.escape(relative)}(?:#[^)]+)?\)", index):
+            errors.append(f"Package index does not link canonical shared contract: {relative}")
+
+    for path, text in files.items():
+        for target in re.findall(r"\[[^]]+\]\((?!https?://)([^)#]+)(?:#[^)]+)?\)", text):
+            linked = (path.parent / target).resolve()
+            if not linked.exists():
+                errors.append(f"Broken relative link in {path.relative_to(root)}: {target}")
+
+    if language == "es" and not re.search(r"(?im)^-\s*Estado\s*:", state + "\n" + index):
+        errors.append("Spanish shared contract must use Estado in its package metadata.")
+    if language == "en" and not re.search(r"(?im)^-\s*Status\s*:", state + "\n" + index):
+        errors.append("English shared contract must use Status in its package metadata.")
+
+    native = [*root.rglob("*.testcase.yml"), *root.rglob("*.testplan.yml"), *root.rglob("*.testrun.yml")]
+    if native:
+        errors.append("Native test-management YAML is outside this workflow boundary.")
+    return errors, warnings
+
+
+def validate(
+    root: Path,
+    language: str,
+    strict: bool = False,
+    package_kind: str = "project",
+) -> tuple[list[str], list[str]]:
+    if package_kind == "shared-contract":
+        return validate_shared_contract(root, language, strict)
     errors: list[str] = []
     warnings: list[str] = []
     files = read_files(root)
@@ -596,6 +694,12 @@ def main() -> int:
     parser.add_argument("--language", choices=("en", "es"), required=True)
     parser.add_argument("--strict", action="store_true", help="Enable readiness, parity, Gherkin, range, and full test-schema checks")
     parser.add_argument(
+        "--package-kind",
+        choices=("project", "shared-contract"),
+        default="project",
+        help="Validate the explicit artifact contract for a full project or shared contract.",
+    )
+    parser.add_argument(
         "--decision-checkpoint",
         action="store_true",
         help="Validate only the latest decision checkpoint and MAP contracts; final artifacts are not required",
@@ -608,7 +712,9 @@ def main() -> int:
         files = read_files(args.folder.resolve())
         errors, warnings = decision_checkpoint_checks(args.folder.resolve(), files)
     else:
-        errors, warnings = validate(args.folder.resolve(), args.language, args.strict)
+        errors, warnings = validate(
+            args.folder.resolve(), args.language, args.strict, args.package_kind
+        )
     for message in errors:
         print(f"ERROR: {message}")
     for message in warnings:

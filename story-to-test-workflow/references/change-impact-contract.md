@@ -10,7 +10,9 @@ Resolver consumidores por IDs y relaciones explícitas:
 ```text
 BR/MAP → US → AC → SC
 SC → CHK/evidencia y decisión de automatización
-FTC agrupa SC; Jira, handoffs y vistas consumen los IDs que presentan
+FTC agrupa SC
+05-user-stories*.md → jira/*.md → payload técnico → presentación editorial
+Jira, handoffs y vistas consumen los IDs y el formato funcional que presentan
 ```
 
 No decidir impacto por coincidencia de palabras, tamaño del diff o proximidad de archivos.
@@ -27,6 +29,7 @@ contradicción semántica.
 | `03-story-map.md` | actividad, paso, variante o recuperación |
 | `04-release-slices.md` | entrega, dependencia, orden o alcance diferido |
 | `05-user-stories.md` | outcome, alcance, criterio o comportamiento de una historia |
+| `05-user-stories*.md` | igual que el volumen principal cuando las historias están divididas por dominio |
 | `06-test-coverage.md` | riesgo, check, evidencia, nivel o cobertura |
 | `07-functional-test-cases.md` | precondición, datos, escenario o resultado esperado |
 | `08-traceability-and-risks.md` | relación o riesgo residual |
@@ -41,6 +44,12 @@ contradicción semántica.
 La existencia de una relación no obliga a reescribir el consumidor: actualizarlo solo si
 su contenido final cambia. Conservarlo cuando siga completo y correcto.
 
+Tratar como impacto propagable el formato que protege significado o transporte: código
+inline que evita autolinks, estructura y nivel de listas, destinos de enlaces y fences. Una
+variación puede no cambiar la regla de producto y aun así exigir regenerar Jira, payload o
+presentación. El validador debe comparar todos los volúmenes `05-user-stories*.md` contra
+sus derivados Jira, no solamente `05-user-stories.md`.
+
 ## Plan de impacto
 
 Antes de escribir, producir para cada unidad:
@@ -52,6 +61,8 @@ Antes de escribir, producir para cada unidad:
 
 Registrar la razón y los IDs originadores. El write set contiene únicamente `update` y
 `metadata-only`; `preserve` permanece en el snapshot completo y se valida por su hash.
+No clasificar un consumidor como `preserve` sin evidencia exacta de que sigue derivando de
+la fuente canónica vigente.
 
 ## Gates
 

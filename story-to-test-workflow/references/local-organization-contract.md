@@ -81,7 +81,7 @@ classification as a proposal. A human must approve:
 - any file whose category is `unclassified`.
 
 Normalize only from the reviewed plan. Show a dry-run write set first. Applying requires a
-backup ZIP outside the artifacts root and explicit authorization for the listed moves and
+versioned backup directory outside the artifacts root and explicit authorization for the listed moves and
 link rewrites. Use a repository tool when one exists; otherwise perform the approved moves
 with ordinary filesystem operations and rerun the checks below.
 

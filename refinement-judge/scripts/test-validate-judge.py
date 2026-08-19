@@ -126,6 +126,73 @@ with tempfile.TemporaryDirectory(prefix="refinement-judge-test-") as folder:
     assert failed.returncode != 0, failed.stdout + failed.stderr
     assert "next reconciliation gate" in failed.stdout, failed.stdout
 
+    shared = root / "shared-contract"
+    shared.mkdir()
+    (shared / "00-workflow-state.md").write_text(
+        """# Estado del workflow
+
+- Estado: Aprobado por Producto
+- Package kind: `shared-contract`
+- Owner project: `payments`
+- Consumer projects: `donations`, `memberships`
+- Change-impact rule: revisar consumidores antes de sincronizar
+""",
+        encoding="utf-8",
+    )
+    (shared / "09-package-index.md").write_text(
+        """# Índice
+
+- Estado: Aprobado por Producto
+- Tipo: `shared-contract`
+
+## Contenido canónico
+
+- [Estado](./00-workflow-state.md)
+- [Contrato](./shared-payment-contract.md)
+""",
+        encoding="utf-8",
+    )
+    (shared / "shared-payment-contract.md").write_text(
+        """# Contrato compartido
+
+- Estado: Aprobado por Producto
+
+## Autoridad y alcance
+
+Payments gobierna el contrato.
+
+## Paquetes consumidores
+
+- Donations
+
+## Gobierno de cambios
+
+Revisar consumidores.
+""",
+        encoding="utf-8",
+    )
+    shared_preflight = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT),
+            "preflight",
+            str(shared),
+            "--language",
+            "es",
+            "--package-kind",
+            "shared-contract",
+        ],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert shared_preflight.returncode == 0, shared_preflight.stdout + shared_preflight.stderr
+    assert "SNAPSHOT_FILES: 3" in shared_preflight.stdout, shared_preflight.stdout
+    assert "shared-payment-contract.md" in {
+        path.relative_to(shared).as_posix()
+        for path in MODULE.snapshot_files(shared, "shared-contract")
+    }
+
     report = root / MODULE.JUDGE_REPORT
     report.write_text(
         report_text(
@@ -146,6 +213,17 @@ with tempfile.TemporaryDirectory(prefix="refinement-judge-test-") as folder:
     )
     valid_report = validate_report(report, publication=True)
     assert valid_report.returncode == 0, valid_report.stdout + valid_report.stderr
+
+    report.write_text(
+        report_text(
+            verdict="PASS",
+            findings="Sin hallazgos abiertos.",
+            scope="technical=2; editorial=1",
+        ),
+        encoding="utf-8",
+    )
+    legacy_scope = validate_report(report, publication=True)
+    assert legacy_scope.returncode == 0, legacy_scope.stdout + legacy_scope.stderr
 
     report.write_text(
         report_text(
@@ -194,4 +272,4 @@ with tempfile.TemporaryDirectory(prefix="refinement-judge-test-") as folder:
     post_publication = validate_report(report, post_publication=True)
     assert post_publication.returncode == 0, post_publication.stdout + post_publication.stderr
 
-print("OK: Judge snapshot, publication scope and verdict regressions passed (8 checks)")
+    print("OK: Judge project/shared snapshots, publication scopes and verdict regressions passed (12 checks)")
