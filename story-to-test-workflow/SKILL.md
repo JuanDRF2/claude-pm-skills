@@ -436,6 +436,13 @@ integration mappings. Strict validation also checks ID ranges, Gherkin clarity,
 Jira/master parity, readiness, check-to-scenario traceability, and the functional-case
 schema.
 
+For a package explicitly registered as `package_kind: shared-contract`, add
+`--package-kind shared-contract` to the strict run instead; it validates state, index,
+canonical contract, owner, consumers, change-impact rule, status and links, in place of a
+full project's artifact set. Never infer this mode from a project's size, and never use it
+to skip stories, coverage or handoffs for a normal project. Propagate the same
+`package_kind` to `refinement-judge`'s preflight and presentation type.
+
 After deterministic validation succeeds, invoke `refinement-judge` as an independent adversarial gate. Give it the original sources, approved decisions, current Markdown package, confirmed language, and intended next action. Do not give it the generating skill's conclusions or suspected findings. Require `11-refinement-judge-report.md` and a validated verdict.
 
 - `PASS`: continue.
