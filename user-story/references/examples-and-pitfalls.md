@@ -8,6 +8,9 @@
 
 ### Running Membership Example
 
+This is a compact illustration. Use `golden-example.md` when reviewing the complete
+current structure, QA strategy and executability fields.
+
 ```markdown
 ### US-MEM-01 — Buy an individual membership as a guest
 
@@ -16,23 +19,40 @@
 - **so that** I can obtain membership benefits without staff assistance
 
 #### AC-MEM-01-01 — Approved purchase
-- **Rules:** BR-01, BR-02
-- **Given:** I selected an available individual membership
-- **And:** I provided valid buyer information
-- **When:** My payment is approved
-- **Then:** One payment is recorded
-- **And:** One membership is created for me
-- **And:** I receive the confirmed purchase communication
+
+**Rules:** BR-01, BR-02
+
+**Acceptance condition:** A confirmed charge records the displayed total and activates one membership for the buyer.
+
+##### SC-MEM-01-01 — Complete a purchase with a confirmed charge
+
+**Given:** I selected an available individual membership with a displayed total of USD 100  
+**And:** I provided the buyer information required by the confirmed rules  
+**When:** I confirm the purchase and the bank reports that USD 100 was charged  
+**Then:** One payment for USD 100 is recorded  
+**And:** One membership is activated for me.
+
+**QA strategy:** Automate now; Integration; High; provider response and final-state evidence required; Not started.
 
 #### AC-MEM-01-02 — Rejected payment
-- **Rules:** BR-03
-- **Given:** I provided valid buyer information
-- **When:** My payment is rejected
-- **Then:** No membership is created or activated
-- **And:** I am told that the payment was not completed
+
+**Rules:** BR-03
+
+**Acceptance condition:** A rejected charge leaves no money or membership recorded and explains that the purchase did not finish.
+
+##### SC-MEM-01-02 — Receive a rejected charge
+
+**Given:** I completed the required information and no payment or membership exists for this request  
+**When:** I confirm the purchase and the bank rejects the charge  
+**Then:** I am told that the payment was not completed  
+**And:** No money or membership is recorded.
+
+**Message validation:** Check meaning and available action unless literal copy was approved.
+
+**QA strategy:** Automate now; Integration; High; controlled rejection and final-state evidence required; Not started.
 ```
 
-The next skill preserves these IDs when creating `FTC-MEM-*` functional cases and `SC-*` scenarios.
+The test-design skill preserves these `SC-*` IDs and groups them under `FTC-MEM-*` cases.
 
 ---
 
@@ -52,12 +72,15 @@ Mini example excerpt:
 - **I want to** log in using my Google account
 - **so that** I can access the app without creating and remembering a new password
 
-#### Acceptance Criteria:
-- **Scenario:** First-time trial user logs in via Google OAuth
-- **Given:** I am on the login page
-- **and Given:** I have a login account
-- **When:** I click the "Sign in with Google" button and authorize the app
-- **Then:** I am logged into the app and redirected to the onboarding flow
+#### AC-042-01 — Access the onboarding flow
+
+**Acceptance condition:** A trial user who authorizes Google login enters the app without creating another password.
+
+##### SC-042-01 — First-time trial user logs in with Google
+
+**Given:** I am a trial user on the login page with an available Google account  
+**When:** I choose `Sign in with Google` and authorize access  
+**Then:** I enter the app and see the onboarding flow.
 ```
 
 ---

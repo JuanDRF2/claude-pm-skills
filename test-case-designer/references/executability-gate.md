@@ -21,6 +21,9 @@ Mark each scenario Ready only when all applicable items are present:
 13. Precision: use exact values, states, recipients, dates, limits, or record effects whenever they change the expected result; do not rely on “valid”, “appropriate”, “correctly”, “successfully”, “the information”, “process”, or “update” without naming what those terms mean in this scenario.
 14. Unchanged behavior: when the action could affect related records, balances, payments, memberships, recipients, dates, statuses, or configurations, state what must remain unchanged or record why that assertion is not applicable.
 15. Execution separation: keep UI click-by-click instructions, fixtures, environment setup, and technical evidence outside the canonical Given/When/Then unless they are themselves approved product behavior.
+16. Controlled-value source: every value, boundary, date, amount, recipient or provider outcome that changes the expected result comes from a confirmed rule, configuration, approved example or named dataset. Mark illustrative values as test data, not product rules.
+17. Asynchronous completion: an asynchronous result has a final observable signal and an approved observation window or completion condition; identify material pending/unchanged behavior and the late or failure result. Without them, use `Needs refinement`.
+18. Message assertion: require literal wording only when approved copy, legal/accessibility text or a contractual label makes it material; otherwise verify purpose, resulting state and available action.
 
 Use `Needs refinement` when behavior is confirmed but execution detail is missing. Use `Blocked` when a valid expected result or execution is impossible. Approval means ready for downstream implementation, not executed or passed.
 
@@ -34,6 +37,26 @@ Do not invalidate or rewrite an existing approved package merely because this ga
 - **Already automated:** preserve scenario boundaries and automation metadata until the impact of the proposed clarification is reviewed.
 
 Apply all checks obligatorily to new scenarios and to existing scenarios when they are modified, prepared for execution, or selected for automation.
+
+## Deterministic scenario boundary
+
+Keep actions in one scenario only when all are true:
+
+1. They use the same actor and business context.
+2. They form one submission, transaction or external event.
+3. Removing one would make that event incomplete rather than create another valid journey.
+4. They lead to one primary outcome and use the same evidence.
+
+If any answer is no, create another `SC-*`; the scenarios may still share one `FTC-*`.
+Multiple `Then/And` statements remain together only when each is necessary evidence that
+the one outcome completed consistently.
+
+## Plain-language gate
+
+Read only the scenario title and Given/When/Then, hiding IDs, fixtures and technical evidence.
+A non-technical stakeholder must still be able to state who acts, what happens, what changes
+and what remains unchanged. Organize the rest as QA preparation/evidence and then optional
+technical detail; do not move missing business meaning into those later layers.
 
 ## Compact high-risk contract
 

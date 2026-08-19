@@ -314,10 +314,18 @@ def strict_checks(root: Path, files: dict[Path, str]) -> tuple[list[str], list[s
                     "State the business context, relevant configuration, and representative values "
                     "in the scenario; move the dataset ID or link to a test-data line after the behavior."
                 )
-        strategy_required = [r"Estrategia QA|QA Strategy", r"Automatizaci[oó]n\s*:", r"Nivel recomendado\s*:", r"Prioridad\s*:", r"Raz[oó]n\s*:", r"Dependencias\s*:", r"Estado\s*:"]
+        strategy_required = [
+            r"Estrategia QA|QA Strategy",
+            r"(?:Automatizaci[oó]n|Automation)\s*:",
+            r"(?:Nivel recomendado|Recommended level)\s*:",
+            r"(?:Prioridad|Priority)\s*:",
+            r"(?:Raz[oó]n|Rationale)\s*:",
+            r"(?:Dependencias|Dependencies)\s*:",
+            r"(?:Estado|Automated coverage)\s*:",
+        ]
         if any(not re.search(pattern, block, re.IGNORECASE) for pattern in strategy_required):
             errors.append(f"{sc_id} is missing its canonical QA strategy fields in the story.")
-        decision = re.search(r"Automatizaci[oó]n:\*\*\s*([^\n]+)", block, re.IGNORECASE)
+        decision = re.search(r"(?:Automatizaci[oó]n|Automation):\*\*\s*([^\n]+)", block, re.IGNORECASE)
         if decision and decision.group(1).strip() not in {"Automate now", "Automate later", "Manual", "Blocked"}:
             errors.append(f"{sc_id} has an unsupported canonical automation decision: {decision.group(1).strip()}.")
 

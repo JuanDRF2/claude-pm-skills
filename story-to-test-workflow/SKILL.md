@@ -168,7 +168,7 @@ Writing rules:
 4. Preserve user edits. Read the current file before updating and change only the relevant sections.
 5. Keep links relative so the package can move or be versioned in Git.
 6. Never publish to Notion, Jira, or another external system unless the user separately requests and authorizes it.
-7. Keep `00-workflow-state.md` current after every approved gate so the workflow can resume without rereading the full conversation.
+7. Keep `00-workflow-state.md` current after every approved gate and every material decision checkpoint so the workflow can resume without rereading the full conversation.
 8. Keep project status separate from delivery status; one completed delivery does not complete the project.
 9. Generate Jira and role-specific views from approved source artifacts, never as competing sources of truth.
 10. Keep atomic checks in `06-test-coverage.md` and QA-reviewable functional scenarios in `07-functional-test-cases.md`.
@@ -234,7 +234,19 @@ State:
 - Shared storage mode and registered Notion root/page manifest when configured
 - Source roles and canonical base snapshot when derived artifacts are present
 
+For every project, classify Notion availability with `references/local-organization-contract.md`. Reuse a confirmed existing project page; for a new project, create its root under the confirmed parent only at Gate 5; when Notion is unavailable, continue Phases 1–5 as `Local draft — publication pending` without inventing remote IDs, URLs or snapshots. Only shared completion remains blocked.
+
+For an existing registered Notion project with no local package, use
+`sync-refinement-package-notion start` before interpreting phase status. For existing
+local artifacts that the user wants to share, preserve their current approval and Judge
+state during the initial native publication.
+
 For the Extend approved package route, complete `extend-approved-package.md`, then continue at Phase 3 using Decision Capture normally.
+
+For a workspace containing multiple existing packages or loose refinement files, inventory
+and normalize locally first under the local organization contract. Obtain separate
+approval for local moves, validate every normalized package, and only then open a Notion
+publication gate. Do not combine local moves and remote writes in one approval.
 
 ### Phase 1: Understand the Project
 
@@ -363,9 +375,7 @@ Make every story Markdown human-first: user story, scope, agreed behavior, depen
 
 Within each criterion, create one or more stable `SC-*` headings, then render related rules as metadata and the behavioral flow as separate lines with bold `Given/Dado`, `When/Cuando`, `Then/Entonces`, `And/Y`, and `But/Pero` labels. Do not present rules and behavior as peers in one bullet list. QA reuses these exact scenarios and adds metadata without changing their meaning.
 
-Write acceptance criteria in product language before technical language. A reader must understand the actor, action, outcome, validation and consequence without knowing internal object names or architecture. Put required terms such as `Subscription`, `Commitment`, Agreements, events, idempotency or correlation IDs in a separate `Consideración técnica` or `Evidencia técnica` line. Do not use compressed shorthand such as `Draft+Commitment`, `Payments→Canceled`, `preview=cronograma`, “no deja parcial”, or slash-separated outcomes.
-
-Read `references/matrix-decision.md` when requirements contain interacting settings, states, permissions, calculations, boundaries, or reusable datasets. Apply its deterministic matrix assessment before creating a decision table or parameterized dataset. A matrix is optional supporting evidence and must never replace the business context, representative values, action, or expected outcome in a canonical `SC-*`.
+Write acceptance criteria in product language before technical language. A reader must understand the actor, action, outcome, validation and consequence without knowing internal object names or architecture. Organize business behavior first, QA preparation/evidence second and optional technical detail last. Put terms such as `Subscription`, `Commitment`, events, idempotency or correlation IDs in `Consideración técnica` or `Evidencia técnica`; never use compressed shorthand. For async results require a confirmed final signal and window/completion condition; source material values from confirmed rules/configuration/test data and require exact copy only when approved wording makes it contractual.
 
 ### Phase 4: Design Test Coverage
 
@@ -379,9 +389,11 @@ Use `test-case-designer` on approved stories and criteria. Produce:
 - Rules-to-tests coverage table
 - Remaining questions and risk
 
-Before writing functional cases, cluster checks by primary business behavior. Create a separate scenario only when the flow, precondition, trigger, primary rule, or user-visible outcome changes materially. Otherwise add the check as another expected result in the same scenario.
+Read `references/matrix-decision.md` when requirements contain interacting settings, states, permissions, calculations, boundaries, or reusable datasets. Apply its deterministic matrix assessment before creating a decision table or parameterized dataset. A matrix is optional supporting evidence and must never replace the business context, representative values, action, or expected outcome in a canonical `SC-*`.
 
-Do not compress a workflow walkthrough into one scenario by listing several actions in one `When` or several unrelated outcomes in one `Then`. If a case covers selection, navigation, saving, validation and recovery, render each as a distinct `SC-*` product scenario and group them under the same `FTC-*` when appropriate. Use natural nouns such as “empleado”, “miembro”, “membresía”, “pago” and “plan”; explain test fixtures and internal records only in Preconditions, Data or Evidence.
+Before writing functional cases, cluster checks by primary business behavior. Keep actions together only when they share actor/context, form one submission or event, cannot stand alone, and lead to one primary outcome with the same evidence. Otherwise create another scenario; checks that prove inseparable consequences may remain expected results in one scenario.
+
+Do not compress a workflow walkthrough into one scenario by listing several actions in one `When` or unrelated outcomes in one `Then`. Render selection, navigation, saving, validation, rejection, asynchronous completion and recovery as distinct `SC-*` items when their trigger or outcome changes, while grouping them under one `FTC-*` when appropriate. Use natural nouns; explain fixtures, controlled values and internal records only in Preconditions, Data or Evidence.
 
 Read `references/qa-design-handoff.md`. Treat `CHK-*` as coverage units, not executable files. Treat `FTC-*` as QA review units, not TestManager keys. Reuse the exact `SC-*` IDs and approved behavior from the criteria; add QA metadata without creating parallel scenarios.
 
@@ -449,10 +461,12 @@ Do not imply that one optional presentation is required. If the user already sel
 Route each selected output:
 
 - **Portal:** use `build-refinement-portal`; generate a self-contained local HTML, recommended as `10-refinement-portal.html` when available.
-- **Word:** use `build-refinement-document`; generate and visually verify a `.docx`, choosing the next free numbered filename.
-- **Notion:** use `publish-refinement-to-notion`; confirm workspace and destination, publish only with authorization, then verify by reading the result. Classify the action as:
-  - `Publicación completa` when the user asks to publish or republish the refinement without limiting pages. Require the portada, every story page and the six native auxiliary pages.
+- **Word:** use `build-refinement-document`; generate and visually verify a `.docx`, choosing the next free numbered filename. When Notion is also selected and already published, prefer generating it from the verified Notion checkout and regenerate it after any later Notion change.
+- **Notion:** before requesting remote authorization, read and execute `references/publication-authorization-gate.md`; resolve incomplete payloads, Judges or hashes locally and ask once only after the deterministic dossier passes. Invoke `publish-refinement-to-notion` through the host skill mechanism and complete its dispatch preflight; if the specialist or a compatible Notion connection cannot be resolved, stop with publication pending instead of designing or writing an alternative page. Publish only with authorization and verify by full readback. Classify the action as:
+  - `Publicación completa` when the user asks to publish or republish the refinement without limiting pages. Generate both the collaborative refinement view (cover, story pages and auxiliary pages) and a 1:1 Markdown mirror that preserves relative paths and roles.
   - `Actualización localizada` when the user explicitly names affected stories, sections or pages. Preserve the rest and update cover facts whose truth changed.
+
+  After initial publication and registration, use `sync-refinement-package-notion` for every `status`, `start`, `publish`, `reconcile` or `recover`. Notion becomes the shared official copy only after complete readback; regenerate the local Markdown checkout from that verified result. The Notion hierarchy must follow `references/markdown-package.md`: keep the established human refinement view as the primary review experience (cover, story pages, auxiliary pages) alongside a technical 1:1 mirror for safe synchronization; publication and sync skills must not consolidate, rename, omit or reclassify its files.
 
 Generate every presentation from approved Markdown, never from another derived presentation. A user may select several formats; produce them independently so HTML, Word and Notion cannot silently drift through chained conversion.
 
@@ -460,7 +474,7 @@ When the package contains a canonical matrix, every selected presentation must r
 
 For external publication, preserve safety:
 
-- Notion: create a private page by default when no destination is specified; do not edit the PRD original.
+- Notion: require a confirmed parent page; allow an explicitly requested private standalone page without making it a future default. Do not edit the PRD original.
 - Hosted portal: offer private hosting only after validating the local HTML; require informed confirmation before public hosting.
 - Word: do not deliver internal render PNGs unless requested.
 
@@ -517,11 +531,12 @@ Read `references/examples-and-pitfalls.md` only when the user requests an exampl
 - `references/readiness-and-approvals.md` — Backlog states, role readiness, and block approvals
 - `references/qa-design-handoff.md` — Boundary between QA design and downstream TestManager artifacts
 - `references/matrix-decision.md` — Deterministic rule for creating matrices without making scenarios depend on them
+- `references/publication-authorization-gate.md` — Autonomous exact-write dossier before Notion authorization
 - `references/examples-and-pitfalls.md` — Worked examples and common interaction failure patterns
 - `skills/refinement-judge/SKILL.md` — Independent adversarial gate before consequential actions
 - `skills/user-story-mapping/SKILL.md` — Journey, rules, variations, and release slices
 - `skills/user-story-splitting/SKILL.md` — Vertical decomposition and sequencing
-- `skills/user-story/SKILL.md` — User stories and acceptance criteria
+- `skills/user-story/SKILL.md` — User stories and acceptance criteria; use its `references/golden-example.md` as the authoritative complete example
 - `skills/test-case-designer/SKILL.md` — Risk-based coverage and test cases
 - `skills/build-refinement-portal/SKILL.md` — Optional final portal generation from approved artifacts
 - `skills/build-refinement-document/SKILL.md` — Optional Word document generation and visual verification

@@ -21,6 +21,8 @@ At each gate, maintain:
 - Optional Word export:
 - Notion URL and Word path:
 - Notion publication mode and page manifest:
+- Publication dossier/run: None | [digest, run path, verified/pending/blocked counts]
+- Post-publication receipts: None | [parity, Judge and audit receipt paths]
 - Project status and delivery statuses:
 - Derived artifacts: None | [artifact list and role]
 - Canonical base snapshot:

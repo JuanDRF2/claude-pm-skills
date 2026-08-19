@@ -7,6 +7,8 @@ Write the report in the package language. Use the translated headings shown belo
 
 - Verdict / Veredicto: PASS | PASS WITH OBSERVATIONS | PASS CON OBSERVACIONES | FAIL
 - Intended action / Acción evaluada: [action]
+- Action stage / Etapa de acción: Preview | Publication | Post-publication
+- Action scope / Alcance de acción: technical=N; editorial=N
 - Gate decision / Decisión del gate: Allowed | Allowed with observations | Blocked
 - Reviewed snapshot SHA-256 / Snapshot revisado SHA-256: [64 lowercase hex]
 - Review date / Fecha de revisión: YYYY-MM-DD
@@ -71,6 +73,11 @@ Write the report in the package language. Use the translated headings shown belo
 - Human override / Excepción humana: None / Ninguna
 ```
 
+`Action stage` y `Action scope` son obligatorios cuando el Judge evalúa una publicación
+localizada en Notion. `Publication` significa el write set remoto exacto; no usarlo para la
+mera preparación de un preview. En otros gates pueden omitirse cuando no aplican páginas
+técnicas/editoriales.
+
 ## Empty findings
 
 For `PASS`, retain the Findings section and write:
@@ -91,3 +98,4 @@ On every rerun:
 4. Update snapshot hash and date.
 5. Recalculate the verdict from open findings.
 6. Keep accepted-risk entries visible.
+7. For Notion publication, update the action stage and exact page counts.

@@ -1,5 +1,15 @@
 # QA Design Output Schema
 
+## Contents
+
+- Testability audit
+- Risk and coverage strategy
+- Atomic coverage checks
+- Grouping review
+- Functional test case
+- Traceability ledger
+- QA handoff
+
 ## 1. Testability Audit
 
 List confirmed inputs, contradictions, blocked results, data/environment needs, and owners.
@@ -46,7 +56,7 @@ Keep these in `07-functional-test-cases.md`.
 - [Minimum setup before execution]
 
 ### Data and environment
-- [Controlled data, configuration, environment, integrations]
+- [Controlled data, configuration, environment, integrations and source of every material value]
 
 ### [SC-ID] — [Exact canonical scenario title from the criterion]
 
@@ -67,6 +77,12 @@ Keep these in `07-functional-test-cases.md`.
 **Evidence:** [UI, record, email, receipt, log, or other proof]
 
 **Evidence location:** [Exact screen, object/record, message, report, or support view]
+
+**Asynchronous observation:** [Only when applicable: final signal, approved observation window/completion condition, pending state and late/failure result]
+
+**Message assertion:** [Exact approved wording, or purpose/resulting state/available action]
+
+Omit asynchronous and message fields when they do not apply; never leave template placeholders in an approved handoff.
 
 For explicit High/Critical risk or critical-domain scenarios only, add the compact fields defined in
 `executability-gate.md`: **Controlled example**, **Initial state**, **Controlled outcome**,
@@ -89,7 +105,17 @@ Use bold labels and whitespace to separate traceability metadata from Given/When
 
 Use complete product-language sentences in Given/When/Then. Do not place fixtures such as “synthetic Contact/Household” in the business behavior, and do not compress results with `+`, `→`, `/`, `=`, or semicolon chains. A reader must understand the scenario without the traceability and technical-evidence sections.
 
+Keep the output in three layers: understandable business behavior, QA preparation/evidence,
+and optional technical evidence. Keep actions in one scenario only when they share actor,
+context, one submission/event, one primary outcome and the same evidence. Source material
+values from confirmed rules, configuration, approved examples or named datasets.
+
 Do not mark a scenario Ready when it uses placeholders such as “appropriate data,” “valid configuration,” “works correctly,” or “verify the records” without identifying what state, configuration, result, or evidence is required.
+
+For asynchronous outcomes, `Ready` requires a final observable signal and an approved
+window or completion condition; do not invent a timeout. Validate literal copy only when
+an approved requirement makes the wording contractual. Otherwise verify meaning, state and
+available action.
 
 ## 6. Traceability Ledger
 
@@ -109,3 +135,5 @@ End with this boundary instruction:
 > Use the local skills of the test-management repository to generate its native test cases, test plan, and test run. Preserve approved scenario boundaries and traceability. Assertions from the same flow may remain consolidated; do not remove behavior or risk without recording a rationale.
 
 Do not generate `.testcase.yml`, `.testplan.yml`, `.testrun.yml`, UUIDs, native keys, counters, execution results, evidence, or defects in this skill.
+
+See `skills/user-story/references/golden-example.md` for the complete canonical story-to-QA example.

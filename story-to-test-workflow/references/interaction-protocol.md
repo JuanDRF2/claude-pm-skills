@@ -76,6 +76,11 @@ approval, handoff or publication.
 
 End a paused phase with the compact workflow state from `SKILL.md`. On resumption, restate only the current phase, approved boundary, blocking questions, and next action.
 
+During a long external publication, report compact progress by project and page state. Do
+not ask the user to choose routine retry, patch fallback, local validation, cache reuse or
+receipt-generation steps; resolve them under the specialist contract. Pause only for a new
+product decision, changed remote scope, concurrent edit or exact external write approval.
+
 ## Approval States
 
 Track ownership with: Proposed by AI, Product confirmed, Engineering review needed, QA review needed, or Blocked. An artifact may be approved while containing visibly pending engineering or QA confirmations.

@@ -11,19 +11,8 @@ import sys
 from pathlib import Path
 
 
-CANONICAL_FILES = [
-    "00-workflow-state.md",
-    "01-project-understanding.md",
-    "02-rules-and-questions.md",
-    "03-story-map.md",
-    "04-release-slices.md",
-    "05-user-stories.md",
-    "06-test-coverage.md",
-    "07-functional-test-cases.md",
-    "08-traceability-and-risks.md",
-    "09-package-index.md",
-    "10-design-and-spec-deltas.md",
-]
+JUDGE_REPORT = "11-refinement-judge-report.md"
+ROOT_PRODUCT_MARKDOWN_RE = re.compile(r"^\d{2}-.*\.md$")
 
 VERDICT_RE = re.compile(
     r"(?im)^-\s*(?:Verdict|Veredicto)(?:\s*/\s*(?:Verdict|Veredicto))?\s*:\s*"
@@ -47,6 +36,19 @@ BLOCK_RE = re.compile(
     r"(?im)^-\s*(?:Blocks action|Bloquea acción)(?:\s*/\s*(?:Blocks action|Bloquea acción))?\s*:\s*"
     r"(Yes|No|Sí)\s*$"
 )
+ACTION_RE = re.compile(
+    r"(?im)^-\s*(?:Intended action|Acción evaluada)"
+    r"(?:\s*/\s*(?:Intended action|Acción evaluada))?\s*:\s*\S"
+)
+ACTION_STAGE_RE = re.compile(
+    r"(?im)^-\s*(?:Action stage|Etapa de acción)"
+    r"(?:\s*/\s*(?:Action stage|Etapa de acción))?\s*:\s*(Preview|Publication|Post-publication)\s*$"
+)
+ACTION_SCOPE_RE = re.compile(
+    r"(?im)^-\s*(?:Action scope|Alcance de acción)"
+    r"(?:\s*/\s*(?:Action scope|Alcance de acción))?\s*:\s*"
+    r"technical\s*=\s*\d+\s*;\s*editorial\s*=\s*\d+\s*$"
+)
 
 
 def package_validator() -> Path:
@@ -57,11 +59,11 @@ def package_validator() -> Path:
 
 
 def snapshot_files(root: Path) -> list[Path]:
-    files: list[Path] = []
-    for relative in CANONICAL_FILES:
-        path = root / relative
-        if path.is_file():
-            files.append(path)
+    files = [
+        path
+        for path in root.glob("*.md")
+        if path.name != JUDGE_REPORT and ROOT_PRODUCT_MARKDOWN_RE.fullmatch(path.name)
+    ]
     for folder in ("jira", "handoffs"):
         directory = root / folder
         if directory.is_dir():
@@ -80,7 +82,7 @@ def snapshot_hash(root: Path, files: list[Path]) -> str:
     return digest.hexdigest()
 
 
-def run_preflight(root: Path, language: str) -> int:
+def run_preflight(root: Path, language: str, phase: str) -> int:
     if not root.is_dir():
         print(f"ERROR: package folder does not exist: {root}")
         return 2
@@ -90,8 +92,11 @@ def run_preflight(root: Path, language: str) -> int:
         str(root),
         "--language",
         language,
-        "--strict",
     ]
+    if phase == "gate-c":
+        command.append("--decision-checkpoint")
+    else:
+        command.append("--strict")
     result = subprocess.run(command, text=True, capture_output=True, check=False)
     if result.stdout:
         print(result.stdout.rstrip())
@@ -101,6 +106,7 @@ def run_preflight(root: Path, language: str) -> int:
     if not files:
         print("ERROR: no canonical files available for snapshot")
         return 1
+    print(f"PREFLIGHT_PHASE: {phase}")
     print(f"SNAPSHOT_SHA256: {snapshot_hash(root.resolve(), files)}")
     print(f"SNAPSHOT_FILES: {len(files)}")
     return result.returncode
@@ -111,7 +117,7 @@ def field_present(block: str, labels: tuple[str, ...]) -> bool:
     return bool(re.search(rf"(?im)^-\s*(?:{joined})(?:\s*/\s*(?:{joined}))?\s*:\s*\S", block))
 
 
-def run_report(report: Path) -> int:
+def run_report(report: Path, required_stage: str | None) -> int:
     if not report.is_file():
         print(f"ERROR: report does not exist: {report}")
         return 2
@@ -121,8 +127,20 @@ def run_report(report: Path) -> int:
     verdict_match = VERDICT_RE.search(text)
     if not verdict_match:
         errors.append("Missing or unsupported Verdict/Veredicto.")
+    if not ACTION_RE.search(text):
+        errors.append("Missing Intended action/Acción evaluada.")
     if not SNAPSHOT_RE.search(text):
         errors.append("Missing valid 64-character reviewed snapshot SHA-256.")
+    if required_stage:
+        stage = ACTION_STAGE_RE.search(text)
+        if not stage or stage.group(1) != required_stage:
+            errors.append(
+                f"{required_stage} validation requires Action stage/Etapa de acción: {required_stage}."
+            )
+        if not ACTION_SCOPE_RE.search(text):
+            errors.append(
+                f"{required_stage} validation requires Action scope/Alcance de acción: technical=N; editorial=N."
+            )
 
     required_sections = [
         ("executive summary", ("Executive summary", "Resumen ejecutivo")),
@@ -139,6 +157,7 @@ def run_report(report: Path) -> int:
 
     findings = list(FINDING_RE.finditer(text))
     open_blocking_severities: list[str] = []
+    open_observations: list[str] = []
     seen: set[str] = set()
     for index, match in enumerate(findings):
         finding_id = match.group(1)
@@ -169,25 +188,35 @@ def run_report(report: Path) -> int:
         if (
             severity
             and status
-            and severity.group(1) in {"Critical", "High", "Medium"}
             and status.group(1) == "Open"
         ):
-            open_blocking_severities.append(finding_id)
+            blocking_severity = severity.group(1) in {"Critical", "High", "Medium"}
+            says_blocking = bool(blocks and blocks.group(1) in {"Yes", "Sí"})
+            if blocking_severity:
+                open_blocking_severities.append(finding_id)
+            else:
+                open_observations.append(finding_id)
+            if blocks and blocking_severity != says_blocking:
+                errors.append(
+                    f"{finding_id} has inconsistent Severity/Severidad and Blocks action/Bloquea acción."
+                )
 
     if verdict_match and verdict_match.group(1) != "FAIL" and open_blocking_severities:
         errors.append(
             "Non-FAIL verdict conflicts with open Critical/High/Medium findings: "
             + ", ".join(open_blocking_severities)
         )
-    if verdict_match and verdict_match.group(1) == "PASS" and findings:
-        open_findings = []
-        for index, match in enumerate(findings):
-            end = findings[index + 1].start() if index + 1 < len(findings) else len(text)
-            status = STATUS_RE.search(text[match.start():end])
-            if status and status.group(1) == "Open":
-                open_findings.append(match.group(1))
-        if open_findings:
-            errors.append("PASS conflicts with open findings: " + ", ".join(open_findings))
+    if verdict_match and verdict_match.group(1) == "PASS" and (open_blocking_severities or open_observations):
+        errors.append(
+            "PASS conflicts with open findings: "
+            + ", ".join(open_blocking_severities + open_observations)
+        )
+    if (
+        verdict_match
+        and verdict_match.group(1) in {"PASS WITH OBSERVATIONS", "PASS CON OBSERVACIONES"}
+        and not open_observations
+    ):
+        errors.append("Observations verdict requires at least one open Low or Observation finding.")
 
     for error in errors:
         print(f"ERROR: {error}")
@@ -205,14 +234,28 @@ def main() -> int:
     preflight = subparsers.add_parser("preflight")
     preflight.add_argument("folder", type=Path)
     preflight.add_argument("--language", choices=("en", "es"), required=True)
+    preflight.add_argument("--phase", choices=("final", "gate-c"), default="final")
 
     report = subparsers.add_parser("report")
     report.add_argument("file", type=Path)
+    report.add_argument(
+        "--publication",
+        action="store_true",
+        help="Require an exact Publication stage and technical/editorial action scope.",
+    )
+    report.add_argument(
+        "--post-publication",
+        action="store_true",
+        help="Require an exact Post-publication stage and technical/editorial action scope.",
+    )
 
     args = parser.parse_args()
     if args.command == "preflight":
-        return run_preflight(args.folder.resolve(), args.language)
-    return run_report(args.file.resolve())
+        return run_preflight(args.folder.resolve(), args.language, args.phase)
+    if args.publication and args.post_publication:
+        parser.error("--publication and --post-publication are mutually exclusive")
+    required_stage = "Publication" if args.publication else "Post-publication" if args.post_publication else None
+    return run_report(args.file.resolve(), required_stage)
 
 
 if __name__ == "__main__":

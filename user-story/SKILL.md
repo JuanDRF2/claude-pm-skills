@@ -65,7 +65,7 @@ A user story combines:
 **Acceptance Criteria (Gherkin format):**
 - **Scenario:** [Brief description of the scenario]
 - **Given:** [Initial context or preconditions]
-- **and Given:** [Additional preconditions]
+- **And:** [Additional preconditions]
 - **When:** [Event that triggers the action]
 - **Then:** [Expected outcome]
 
@@ -131,11 +131,11 @@ Use `template.md` for the full fill-in structure.
 Fill in the template:
 
 ```markdown
-### User Story [ID]:
+### [US-ID] — [Brief title focused on user value]
 
 - **Summary:** [Brief, memorable title focused on value to the user]
 
-#### Use Case:
+#### User story
 - **As a** [user name if available, otherwise persona, otherwise role]
 - **I want to** [action user takes to get to outcome]
 - **so that** [desired outcome]
@@ -157,17 +157,19 @@ Fill in the template:
 Fill in the template:
 
 ```markdown
-#### Acceptance Criteria:
+#### AC-[ID] — [Human-readable outcome]
 
-- **Scenario:** [Brief, human-readable scenario describing value]
-- **Given:** [Initial context or precondition]
-- **and Given:** [Additional context or preconditions]
-- **and Given:** [Additional context as needed]
-- **and Given:** [UI-focused context ensuring 'When' can happen]
-- **and Given:** [Outcomes-focused context ensuring 'Then' is delivered]
-- **When:** [Event that triggers the action—aligns with 'I want to']
-- **Then:** [Primary expected outcome—aligns with 'so that']
-- **And:** [Additional inseparable observable result, as needed]
+**Rules:** [BR IDs]
+
+**Acceptance condition:** [What must be true for this criterion to be accepted]
+
+##### SC-[ID] — [Human-readable example]
+
+**Given:** [Concrete initial state in product language]  
+**And:** [Additional relevant context]  
+**When:** [Primary business event aligned with "I want to"]  
+**Then:** [Observable outcome aligned with "so that"]  
+**And:** [Additional inseparable result, when needed]
 ```
 
 **Quality checks:**
@@ -176,6 +178,10 @@ Fill in the template:
 - **One behavior per scenario:** Multiple inseparable `Then/And` results are valid when they prove one coherent business outcome
 - **Multiple scenarios are expected:** Add success, validation, alternate-rule, or material-failure scenarios required for acceptance
 - **Alignment:** Does "When" match "I want to"? Does "Then" match "so that"?
+
+Treat actions as inseparable only when they use the same actor and context, form one
+submission or external event, cannot be meaningfully performed alone, and lead to one
+primary outcome verified with the same evidence. Otherwise create another scenario.
 
 **Red flags:**
 - **Multiple unrelated When/Then pairs:** Sign of scope creep—evaluate splitting (reference `skills/user-story-splitting/SKILL.md`)
@@ -191,6 +197,9 @@ Write every criterion so a product stakeholder can understand it without knowing
 - Keep multiple `Then/And` results together only when they are inseparable proof of one business outcome.
 - Expand shorthand into sentences. Never write compressed forms such as `Draft+Commitment`, `Payments→Canceled`, `preview=timeline`, `success/reject`, “does not leave partial”, slash-separated actions, or semicolon chains of unrelated results.
 - Explain necessary product labels the first time they appear. Preserve the exact label in backticks when the UI or domain requires it.
+- Organize detail in three layers: understandable business behavior first, QA preparation
+  and evidence second, and optional internal implementation detail last. IDs and technical
+  vocabulary must never be required to understand the Given/When/Then.
 
 Before accepting a criterion, read it aloud without its rule IDs or technical note. If the behavior is not clear by itself, rewrite it.
 
@@ -202,6 +211,12 @@ Before accepting a criterion, read it aloud without its rule IDs or technical no
 - Create another `SC-*` when the trigger or primary outcome changes.
 - Allow secondary criterion traceability when one inseparable event proves several criteria, but ensure every criterion owns or explicitly references at least one scenario.
 - Do not create separate “acceptance scenario” and “QA scenario” versions. QA enriches the same scenario with checks, evidence, data, risk and automation.
+- For asynchronous behavior, state the final observable signal and the approved observation
+  window or completion condition. If neither is confirmed, mark the scenario `Needs refinement`
+  instead of choosing a timeout.
+- Validate exact message wording only when approved copy, legal text, accessibility wording,
+  or a contractual label requires it. Otherwise validate the meaning, resulting state and
+  available user action without freezing incidental copy.
 
 #### Matrix and dataset references
 
@@ -210,6 +225,9 @@ Before accepting a criterion, read it aloud without its rule IDs or technical no
 - Put matrix IDs and links after the Given/When/Then under **Test data / Datos de prueba** or **Complete numeric data / Datos numéricos completos**.
 - Keep one scenario parameterized only when every matrix row shares the same business event and expected-result structure. Split rows into separate `SC-*` scenarios when the trigger, applicable rule, validation path, or primary outcome changes.
 - A reviewer must be able to understand and approve the scenario when the matrix link is unavailable.
+- Take expected values and boundaries from a confirmed rule, approved example, configuration,
+  or named test dataset. Label illustrative values as test data; never turn a convenient QA
+  value into a product rule.
 
 ---
 
@@ -234,6 +252,9 @@ Write a short, memorable summary that captures the story's value:
 - **Test acceptance criteria:** Can QA write test cases from this?
 - **Check for splitting:** If the story feels too big, use `skills/user-story-splitting/SKILL.md`
 - **Ensure testability:** Can you prove "Then" happened?
+- **Check plain language:** Can a non-technical reviewer explain the actor, event and result after hiding IDs and technical notes?
+- **Check async behavior:** Is there an approved completion signal/window, or is the scenario visibly `Needs refinement`?
+- **Check messages and values:** Is exact copy intentionally required, and does every material value have a confirmed source?
 - **Trace rules:** Does every acceptance criterion cite at least one rule, and is every in-scope rule covered?
 - **Expose uncertainty:** Are assumptions and open questions visibly separated from approved behavior?
 - **Check failure consistency:** For payments, identity, scheduling, or other high-risk workflows, are duplicate requests and partial failures addressed?
@@ -252,7 +273,9 @@ For payment stories, never use “approved” ambiguously. Distinguish authorize
 
 ## Examples and Pitfalls
 
-Read `references/examples-and-pitfalls.md` only when a concrete example is needed or a review detects one of its quality failure patterns. Apply those examples without changing the output contract above.
+Read `references/golden-example.md` when a complete current example is needed. Use it as
+the authoritative structure. Read `references/examples-and-pitfalls.md` only for focused
+illustrations and failure patterns; they never override the template or golden example.
 
 ## References
 

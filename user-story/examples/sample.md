@@ -1,5 +1,9 @@
 # User Story Examples
 
+These examples explain focused quality decisions. For the complete current structure,
+including acceptance conditions, executability, QA strategy, asynchronous outcomes and
+functional grouping, use `../references/golden-example.md`.
+
 ## Example 1: Good User Story
 
 ```markdown
@@ -14,12 +18,18 @@
 
 #### Acceptance Criteria:
 
-##### SC-042-01 — First-time trial user logs in via Google OAuth
-- **Given:** I am on the login page
-- **and Given:** I have a Google account
-- **and Given:** The "Sign in with Google" button is visible
-- **When:** I click the "Sign in with Google" button and authorize the app
-- **Then:** I am logged into the app and redirected to the onboarding flow
+##### AC-042-01 — Access onboarding without another password
+
+**Acceptance condition:** A trial user who authorizes Google login enters the app without creating another password.
+
+###### SC-042-01 — First-time trial user logs in with Google
+
+**Given:** I am a trial user on the login page with an available Google account  
+**And:** the `Sign in with Google` option is available  
+**When:** I choose that option and authorize access  
+**Then:** I enter the app and see the onboarding flow.
+
+**QA strategy:** Manual; E2E; Medium; depends on a controlled Google account; Not started.
 ```
 
 **Why this works:**
@@ -47,11 +57,16 @@
 
 #### Acceptance Criteria:
 
-- **Scenario:** User logs in
-- **Given:** I want to log in
-- **and Given:** I have an active account
-- **When:** I log in
-- **Then:** It works better
+##### AC-999-01 — Login
+
+**Acceptance condition:** The login should be better.
+
+###### SC-999-01 — User logs in
+
+**Given:** I want to log in  
+**And:** I have an active account  
+**When:** I log in  
+**Then:** It works better.
 ```
 
 **Why this fails:**
@@ -82,18 +97,23 @@
 
 #### Acceptance Criteria:
 
-- **Scenario:** Shopping cart management
-- **Given:** I have items in my cart
-- **When:** I add an item
-- **Then:** It appears in the cart
-- **When:** I remove an item
-- **Then:** It disappears from the cart
-- **When:** I update quantity
-- **Then:** The quantity changes
-- **When:** I apply a coupon
-- **Then:** The discount is applied
-- **When:** I checkout
-- **Then:** I proceed to payment
+##### AC-100-01 — Shopping cart management
+
+**Acceptance condition:** The shopper can manage the entire cart and checkout.
+
+###### SC-100-01 — Manage the complete cart in one scenario
+
+**Given:** I have items in my cart  
+**When:** I add an item  
+**Then:** It appears in the cart  
+**When:** I remove an item  
+**Then:** It disappears from the cart  
+**When:** I update quantity  
+**Then:** The quantity changes  
+**When:** I apply a coupon  
+**Then:** The discount is applied  
+**When:** I checkout  
+**Then:** I proceed to payment.
 ```
 
 **Why this needs splitting:**
@@ -126,14 +146,25 @@ Each becomes its own story with focused acceptance criteria.
 - **so that** my membership becomes available without staff assistance
 
 #### Acceptance Criteria:
-- **AC-01 — Rules:** BR-01, BR-02, BR-03
-- **Scenario:** Approved individual membership purchase
-- **Given:** I selected an available individual membership
-- **And:** I provided valid buyer information
-- **When:** The payment provider approves the purchase
-- **Then:** Exactly one payment is recorded
-- **And:** Exactly one membership is created for the buyer
-- **And:** A confirmation is displayed and sent according to the confirmed communication rule
+
+##### AC-120-01 — Activate membership after the charge
+
+**Rules:** BR-01, BR-02, BR-03
+
+**Acceptance condition:** A confirmed charge records the displayed total and activates one membership for the buyer.
+
+###### SC-120-01 — Complete an individual membership purchase
+
+**Given:** I selected an available individual membership with a displayed total of USD 100  
+**And:** I provided the buyer information required by the confirmed rules  
+**When:** I confirm the purchase and the bank reports that USD 100 was charged  
+**Then:** Exactly one payment for USD 100 is recorded  
+**And:** Exactly one membership is activated for the buyer  
+**And:** The screen confirms that the purchase finished.
+
+**Test data:** USD 100 is an illustrative configured value, not a product price rule.
+
+**QA strategy:** Automate now; Integration; High; controlled provider response and final-state evidence required; Not started.
 ```
 
 **Why this stays together:** The outcomes jointly prove one transaction. Splitting payment recording, membership creation, and confirmation would allow an incomplete business result to appear done.

@@ -1,4 +1,4 @@
 interface:
   display_name: "User Story"
   short_description: "Write clear, testable, Jira-ready user stories"
-  default_prompt: "Use $user-story to write a same-language, Jira-ready user story with plain-language product outcomes, focused acceptance scenarios, approval state, sizing assessment, and inline traceability."
+  default_prompt: "Use $user-story to write a same-language, Jira-ready user story with non-technical product outcomes, explicit acceptance conditions, focused canonical scenarios, approval state, sizing assessment, and inline traceability."

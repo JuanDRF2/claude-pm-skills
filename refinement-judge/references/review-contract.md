@@ -143,6 +143,11 @@ high-severity parity defect. Review the deterministic editorial receipt as evide
 independently inspect every failed or high-risk story; never infer parity from the receipt
 alone.
 
+For every affected non-story presentation, compare its frozen expected payload with the
+complete readback and require the expected IDs, headings, links and responsibility-specific
+content. Validate internal destinations by Notion page ID; a URL with form `https://*.md`
+is a broken link, not a harmless serialization difference.
+
 Also verify that sections 7 and 9 provide the visible navigation while every native `<page>` block appears exactly once inside the final collapsed container `Subpáginas internas del proyecto`. Report loose native page blocks or a second visible page list as a presentation-parity defect.
 
 ### 9. Derived artifacts and product boundaries

@@ -65,5 +65,5 @@ If rows have materially different triggers, rules, or primary outcomes, create s
 - Keep one canonical matrix in local Markdown.
 - Consumer stories summarize the row values they need and link to the canonical matrix.
 - Publish the matrix as navigable content in every selected collaborative format.
-- Notion, Portal, and Word views must not rely on a local filesystem path.
+- Notion, Portal, and any optional Word export must not rely on a local filesystem path.
 - A broken or unavailable matrix link must not make a story impossible to understand or approve.

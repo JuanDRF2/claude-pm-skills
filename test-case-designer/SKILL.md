@@ -160,6 +160,9 @@ Start from the canonical `SC-*` scenarios under the acceptance criteria. Group t
 
 - Write each functional scenario so Product, QA and Engineering can understand the business journey without decoding fixtures or internal object names.
 - Use product language in Given/When/Then. Keep tenant setup, synthetic data, mocks and clocks in **Preconditions** or **Data and environment**; keep APIs, records, events, keys and logs in **Technical evidence**.
+- Present three readable layers: business behavior first, QA preparation and observable
+  evidence second, and optional implementation detail last. A reader must not need the
+  second or third layer to understand the intended outcome.
 - Give each materially different action or outcome its own titled `SC-*` scenario. Selection, Back, Keep editing, Save, validation failure, persistence failure, payment rejection, unknown result and recovery are different scenarios unless they are truly inseparable parts of one event.
 - Require every approved `AC-*` to own or explicitly reference at least one `SC-*`.
 - Keep canonical Given/When/Then under the criterion. In the QA artifact, reproduce it verbatim as a derived view or link to it while adding checks and QA metadata; never rewrite its meaning.
@@ -168,6 +171,17 @@ Start from the canonical `SC-*` scenarios under the acceptance criteria. Group t
 - Explain exact UI or domain labels when needed, while keeping the surrounding sentence natural.
 - Treat matrix and dataset IDs as supporting test data, never as the business precondition. The scenario itself must state the relevant configuration, representative values, action, and expected result. Put the ID or link afterward under test data.
 - Keep rows parameterized only when their business event and expected-result structure are the same. Split materially different rules, triggers, validation paths, or outcomes into separate scenarios.
+- Keep actions together only when they use the same actor and context, form one submission
+  or external event, cannot be meaningfully performed alone, and share one primary outcome
+  and evidence. If any condition fails, split the scenario even when the `FTC-*` remains the same.
+- Source every outcome-changing value or boundary from a confirmed rule, configuration,
+  approved example or named dataset. Label convenient representative values as test data;
+  never promote them to product behavior.
+- For asynchronous results, require a final observable signal plus an approved observation
+  window or completion condition. State the relevant pending/unchanged behavior and late or
+  failure result. Without those decisions, use `Needs refinement`; do not invent a timeout.
+- Assert exact message wording only for approved copy, legal/accessibility text or contractual
+  labels. Otherwise assert the message purpose, resulting state and available user action.
 
 Apply a readability gate before the executability gate: hide traceability metadata and technical evidence, then confirm that a product stakeholder can still explain who acts, what happens and what result is expected.
 
@@ -216,7 +230,9 @@ Stop after the Markdown QA handoff. Do not generate `.testcase.yml`, `.testplan.
 
 ### Membership Example
 
-Create small checks, then group consequences of the same purchase:
+Create small checks, preserve different events as separate scenarios and group them under
+one functional case. See `skills/user-story/references/golden-example.md` for the complete
+current example.
 
 ```markdown
 | CHK-MEM-001 | AC-MEM-01-01 | Record one approved payment |
@@ -225,18 +241,29 @@ Create small checks, then group consequences of the same purchase:
 
 ## FTC-MEM-01 — Purchase an individual membership
 
-### SC-MEM-01-01 — Complete an approved purchase
+### SC-MEM-01-01 — Complete a purchase with a confirmed charge
 
-- Covered checks: CHK-MEM-001, CHK-MEM-002, CHK-MEM-003
-- Given: an individual membership and controlled buyer are available
-- When: the buyer completes one approved purchase
-- Then:
-  - one payment is recorded
-  - one membership is created for the buyer
-  - repeating the same submission does not create duplicates
+**Covered checks:** CHK-MEM-001, CHK-MEM-002
+
+**Given:** a buyer selected a membership whose displayed total is USD 100  
+**When:** the buyer confirms the purchase and the bank reports that USD 100 was charged  
+**Then:** one payment for USD 100 is recorded  
+**And:** one membership is activated for the buyer.
+
+**Test data:** USD 100 is a representative configured value, not a general price rule.
+
+### SC-MEM-01-02 — Repeat the same purchase submission
+
+**Covered checks:** CHK-MEM-003
+
+**Given:** the original submission already produced one payment and one membership  
+**When:** the same submission is received again  
+**Then:** the existing result is returned  
+**And:** no additional payment or membership is created.
 ```
 
-Do not create three executable scenarios for these checks because they are evidence from the same action. A rejected payment remains a separate scenario because its primary outcome changes.
+Do not create one scenario per check. The first two checks share one event; repeated
+submission and rejected payment remain separate because their triggers and outcomes change.
 
 ## Common Pitfalls
 
@@ -294,5 +321,5 @@ Do not create three executable scenarios for these checks because they are evide
 - `references/risk-model.md` — Lightweight risk model and coverage depth
 - `references/output-schema.md` — Required output and test-case templates
 - `references/executability-gate.md` — Readiness criteria for a QA-reviewable downstream handoff
-- `skills/user-story/SKILL.md` — Source story and acceptance-criteria format
+- `skills/user-story/SKILL.md` and `skills/user-story/references/golden-example.md` — Source format and complete canonical example
 - `skills/user-story-mapping/SKILL.md` — Source variations, states, and rules

@@ -96,6 +96,28 @@ def main() -> int:
 
     with tempfile.TemporaryDirectory() as temporary:
         root = Path(temporary)
+        english_story = """
+### AC-LOGIN-01-01 — Access onboarding
+**Acceptance condition:** the trial user enters onboarding without another password.
+#### SC-LOGIN-01-01 — Sign in with Google
+**Given:** a trial user is on the login page
+**When:** the user authorizes Google sign-in
+**Then:** the user enters the onboarding flow
+#### QA Strategy
+**Executability:** Needs refinement
+**Automation:** Manual
+**Recommended level:** E2E
+**Priority:** Medium
+**Rationale:** external identity dependency
+**Dependencies:** controlled Google account
+**Automated coverage:** Not started
+"""
+        (root / "05-user-stories.md").write_text(english_story, encoding="utf-8")
+        errors, _warnings = validator.strict_checks(root, validator.read_files(root))
+        assert not any("canonical QA strategy" in error for error in errors), "\n".join(errors)
+
+    with tempfile.TemporaryDirectory() as temporary:
+        root = Path(temporary)
         incomplete = """
 ### AC-PAY-01-01 — Cobro
 **Condición de aceptación:** se cobra una cuota.

@@ -43,11 +43,23 @@ If original evidence is unavailable, do not claim source fidelity. Record the li
 
 ### 1. Freeze the reviewed snapshot
 
-Run:
+For a complete package before publication, Jira or final handoff, run the strict default:
 
 ```bash
 python3 scripts/validate-judge.py preflight <artifact-folder> --language <es|en>
 ```
+
+For the extension-route Gate C that occurs before Gate 2 stories exist, run:
+
+```bash
+python3 scripts/validate-judge.py preflight <artifact-folder> --language <es|en> --phase gate-c
+```
+
+`gate-c` validates the decision checkpoint and freezes every numbered root product Markdown
+plus Jira/handoff projections when present. Unnumbered guidance such as `README.md` does not
+belong to the product snapshot. This phase must not require artifacts owned by future gates
+and does not authorize final publication readiness. The default `final` mode remains strict
+and requires the complete package.
 
 Record the returned snapshot SHA-256 in the report. If deterministic validation fails, continue only far enough to explain the defects and emit `FAIL`.
 
@@ -55,6 +67,10 @@ The preflight validates and hashes product artifacts only. It excludes
 `11-refinement-judge-report.md` because findings may intentionally mention missing
 or contradictory IDs and must not become product requirements merely by being
 recorded in the audit.
+
+For a localized Notion publication, evaluate the remote write itself, not only preparation
+of its preview. Record `Action stage / Etapa de acción: Publication` and `Action scope /
+Alcance de acción: technical=N; editorial=N` using the frozen authorization dossier.
 
 ### 2. Reconstruct the source model
 
@@ -90,10 +106,11 @@ a structurally valid Gherkin block is insufficient.
 For Notion, obtain the declared publication mode and page manifest. In `Publicación completa`, inspect the portada, every story page and all six required auxiliary pages; do not use sampling. In `Actualización localizada`, inspect every page in scope plus any cover facts or links that changed, and verify that unrelated pages were preserved.
 
 After a Notion write, run a second Judge pass against the actual readback before audit
-completion. Require an editorial-parity receipt for every affected story and independently
+completion. Require presentation-parity receipts for every affected cover, story and
+auxiliary page, plus the detailed editorial receipt for every affected story. Independently
 confirm that each visible story contains its complete applicable `AC`, `SC`, `CHK`, `FTC`
-and scenario behavior. A summary or link is not parity. Emit `FAIL` when a required story
-is missing, abbreviated or only present in the technical Markdown mirror.
+and scenario behavior. A summary or link is not parity. Emit `FAIL` when a required
+presentation is missing, abbreviated, incorrectly linked or only present in the mirror.
 
 Do not infer that absence of a finding proves completeness. State what was actually inspected and what could not be verified.
 
@@ -125,6 +142,22 @@ Validate the report:
 python3 scripts/validate-judge.py report <artifact-folder>/11-refinement-judge-report.md
 ```
 
+For the Judge that authorizes an exact Notion write set, use `--publication`. Fix every
+semantic inconsistency before requesting human authorization:
+
+```bash
+python3 scripts/validate-judge.py report \
+  <artifact-folder>/11-refinement-judge-report.md --publication
+```
+
+For the mandatory readback pass, record `Action stage / Etapa de acción:
+Post-publication` and validate it separately:
+
+```bash
+python3 scripts/validate-judge.py report \
+  <artifact-folder>/11-refinement-judge-report.md --post-publication
+```
+
 ### 6. Enforce the gate
 
 - `PASS`: permit the intended next gate.
@@ -138,9 +171,10 @@ Do not override `FAIL` yourself. A human may explicitly accept the risk by namin
 When the intended action is a Notion publication, a missing, stale, duplicated or incorrectly linked required page is a parity defect. Marking an auxiliary page `No aplica` does not resolve the defect when its applicable canonical source exists.
 
 Do not let a pre-publication package `PASS` authorize audit completion. The Notion
-publication remains `pending_editorial_verification` until the post-publication Judge pass
-reviews the connector readback and its deterministic parity receipts. Persist the report
-with the final snapshot so `sync-refinement-package-notion` can verify it before audit completion.
+publication remains `pending_post_publication_verification` until the post-publication Judge
+pass reviews the connector readback and all deterministic parity receipts. Persist the
+report with the final snapshot so `sync-refinement-package-notion` can verify it before
+audit completion.
 
 ## Correction Loop
 
