@@ -159,6 +159,14 @@ Start from the canonical `SC-*` scenarios under the acceptance criteria. Group t
 #### Plain-language and scenario-boundary contract
 
 - Write each functional scenario so Product, QA and Engineering can understand the business journey without decoding fixtures or internal object names.
+- Do not confuse atomicity with missing context. An atomic scenario may focus on one event,
+  but its Given/When/Then must still identify the actor or trigger, relevant journey state,
+  named action or decision and observable business result. It must not require reconstructing
+  preparation from unrelated criteria.
+- A bare option such as `Yes`, `No`, `Check` or `Continue` is not self-explanatory: name the
+  question, payment method, confirmation or choice it belongs to. State internal records and
+  statuses under technical evidence unless they are themselves an authorized QA surface;
+  never use them as the only understandable outcome.
 - Use product language in Given/When/Then. Keep tenant setup, synthetic data, mocks and clocks in **Preconditions** or **Data and environment**; keep APIs, records, events, keys and logs in **Technical evidence**.
 - Present three readable layers: business behavior first, QA preparation and observable
   evidence second, and optional implementation detail last. A reader must not need the

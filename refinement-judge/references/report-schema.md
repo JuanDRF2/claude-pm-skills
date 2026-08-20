@@ -37,7 +37,7 @@ Write the report in the package language. Use the translated headings shown belo
 ### JUDGE-[PROJECT]-001 — [Plain-language title]
 
 - Severity / Severidad: Critical | High | Medium | Low | Observation
-- Status / Estado: Open | Resolved | Accepted risk | Not reproducible | Superseded
+- Status / Estado: Open | Partially resolved | Resolved | Accepted risk | Not reproducible | Superseded
 - Blocks action / Bloquea acción: Yes | No
 - Evidence / Evidencia: [source plus exact section, file plus ID or heading]
 - Affected artifacts / Artefactos afectados: [IDs and files]
@@ -75,9 +75,11 @@ Write the report in the package language. Use the translated headings shown belo
 
 `Action stage` y `Action scope` son obligatorios cuando el Judge evalúa una publicación
 localizada en Notion. Usar `technical=N; editorial=N`; contar solo páginas que pueden
-escribirse y declarar `verification-only` por separado. `Publication` significa el write
-set remoto exacto; no usarlo para la mera preparación de un preview. En otros gates pueden
-omitirse cuando no aplica una publicación externa.
+escribirse y declarar `verification-only` por separado. `Publication` significa el write set remoto exacto; no usarlo
+para la mera preparación de un preview. En otros gates pueden omitirse cuando no aplica
+una publicación externa.
+
+En `Preview`, omite `Action scope`: todavía no existe un write set remoto autorizable.
 
 ## Empty findings
 
@@ -93,10 +95,19 @@ Do not create placeholder finding IDs.
 
 On every rerun:
 
-1. Preserve existing finding IDs.
-2. Update status and verification evidence.
-3. Add new IDs sequentially.
-4. Update snapshot hash and date.
-5. Recalculate the verdict from open findings.
-6. Keep accepted-risk entries visible.
-7. For Notion publication, update the action stage and exact technical/editorial counts.
+1. Preserve every existing finding ID, title and defect meaning.
+2. Use `Partially resolved` when a proven subset changed and name the residual population.
+3. Update status and verification evidence without replacing a global audit with a local one.
+4. Add new IDs sequentially after the highest historical ID, including IDs already recorded
+   in preserved review evidence.
+5. Mark a finding `Superseded` only when it names the decision or finding IDs that own the
+   remaining meaning.
+6. Compare the rerun with the preserved report using `--previous-report`.
+7. Update snapshot hash and date.
+8. Recalculate the verdict from open and partially resolved findings.
+9. Keep accepted-risk entries visible.
+10. For Notion publication, update the action stage and exact technical/editorial counts.
+
+For a finding that summarizes several affected IDs, include the complete inventory directly
+or link a durable review artifact with one row per ID, classification, evidence, status and
+owner. Do not rely on chat-only lists or an unnamed historical inventory.

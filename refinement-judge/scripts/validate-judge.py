@@ -24,13 +24,16 @@ SNAPSHOT_RE = re.compile(
     r"([0-9a-f]{64})\s*$"
 )
 FINDING_RE = re.compile(r"(?m)^###\s+(JUDGE-[A-Z0-9]+-\d{3,})\b")
+FINDING_HEADER_RE = re.compile(
+    r"(?m)^###\s+(JUDGE-([A-Z0-9]+)-(\d{3,}))\s+(?:—|-)\s+(.+?)\s*$"
+)
 SEVERITY_RE = re.compile(
     r"(?im)^-\s*(?:Severity|Severidad)(?:\s*/\s*(?:Severity|Severidad))?\s*:\s*"
     r"(Critical|High|Medium|Low|Observation)\s*$"
 )
 STATUS_RE = re.compile(
     r"(?im)^-\s*(?:Status|Estado)(?:\s*/\s*(?:Status|Estado))?\s*:\s*"
-    r"(Open|Resolved|Accepted risk|Not reproducible|Superseded)\s*$"
+    r"(Open|Partially resolved|Resolved|Accepted risk|Not reproducible|Superseded)\s*$"
 )
 BLOCK_RE = re.compile(
     r"(?im)^-\s*(?:Blocks action|Bloquea acción)(?:\s*/\s*(?:Blocks action|Bloquea acción))?\s*:\s*"
@@ -48,6 +51,10 @@ ACTION_SCOPE_RE = re.compile(
     r"(?im)^-\s*(?:Action scope|Alcance de acción)"
     r"(?:\s*/\s*(?:Action scope|Alcance de acción))?\s*:\s*"
     r"technical\s*=\s*\d+\s*;\s*editorial\s*=\s*\d+\s*$"
+)
+ACTION_SCOPE_LABEL_RE = re.compile(
+    r"(?im)^-\s*(?:Action scope|Alcance de acción)"
+    r"(?:\s*/\s*(?:Action scope|Alcance de acción))?\s*:"
 )
 
 
@@ -119,12 +126,67 @@ def field_present(block: str, labels: tuple[str, ...]) -> bool:
     return bool(re.search(rf"(?im)^-\s*(?:{joined})(?:\s*/\s*(?:{joined}))?\s*:\s*\S", block))
 
 
-def run_report(report: Path, required_stage: str | None) -> int:
+def finding_headers(text: str) -> dict[str, tuple[str, int, str]]:
+    """Return stable finding identity as ID -> (project, number, title)."""
+    return {
+        match.group(1): (match.group(2), int(match.group(3)), match.group(4).strip())
+        for match in FINDING_HEADER_RE.finditer(text)
+    }
+
+
+def validate_finding_history(
+    current_text: str, previous_text: str, errors: list[str]
+) -> None:
+    """Reject deleted, repurposed, or non-sequential finding IDs on Judge reruns."""
+    current = finding_headers(current_text)
+    previous = finding_headers(previous_text)
+
+    for finding_id, (_project, _number, previous_title) in previous.items():
+        if finding_id not in current:
+            errors.append(f"Previous finding ID was removed: {finding_id}.")
+            continue
+        current_title = current[finding_id][2]
+        if current_title != previous_title:
+            errors.append(
+                f"Previous finding ID changed meaning/title: {finding_id}. "
+                "Keep the historical title and create a new sequential ID for a different defect."
+            )
+
+    previous_by_project: dict[str, list[int]] = {}
+    for project, number, _title in previous.values():
+        previous_by_project.setdefault(project, []).append(number)
+    new_by_project: dict[str, list[int]] = {}
+    for finding_id, (project, number, _title) in current.items():
+        if finding_id not in previous:
+            new_by_project.setdefault(project, []).append(number)
+    for project, numbers in new_by_project.items():
+        if project not in previous_by_project:
+            continue
+        start = max(previous_by_project[project]) + 1
+        expected = list(range(start, start + len(numbers)))
+        if sorted(numbers) != expected:
+            errors.append(
+                f"New finding IDs for JUDGE-{project} must continue sequentially from "
+                f"{start:03d}: found {', '.join(f'{number:03d}' for number in sorted(numbers))}."
+            )
+
+
+def run_report(
+    report: Path, required_stage: str | None, previous_report: Path | None = None
+) -> int:
     if not report.is_file():
         print(f"ERROR: report does not exist: {report}")
         return 2
     text = report.read_text(encoding="utf-8")
     errors: list[str] = []
+
+    if previous_report:
+        if not previous_report.is_file():
+            errors.append(f"Previous Judge report does not exist: {previous_report}")
+        else:
+            validate_finding_history(
+                text, previous_report.read_text(encoding="utf-8"), errors
+            )
 
     verdict_match = VERDICT_RE.search(text)
     if not verdict_match:
@@ -133,8 +195,13 @@ def run_report(report: Path, required_stage: str | None) -> int:
         errors.append("Missing Intended action/Acción evaluada.")
     if not SNAPSHOT_RE.search(text):
         errors.append("Missing valid 64-character reviewed snapshot SHA-256.")
+    stage = ACTION_STAGE_RE.search(text)
+    if stage and stage.group(1) == "Preview" and ACTION_SCOPE_LABEL_RE.search(text):
+        errors.append(
+            "Preview reports must omit Action scope/Alcance de acción; exact write counts "
+            "belong to Publication or Post-publication."
+        )
     if required_stage:
-        stage = ACTION_STAGE_RE.search(text)
         if not stage or stage.group(1) != required_stage:
             errors.append(
                 f"{required_stage} validation requires Action stage/Etapa de acción: {required_stage}."
@@ -191,7 +258,7 @@ def run_report(report: Path, required_stage: str | None) -> int:
         if (
             severity
             and status
-            and status.group(1) == "Open"
+            and status.group(1) in {"Open", "Partially resolved"}
         ):
             blocking_severity = severity.group(1) in {"Critical", "High", "Medium"}
             says_blocking = bool(blocks and blocks.group(1) in {"Yes", "Sí"})
@@ -256,6 +323,14 @@ def main() -> int:
         action="store_true",
         help="Require an exact Post-publication stage and technical/editorial scope.",
     )
+    report.add_argument(
+        "--previous-report",
+        type=Path,
+        help=(
+            "Validate rerun history: previous IDs must remain, keep their titles, and "
+            "allocate new IDs sequentially."
+        ),
+    )
 
     args = parser.parse_args()
     if args.command == "preflight":
@@ -265,7 +340,8 @@ def main() -> int:
     if args.publication and args.post_publication:
         parser.error("--publication and --post-publication are mutually exclusive")
     required_stage = "Publication" if args.publication else "Post-publication" if args.post_publication else None
-    return run_report(args.file.resolve(), required_stage)
+    previous_report = args.previous_report.resolve() if args.previous_report else None
+    return run_report(args.file.resolve(), required_stage, previous_report)
 
 
 if __name__ == "__main__":

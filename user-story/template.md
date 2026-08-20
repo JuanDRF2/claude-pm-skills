@@ -26,6 +26,15 @@ Adapted from `prompts/user-story-prompt-template.md` in the `https://github.com/
 - **In scope:** [Behavior included]
 - **Out of scope:** [Behavior explicitly deferred]
 
+#### Main journey / Recorrido principal
+<!-- Include only for a sequential flow spread across multiple criteria. -->
+1. **Entry:** [Where and why the actor begins]
+2. **Preparation:** [Required information or state before the final action]
+3. **Material decisions:** [Conditional fields or choices that change behavior]
+4. **Completion:** [Final business action or submission]
+5. **Visible result:** [Confirmation or observable completed state]
+6. **Next destination:** [Only when confirmed and material; otherwise omit]
+
 #### Agreed behavior and business rules
 - [Plain-language behavior a non-technical reader can understand] ([BR-01])
 - [Another behavior] ([BR-02])
@@ -112,6 +121,8 @@ Adapted from `prompts/user-story-prompt-template.md` in the `https://github.com/
 
 ## Notes
 - Use one business event per scenario. Multiple `Then/And` results are valid when they jointly prove one coherent outcome.
+- Use the conditional main journey to preserve continuity across criteria; do not copy its
+  full sequence into every atomic scenario.
 - Keep actions together only when they use the same actor and context, form one event or submission, cannot be meaningfully performed alone, and share one primary outcome and evidence.
 - Use multiple scenarios when distinct accepted conditions belong to the same user outcome; split only unrelated behaviors.
 - Never promote an assumption or open question into an acceptance criterion.

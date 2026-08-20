@@ -137,6 +137,91 @@ def canonical_acceptance_blocks(
     return merged
 
 
+def canonical_story_text(root: Path, files: dict[Path, str]) -> str:
+    """Return all canonical story volumes, including split 05-user-stories files."""
+    volumes = sorted(root.glob("05-user-stories*.md"), key=lambda item: item.name)
+    return "\n\n".join(files.get(volume, "") for volume in volumes)
+
+
+def scenario_blocks(text: str) -> dict[str, str]:
+    """Extract one canonical block per SC for cross-volume clarity warnings."""
+    hits = list(ID_PATTERNS["SC"].finditer(text))
+    blocks: dict[str, str] = {}
+    for index, hit in enumerate(hits):
+        end = hits[index + 1].start() if index + 1 < len(hits) else len(text)
+        block = text[hit.start():end]
+        next_ac = ID_PATTERNS["AC"].search(block, len(hit.group()))
+        if next_ac:
+            block = block[:next_ac.start()]
+        blocks.setdefault(hit.group(), block)
+    return blocks
+
+
+def scenario_clarity_warnings(sc_id: str, block: str) -> list[str]:
+    """Flag deterministic signals of incomplete prose; semantic approval stays with Judge."""
+    warnings: list[str] = []
+
+    def step(labels: str) -> str:
+        match = re.search(
+            rf"(?im)^(?:-\s*)?(?:\*\*)?(?:{labels})\s*:?(?:\*\*)?\s*:?\s*([^\n]+)",
+            block,
+        )
+        return match.group(1).strip() if match else ""
+
+    given = step("Given|Dado")
+    when = step("When|Cuando")
+    then = step("Then|Entonces")
+
+    if given and len(re.findall(r"[\wÁÉÍÓÚÜÑáéíóúüñ]+", given)) < 4:
+        warnings.append(
+            f"{sc_id} may have a fragmentary Given/Dado. Name the actor or business "
+            "context and the concrete state needed to understand the scenario."
+        )
+
+    unexplained_choice = re.search(
+        r"\b(?:responds?|responde|selects?|selecciona|chooses?|elige)\s+"
+        r"(?:Yes|No|S[ií])\b",
+        when,
+        re.IGNORECASE,
+    )
+    choice_context = re.search(
+        r"\b(?:question|pregunta|confirmation|confirmaci[oó]n|message|mensaje|"
+        r"option|opci[oó]n|whether|si desea|si quiere)\b",
+        when,
+        re.IGNORECASE,
+    )
+    if unexplained_choice and not choice_context:
+        warnings.append(
+            f"{sc_id} uses a Yes/No or Sí/No choice without naming the question or "
+            "decision being answered."
+        )
+
+    internal_objects = re.search(
+        r"\b(?:Payment|Contribution|Agreement|Opportunity|Transaction)\b",
+        then,
+        re.IGNORECASE,
+    )
+    internal_states = re.search(
+        r"\b(?:Paid|Closed Won|Draft|Pending|Failed|Canceled|Cancelled)\b",
+        then,
+        re.IGNORECASE,
+    )
+    observable_language = re.search(
+        r"\b(?:shows?|displays?|informs?|confirms?|receives?|can|sees?|appears?|"
+        r"muestra|informa|confirma|recibe|puede|ve|aparece|pantalla|correo|"
+        r"receipt|comprobante|balance|saldo|membership|membres[ií]a|donation|donaci[oó]n)\b",
+        then,
+        re.IGNORECASE,
+    )
+    if internal_objects and internal_states and not observable_language:
+        warnings.append(
+            f"{sc_id} may use only internal records or statuses as its Then/Entonces. "
+            "State the observable business result first and move internal states to technical evidence."
+        )
+
+    return warnings
+
+
 def definition_blocks(files: dict[Path, str], prefix: str) -> dict[str, str]:
     """Extract heading/table definition blocks for incremental contract checks."""
     pattern = ID_PATTERNS[prefix]
@@ -282,7 +367,11 @@ def strict_checks(root: Path, files: dict[Path, str]) -> tuple[list[str], list[s
 
     master = canonical_acceptance_blocks(root, files, errors)
     for ac_id, block in master.items():
-        when_count = len(re.findall(r"(?:^|\s)(?:-\s*)?(?:\*\*)?(?:When|Cuando)(?:\*\*)?\s*:?", block, re.IGNORECASE))
+        when_count = len(re.findall(
+            r"(?:^|\s)(?:-\s*)?(?:\*\*)?(?:When|Cuando)\s*:?(?:\*\*)?\s*:?",
+            block,
+            re.IGNORECASE,
+        ))
         if when_count < 1:
             errors.append(f"{ac_id} must contain an identifiable When/Cuando event.")
         if re.search(r"\b(correctly|properly|successfully|correctamente|adecuadamente|exitosamente)\b", block, re.IGNORECASE):
@@ -310,15 +399,20 @@ def strict_checks(root: Path, files: dict[Path, str]) -> tuple[list[str], list[s
         next_ac = ID_PATTERNS["AC"].search(block, len(sc_id))
         if next_ac:
             block = block[:next_ac.start()]
-        when_count = len(re.findall(r"\*\*(?:When|Cuando)(?:\*\*)?\s*:?(?=\s|$)", block, re.IGNORECASE))
-        # NOTE (merge 2026-07-31): personal required exactly one primary When/Cuando per SC-*;
-        # staging relaxed this to "at least one". Kept personal's stricter behavior here because
-        # it wasn't in the explicitly authorized staging adoption list (DELTA/MAP patterns,
-        # definition_blocks(), decision_checkpoint_checks()) — flagged in REPORT.md for a decision.
+        when_count = len(re.findall(
+            r"(?:\*\*)?(?:When|Cuando)\s*:?(?:\*\*)?\s*:?(?=\s|$)",
+            block,
+            re.IGNORECASE,
+        ))
+        # NOTE (merge 2026-07-31, reconfirmed 2026-08-20 against v3.2.0): personal requires
+        # exactly one primary When/Cuando per SC-*; staging keeps relaxing this to "at least
+        # one" every version. Kept personal's stricter behavior — adopted this version's
+        # colon-inside/outside-bold regex robustness improvement without adopting the
+        # strictness relaxation that came bundled with it.
         if when_count != 1:
             errors.append(f"{sc_id} must contain exactly one primary When/Cuando event; found {when_count}.")
         given_match = re.search(
-            r"(?im)^(?:-\s*)?\*\*(?:Given|Dado)\*\*\s*:?\s*([^\n]+)",
+            r"(?im)^(?:-\s*)?(?:\*\*)?(?:Given|Dado)\s*:?(?:\*\*)?\s*:?\s*([^\n]+)",
             block,
         )
         if given_match:
@@ -413,6 +507,12 @@ def strict_checks(root: Path, files: dict[Path, str]) -> tuple[list[str], list[s
                     )
             if automate_now and missing:
                 errors.append(f"{sc_id} cannot use Automate now while its execution contract is incomplete.")
+
+    # Split volumes are authoritative for behavior and must receive semantic clarity
+    # warnings. Keep legacy structural adoption progressive: untouched historical
+    # scenarios are not failed solely because newer QA metadata was introduced later.
+    for sc_id, block in scenario_blocks(canonical_story_text(root, files)).items():
+        warnings.extend(scenario_clarity_warnings(sc_id, block))
 
     for jira in (root / "jira").glob("US-*.md") if (root / "jira").is_dir() else []:
         jira_blocks = acceptance_blocks(jira.read_text(encoding="utf-8"))

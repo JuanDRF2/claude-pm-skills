@@ -221,6 +221,36 @@ def main() -> int:
         errors, _warnings = validator.strict_checks(root, validator.read_files(root))
         assert not any("Jira/master acceptance criterion differs" in error for error in errors)
 
+    # Clarity checks must inspect split story volumes and flag incomplete scenario prose.
+    with tempfile.TemporaryDirectory() as temporary:
+        root = Path(temporary)
+        (root / "05-user-stories.md").write_text("# Índice\n", encoding="utf-8")
+        (root / "05-user-stories-manual-payments.md").write_text(
+            """
+## US-PAY-01 — Registrar un pago manual
+
+### AC-PAY-01-01 — Completar el pago
+**Condición de aceptación:** el pago manual queda registrado después de la confirmación.
+#### SC-PAY-01-01 — Confirmar un cheque
+**Dado:** Check seleccionado
+**Cuando:** responde Yes y guarda
+**Entonces:** Payment queda Paid y Contribution Closed Won.
+#### Estrategia QA
+**Ejecutabilidad:** Needs refinement
+**Automatización:** Manual
+**Nivel recomendado:** E2E
+**Prioridad:** Medium
+**Razón:** falta contexto funcional
+**Dependencias:** decisión de Producto
+**Estado:** Not started
+""",
+            encoding="utf-8",
+        )
+        _errors, warnings = validator.strict_checks(root, validator.read_files(root))
+        assert any("fragmentary Given" in warning for warning in warnings), warnings
+        assert any("without naming the question" in warning for warning in warnings), warnings
+        assert any("only internal records or statuses" in warning for warning in warnings), warnings
+
     # A shared contract has a smaller explicit contract; project mode must stay strict.
     with tempfile.TemporaryDirectory() as temporary:
         root = Path(temporary)

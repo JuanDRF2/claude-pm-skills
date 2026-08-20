@@ -24,6 +24,10 @@ Mark each scenario Ready only when all applicable items are present:
 16. Controlled-value source: every value, boundary, date, amount, recipient or provider outcome that changes the expected result comes from a confirmed rule, configuration, approved example or named dataset. Mark illustrative values as test data, not product rules.
 17. Asynchronous completion: an asynchronous result has a final observable signal and an approved observation window or completion condition; identify material pending/unchanged behavior and the late or failure result. Without them, use `Needs refinement`.
 18. Message assertion: require literal wording only when approved copy, legal/accessibility text or a contractual label makes it material; otherwise verify purpose, resulting state and available action.
+19. Journey context: atomicity has not removed essential context. The scenario names the
+    actor or trigger, relevant point in the journey, concrete state, decision/action and
+    observable business result. A reader does not need another criterion to discover what
+    “Yes”, “save”, “selected” or an internal status means.
 
 Use `Needs refinement` when behavior is confirmed but execution detail is missing. Use `Blocked` when a valid expected result or execution is impossible. Approval means ready for downstream implementation, not executed or passed.
 
@@ -57,6 +61,11 @@ Read only the scenario title and Given/When/Then, hiding IDs, fixtures and techn
 A non-technical stakeholder must still be able to state who acts, what happens, what changes
 and what remains unchanged. Organize the rest as QA preparation/evidence and then optional
 technical detail; do not move missing business meaning into those later layers.
+
+For a story whose criteria divide one sequential journey, also inspect its short main-flow
+summary. It should connect entry, preparation, material decisions, final action and visible
+completion without turning every scenario into an end-to-end script. Require a subsequent
+destination only when it is confirmed product behavior.
 
 ## Compact high-risk contract
 

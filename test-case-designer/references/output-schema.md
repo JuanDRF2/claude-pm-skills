@@ -105,6 +105,11 @@ Use bold labels and whitespace to separate traceability metadata from Given/When
 
 Use complete product-language sentences in Given/When/Then. Do not place fixtures such as “synthetic Contact/Household” in the business behavior, and do not compress results with `+`, `→`, `/`, `=`, or semicolon chains. A reader must understand the scenario without the traceability and technical-evidence sections.
 
+Atomic does not mean fragmentary. Include the actor or trigger, relevant journey state and
+the name of any question or choice being answered. A technical status may be evidence, but
+the scenario must state the observable business result first. Do not repeat an entire main
+journey when only one step changes.
+
 Keep the output in three layers: understandable business behavior, QA preparation/evidence,
 and optional technical evidence. Keep actions in one scenario only when they share actor,
 context, one submission/event, one primary outcome and the same evidence. Source material

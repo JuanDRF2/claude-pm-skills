@@ -13,8 +13,9 @@ Use the artifact language for prose and headings. Keep these identifiers languag
 | Coverage check | `CHK-` | `CHK-MEM-004` |
 | Functional test case | `FTC-` | `FTC-MEM-02` |
 | Functional scenario | `SC-` | `SC-MEM-02-01` |
+| Judge finding | `JUDGE-` | `JUDGE-MEM-001` |
 
-Preserve IDs after approval. Record superseded items rather than silently reusing their identifiers for different behavior.
+Preserve IDs after approval. Record superseded items rather than silently reusing their identifiers for different behavior. Judge IDs also preserve their original title and defect meaning across reruns; partial corrections update status and residual scope instead of repurposing the ID.
 
 ## Phase Handoffs
 

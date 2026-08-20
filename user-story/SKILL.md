@@ -154,6 +154,20 @@ Fill in the template:
 
 ### Step 3: Write the Acceptance Criteria
 
+Before the criteria, apply a journey-integrity check when the story represents a sequential
+UI or business flow whose steps are distributed across several criteria. Add one short
+**Main journey / Recorrido principal** that names the entry point, required preparation,
+material decisions, final action, visible completion and subsequent destination when that
+destination is confirmed behavior. Omit this section for a single-event story or when it
+would merely repeat one scenario.
+
+The journey summary is navigation for readers, not a giant acceptance scenario. Each
+`SC-*` remains atomic, but must still contain enough context to understand it without
+reconstructing other criteria: name the actor or trigger, concrete initial state, named
+decision/action and observable business result. A response such as “Yes” must name the
+question it answers. Internal records or statuses may support technical evidence but cannot
+be the only `Then`.
+
 Fill in the template:
 
 ```markdown
@@ -186,6 +200,11 @@ primary outcome verified with the same evidence. Otherwise create another scenar
 **Red flags:**
 - **Multiple unrelated When/Then pairs:** Sign of scope creep—evaluate splitting (reference `skills/user-story-splitting/SKILL.md`)
 - **Vague Thens:** "Then I see improved performance" (unmeasurable—make it specific)
+- **Fragmentary context:** “Given Check selected” does not identify who is acting, which
+  journey is in progress, or which relevant preparation is complete.
+- **Unexplained decisions:** “When they answer Yes” must name the question or confirmation.
+- **Internal-only result:** “Payment is Paid” belongs in technical evidence unless the
+  scenario first states the understandable and observable business outcome.
 
 #### Plain-language contract
 

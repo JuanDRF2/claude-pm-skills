@@ -90,12 +90,20 @@ Controlado.
 """
 
 
-def validate_report(report: Path, *, publication: bool = False, post_publication: bool = False) -> subprocess.CompletedProcess[str]:
+def validate_report(
+    report: Path,
+    *,
+    publication: bool = False,
+    post_publication: bool = False,
+    previous_report: Path | None = None,
+) -> subprocess.CompletedProcess[str]:
     command = [sys.executable, str(SCRIPT), "report", str(report)]
     if publication:
         command.append("--publication")
     if post_publication:
         command.append("--post-publication")
+    if previous_report:
+        command.extend(["--previous-report", str(previous_report)])
     return subprocess.run(command, text=True, capture_output=True, check=False)
 
 
@@ -265,6 +273,89 @@ Revisar consumidores.
     assert preview_only.returncode != 0, preview_only.stdout
     assert "requires Action stage" in preview_only.stdout, preview_only.stdout
 
+    preview_with_scope = validate_report(report)
+    assert preview_with_scope.returncode != 0, preview_with_scope.stdout
+    assert "Preview reports must omit Action scope" in preview_with_scope.stdout
+
+    previous = root / "previous-judge-report.md"
+    previous.write_text(
+        report_text(
+            verdict="FAIL",
+            findings=f"""### JUDGE-TST-001 — Defecto histórico
+
+- Severidad: High
+- Estado: Open
+- Bloquea acción: Sí
+- Evidencia: Evidencia histórica.
+- Artefactos afectados: SC-TST-01-01.
+- Consecuencia: No es ejecutable.
+- Corrección requerida: Completar el escenario.
+- Verificación: Pendiente.
+""",
+        ),
+        encoding="utf-8",
+    )
+    report.write_text(
+        report_text(
+            verdict="FAIL",
+            findings=f"""### JUDGE-TST-001 — Defecto histórico
+
+- Severidad: High
+- Estado: Partially resolved
+- Bloquea acción: Sí
+- Evidencia: Una parte fue corregida.
+- Artefactos afectados: SC-TST-01-01.
+- Consecuencia: El resto sigue sin ejecutarse.
+- Corrección requerida: Completar el escenario restante.
+- Verificación: Corrección parcial comprobada.
+
+### JUDGE-TST-002 — Nuevo defecto
+
+- Severidad: Medium
+- Estado: Open
+- Bloquea acción: Sí
+- Evidencia: Evidencia nueva.
+- Artefactos afectados: AC-TST-01-01.
+- Consecuencia: Resultado ambiguo.
+- Corrección requerida: Aclarar el resultado.
+- Verificación: Pendiente.
+""",
+        ),
+        encoding="utf-8",
+    )
+    valid_history = validate_report(report, previous_report=previous)
+    assert valid_history.returncode == 0, valid_history.stdout + valid_history.stderr
+
+    repurposed = report.read_text(encoding="utf-8").replace(
+        "JUDGE-TST-001 — Defecto histórico",
+        "JUDGE-TST-001 — Significado diferente",
+    )
+    report.write_text(repurposed, encoding="utf-8")
+    invalid_history = validate_report(report, previous_report=previous)
+    assert invalid_history.returncode != 0, invalid_history.stdout
+    assert "changed meaning/title" in invalid_history.stdout
+
+    report.write_text(
+        report_text(
+            verdict="FAIL",
+            findings=f"""### JUDGE-TST-003 — ID saltado
+
+- Severidad: High
+- Estado: Open
+- Bloquea acción: Sí
+- Evidencia: Evidencia nueva.
+- Artefactos afectados: SC-TST-01-02.
+- Consecuencia: Falta cobertura.
+- Corrección requerida: Agregar cobertura.
+- Verificación: Pendiente.
+""",
+        ),
+        encoding="utf-8",
+    )
+    invalid_sequence = validate_report(report, previous_report=previous)
+    assert invalid_sequence.returncode != 0, invalid_sequence.stdout
+    assert "Previous finding ID was removed" in invalid_sequence.stdout
+
     report.write_text(
         report_text(verdict="PASS", findings="Sin hallazgos abiertos.", stage="Post-publication"),
         encoding="utf-8",
@@ -272,4 +363,4 @@ Revisar consumidores.
     post_publication = validate_report(report, post_publication=True)
     assert post_publication.returncode == 0, post_publication.stdout + post_publication.stderr
 
-    print("OK: Judge project/shared snapshots, publication scopes and verdict regressions passed (12 checks)")
+    print("OK: Judge snapshots, scope, history and verdict regressions passed")

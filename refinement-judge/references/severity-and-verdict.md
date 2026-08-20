@@ -35,16 +35,19 @@ Use for optional improvements or residual risk that is already understood and co
 Use one:
 
 - Open
+- Partially resolved
 - Resolved
 - Accepted risk
 - Not reproducible
 - Superseded
 
 Include verification evidence for `Resolved` and human owner, reason and date for `Accepted risk`.
+`Partially resolved` remains open for the verdict. Record both the verified corrected subset
+and the exact residual population; do not use it to lower severity merely because work began.
 
 ## Verdict algorithm
 
-Evaluate only current open findings:
+Evaluate current `Open` and `Partially resolved` findings:
 
 ```text
 Any Critical, High or Medium → FAIL

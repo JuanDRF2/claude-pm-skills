@@ -22,6 +22,8 @@ estructural autoritativa.
   nunca como una regla inventada.
 - La validación de mensajes distingue significado y texto exacto.
 - QA agrega ejecutabilidad y evidencia sin reescribir el comportamiento de Producto.
+- Una historia secuencial muestra su recorrido principal sin repetirlo completo dentro de
+  cada escenario atómico.
 
 ## Historia de usuario
 
@@ -46,6 +48,15 @@ estructural autoritativa.
 
 - **Incluye:** cobro de una membresía individual, activación, rechazo del pago y confirmación.
 - **No incluye:** membresías familiares, regalos, renovaciones ni cambios posteriores.
+
+#### Recorrido principal
+
+1. **Entrada:** el visitante elige comprar una membresía individual para sí mismo.
+2. **Preparación:** selecciona el programa y completa la información requerida.
+3. **Decisión material:** revisa el total que se intentará cobrar.
+4. **Finalización:** confirma la compra y presenta el pago.
+5. **Resultado visible:** recibe la confirmación de que la compra terminó y ve el total pagado.
+6. **Después:** recibe por correo la confirmación de la membresía dentro del tiempo acordado.
 
 #### Comportamiento acordado
 

@@ -34,6 +34,8 @@ Require:
 5. Intended next action.
 6. Derived-artifact inventory, base snapshot and delta ledger when prototypes, HTML,
    designs or generated SPECs are in scope.
+7. The previous Judge report when this is a rerun. Preserve it as comparison evidence
+   before replacing the canonical report.
 
 Do not treat derived HTML, Word, Notion, or Jira presentations as canonical sources. Use them only for parity checks.
 
@@ -124,8 +126,8 @@ After a Notion write, run a second Judge pass against the actual readback before
 completion. Require Markdown-equivalence receipts for every affected technical page, plus
 semantic presentation-parity receipts for every affected cover, story and auxiliary page,
 and the structural format receipt produced from the same readback. Independently confirm
-that each visible story contains its complete applicable `AC`, `SC`, `CHK`, `FTC` and
-scenario behavior. A summary
+that each visible story
+contains its complete applicable `AC`, `SC`, `CHK`, `FTC` and scenario behavior. A summary
 or link is not parity. Emit `FAIL` when an affected technical page differs materially from
 its authorized target, or when a required human presentation is missing, abbreviated or
 incorrectly linked.
@@ -141,6 +143,23 @@ JUDGE-<PROJECT>-001
 ```
 
 For every finding include severity, status, evidence, affected artifacts, consequence, required correction, and whether it blocks the intended action. Cite file paths plus IDs, headings, or source sections; do not use vague statements such as “coverage seems incomplete.”
+
+When a finding claims a counted population such as “72 scenarios,” persist the exact IDs in
+the report or in a named, durable review artifact and link it from Evidence. A count or a
+reference to an unspecified “historical inventory” is not reproducible evidence. Record each
+affected item once with its classification, gap and decision owner before starting bulk
+corrections.
+
+Treat each finding ID as an immutable defect identity. Keep its title and meaning when
+evidence, severity or status changes. Never repurpose an existing ID for a narrower or
+different issue. Use `Partially resolved` when only a proven subset was corrected; record
+the corrected subset and the exact residual population. Use `Superseded` only when the
+historical finding remains visible and names the finding IDs or decision that now owns its
+remaining meaning.
+
+A localized review updates only related findings; it never replaces or silently closes the
+broader audit. Recalculate the global verdict from every current open or partially resolved
+finding when the intended action claims global readiness.
 
 Read `references/severity-and-verdict.md` before assigning severity or verdict.
 
@@ -159,6 +178,18 @@ Validate the report:
 ```bash
 python3 scripts/validate-judge.py report <artifact-folder>/11-refinement-judge-report.md
 ```
+
+On a rerun, compare the new report with the preserved prior report. This rejects removed,
+repurposed or non-sequential finding IDs:
+
+```bash
+python3 scripts/validate-judge.py report \
+  <artifact-folder>/11-refinement-judge-report.md \
+  --previous-report <preserved-prior-report.md>
+```
+
+`Preview` reports omit `Action scope`; exact technical/editorial write counts belong only
+to `Publication` and `Post-publication`.
 
 For the Judge that authorizes an exact Notion write set, use `--publication`. Fix every
 semantic inconsistency before requesting human authorization:
