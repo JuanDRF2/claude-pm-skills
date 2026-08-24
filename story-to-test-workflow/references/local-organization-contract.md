@@ -5,14 +5,18 @@
 - Authority and standard local layout
 - New, shared and existing work
 - Link, duplicate and rollback safety
-- Notion isolation and destination decision
+- Notion isolation and explicit derived-output routing
 
 ## Authority
 
 Organize the local Markdown workspace before publishing or synchronizing externally.
 Local organization must not silently compensate for ambiguous ownership. When the project
-uses Notion, verified native pages are the shared official copy and the local Markdown
-folder is a snapshot-bound checkout.
+uses a registered GitHub repository, its canonical branch is the shared documentary source
+of truth and the local Markdown folder is a branch-bound checkout. Notion may provide a
+derived collaborative view but never outranks the merged Markdown.
+
+Use repository `PROJECTS.md` to locate packages and each package `09-package-index.md` to
+declare internal authority and supersession. Do not add a parallel `_canon/INDEX.md`.
 
 ## Standard local layout
 
@@ -43,12 +47,12 @@ artifacts/
 
 Create a project in its final local category from the start:
 
-| Content | Local destination | Notion treatment |
+| Content | Local destination | Shared treatment |
 |---|---|---|
-| Canonical project package | `artifacts/<project-slug>/` | Publish to Notion before declaring the shared refinement complete |
-| Authoritative shared contract | `artifacts/_shared/<slug>/` | Register separately if it needs a shared Notion home |
-| Review, audit or historical delta | `artifacts/_reviews/<group>/` | Keep local unless explicitly published |
-| Executable helper | `artifacts/_local/tooling/<group>/` | Never publish |
+| Canonical project package | `artifacts/<project-slug>/` | Review and merge through the configured GitHub repository |
+| Authoritative shared contract | `artifacts/_shared/<slug>/` | Version once in GitHub; register a derived Notion view only when requested |
+| Review, audit or historical delta | `artifacts/_reviews/<group>/` | Commit only when durable and understandable without local evidence |
+| Executable helper | `artifacts/_local/tooling/<group>/` | Never commit or publish |
 
 A shared package must include `00-workflow-state.md` and `09-package-index.md`, name its owner and consumers, and preserve approval state.
 
@@ -56,18 +60,18 @@ A shared package must include `00-workflow-state.md` and `09-package-index.md`, 
 
 Classify every shared artifact before publishing it:
 
-| Shared artifact | Owner | Local location | Notion location |
+| Shared artifact | Owner | GitHub location | Optional Notion location |
 |---|---|---|---|
-| Contract created and governed by one feature/project | That feature/project | `artifacts/_shared/<contract-slug>/` | Inside the canonical Notion page of the owner project |
+| Contract created and governed by one feature/project | That feature/project | `artifacts/_shared/<contract-slug>/` | Inside the derived page of the owner project |
 | Organization-wide standard without a natural project owner | Named team or governance domain | `artifacts/_shared/<standard-slug>/` | A dedicated shared-standards hub under the user-confirmed parent |
 
 Do not infer ownership from the number of consumers. A contract used by many projects can
 remain owned by the feature that defines and governs its behavior.
 
-Every shared package must declare `package_kind`, owner, consumers, change-impact rule,
-canonical file and, once published, its confirmed Notion destination. Consumers link to
-the owner's shared page and never copy the contract as independently editable truth. Keep
-the Markdown under `_shared/` even when its Notion page lives inside the owner project.
+Every shared package must declare `package_kind`, owner, consumers, change-impact rule and
+canonical file. Consumers link to the GitHub-versioned contract and never copy it as
+independently editable truth. Keep the Markdown under `_shared/` even when an optional
+Notion page lives inside the owner project.
 
 ## Existing work
 
@@ -134,31 +138,22 @@ The backup created before normalization is the recovery source. If a move, link 
 3. regenerate the local inventory;
 4. report the failed action and remaining differences.
 
-## Shared destination decision
+## Derived outputs only on request
 
-Classify Notion independently for every project during Phase 0:
+Do not classify, offer or ask about Notion during Phase 0. The default route is the complete
+GitHub workflow. Evaluate Notion only when:
 
-| State | How work proceeds | Consequence |
-|---|---|---|
-| `Existing project page` | Confirm the exact page and permissions; synchronize before interpreting remote state | Reuse that project only after reading its registered state |
-| `New project, parent confirmed` | Build and validate locally; create the project root under that parent only at Gate 5 | The page need not exist when discovery starts |
-| `Notion unavailable` | Continue Phases 1–5 locally and record `Local draft — publication pending` | Only shared completion and remote-derived exports remain blocked |
+- the user explicitly requests publication, synchronization or parity review; or
+- a known material remote edit must be reconciled into Markdown.
 
-Notion is unavailable when there is no compatible connection, the authorization expired,
-the user lacks access, the workspace or parent is unknown, or the service/integration is
-temporarily failing. Do not invent page IDs, URLs, manifests, readbacks or synchronized
-snapshots. Record the reason, required owner/action and the confirmed local package path.
-When availability returns, resume at Gate 5; rerun earlier phases only if their source
-changed.
+When applicable, record one of: `Publication requested`, `Synced to commit <SHA>`,
+`Deferred`, `Stale or unknown`, or `Unavailable`. An absent, stale, deferred or unavailable
+view blocks only that requested Notion action; it never blocks GitHub review, merge, DEV
+handoff or QA design. Do not invent page IDs, URLs, manifests, readbacks or synchronized
+snapshots.
 
-Never use the destination of a previous project as a default. Notion is required for the
-completed shared refinement; Word is an optional final export.
-
-Present these consequences in plain language before asking for the choice. Clarify that
-Markdown still exists in Notion-connected mode for validation, safe editing, portability
-and recovery; it is not a second independently editable source. Explain that a person
-without local files begins with `start`, while a person with a checkout begins with
-`status`. A disconnected person may hand the validated package to a person or AI with a
-compatible Notion connection; the receiving tool must still preview, authorize, publish
-and read back. Offer Word only after the Notion readback, synchronization and parity Judge
-pass.
+Never use the destination of a previous project as a default. A person without local files
+begins by cloning the registered GitHub repository. For an explicitly requested Notion
+view, `start` imports remote content only as reconciliation evidence and `status` compares a
+registered view with its baseline. The receiving tool must still preview, authorize,
+publish and read back.

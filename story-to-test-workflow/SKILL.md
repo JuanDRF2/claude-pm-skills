@@ -56,7 +56,10 @@ At Phase 0, infer from the conversation and confirm together with the output fol
 
 - Artifact language: default to the user's language across headings and content
 - Audience: business, DEV, QA, or all
-- Canonical source: always local Markdown
+- Canonical source: local Markdown; when a shared GitHub repository is registered, the
+  configured canonical branch (normally `main`) becomes the shared documentary source of
+  truth once merged — read `references/github-source-of-truth-contract.md` before any
+  checkout, branch, commit or Pull Request action
 - Optional final presentations: Portal HTML, Word, Notion, several, or none
 - Detail level: concise tickets or full review package
 - Team conventions: IDs, ticket template, and story sizing method or ceiling
@@ -134,8 +137,18 @@ Every route uses the same guided loop and decision gates. Infer one internal rou
 3. **Continue approved work:** load workflow state and resume at the next applicable phase.
 4. **Reconcile derived artifact:** compare canon with HTML, design, screenshots or generated SPEC.
 5. **Extend approved package:** run Gate C before assigning IDs or changing approved behavior.
+6. **Explicit deep or cross-refinement audit:** read `references/deep-audit-contract.md`, freeze the exact packages in scope, then continue from the first phase that scope actually requires; never turn a routine localized review into a full audit without the user asking for one.
 
 Routes are internal choices, not interaction styles. Always guide the user. A requested fast draft stays provisional and returns to the guided loop before approval or publication. For the extension route, read `references/extend-approved-package.md` in Phase 0.
+
+Read `references/codebase-verification-contract.md` only when a material claim depends on
+current implemented behavior, an integration contract or technical feasibility — not for
+ordinary copy changes or future behavior Product is still defining. When design evidence or
+domain/architecture boundaries for your own product are material, read
+`references/domain-and-design-sources.md`. If the team confirms an external dev-tracking
+destination for this project, read `references/dev-destination-handoff.md` before mapping
+canonical IDs into it. None of these references change product authority or add a
+mandatory Notion cover section.
 
 ## Markdown Output
 
@@ -352,7 +365,7 @@ Classify content as business rule, quality requirement, observability requiremen
 
 #### Gate 3: Approve Behavior
 
-Ask PM/PO, QA, and engineering to review from their perspectives. If the current user represents only one role, clearly list which confirmations remain with other owners.
+Ask PM/PO, QA, and engineering to review from their perspectives. Before requesting approval, surface any fragmentary journey, unexplained decision, or purely technical outcome as a finding; do not hide it merely because the file has Given/When/Then headings. If the current user represents only one role, clearly list which confirmations remain with other owners.
 
 Offer numbered actions:
 
@@ -374,6 +387,18 @@ The Jira view must reproduce the approved acceptance criteria without shortening
 Make every story Markdown human-first: user story, scope, agreed behavior, dependencies/questions, acceptance criteria, and QA coverage. Put status metadata in its own section, keep IDs secondary to readable titles, and use whitespace plus heading hierarchy instead of dense uninterrupted lists. Never add CSS or platform-specific markup to authoritative Markdown. Preserve every approved statement when reorganizing an existing artifact.
 
 Within each criterion, create one or more stable `SC-*` headings, then render related rules as metadata and the behavioral flow as separate lines with bold `Given/Dado`, `When/Cuando`, `Then/Entonces`, `And/Y`, and `But/Pero` labels. Do not present rules and behavior as peers in one bullet list. QA reuses these exact scenarios and adds metadata without changing their meaning.
+
+Before Gate 3, apply journey integrity. When a story represents a sequential flow spread
+across several criteria, include a brief main journey with entry point, preparation,
+material decisions, final action, observable confirmation and downstream destination only
+when confirmed. Do not require it for single-event stories. The journey connects the
+experience; it does not replace the criteria or get copied in full into every scenario.
+
+Then apply context sufficiency to every `SC-*`: it must identify actor or trigger, concrete
+state, named action or decision, and an observable business result without forcing the
+reader to reconstruct other criteria. Atomicity separates independent behaviors; it does
+not authorize phrases such as "Check selected," "answers Yes," or outcomes made only of
+internal objects and states.
 
 Write acceptance criteria in product language before technical language. A reader must understand the actor, action, outcome, validation and consequence without knowing internal object names or architecture. Organize business behavior first, QA preparation/evidence second and optional technical detail last. Put terms such as `Subscription`, `Commitment`, events, idempotency or correlation IDs in `Consideración técnica` or `Evidencia técnica`; never use compressed shorthand. For async results require a confirmed final signal and window/completion condition; source material values from confirmed rules/configuration/test data and require exact copy only when approved wording makes it contractual.
 
@@ -401,9 +426,16 @@ Apply the `test-case-designer` Gherkin clarity and executability gates before Ga
 
 For every new or changed high-risk scenario, persist the compact execution contract required by `test-case-designer` and let strict validation enforce it; do not retroactively invalidate unchanged approved scenarios, but require migration when they are edited. If a material value or expected outcome lacks an owner decision, stop at `Needs refinement` because Product approval alone does not make the scenario executable. Keep scenario executability and automation separate. For every `SC-*`, record `Automate now`, `Automate later`, `Manual`, or `Blocked`; include the reason, priority, lowest useful level, dependencies, and `Not started`, `Planned`, or `Implemented` coverage status. Never report execution results in this workflow.
 
+For payments, purchases, renewals, asynchronous processes or journeys that create or update
+several related results, read and apply
+`test-case-designer/references/journey-integrity-contract.md`. Keep the `SC-*` atomic and
+independent, and compose the complete journey in one `FTC-*`. The coverage inventory must
+declare `Required` or `Not applicable` with a reason; never add acceptance criteria for test
+mechanics.
+
 #### Gate 4: Review Coverage
 
-Present high-risk coverage, blocked cases, intentionally omitted combinations, and remaining risk. Ask whether the user wants to approve, revise, expand to regression, or prepare the artifacts for another system.
+Present high-risk coverage, blocked cases, intentionally omitted combinations, and remaining risk. Do not approve Gate 4 when a critical journey appears only as fragmented checks: a composition must exist connecting entry action, visible outcome, final condition, applicable downstream consistency and participating scenarios. Require a complete E2E/Integration/Manual validation, or a `Blocked` exception with reason, owner and risk; automation does not define functional coverage. Ask whether the user wants to approve, revise, expand to regression, or prepare the artifacts for another system.
 
 After approval, write or update:
 
@@ -489,6 +521,12 @@ Update `00-workflow-state.md` and `09-package-index.md` with every selected form
 
 After a Notion publication, rerun `refinement-judge` in presentation-parity mode against the same canonical snapshot and the pages just verified. A complete publication must fail parity when a required auxiliary page is absent, stale, duplicated, incorrectly linked or marked `No aplica` despite an applicable canonical source. A localized update is judged against its declared scope and the cover facts it changed.
 
+If this project registers a shared GitHub repository, follow
+`references/github-source-of-truth-contract.md` for the handoff: show the repository,
+canonical branch, working branch, exact changed files and affected IDs, validation and
+Judge verdict before any commit, push or Pull Request action. Never push directly to the
+canonical branch, and never claim the shared canon changed before observing the merge.
+
 ## State and Resumption
 
 At each gate, maintain a compact state summary. The instant a gate is approved, append one line to the Gate approval log below — who approved it (the user, by name if known, otherwise "the user") and today's date — before moving on. Don't infer or backfill a missing log line later; if a gate isn't logged, treat it as not actually approved yet.
@@ -539,6 +577,11 @@ Read `references/examples-and-pitfalls.md` only when the user requests an exampl
 - `references/qa-design-handoff.md` — Boundary between QA design and downstream TestManager artifacts
 - `references/matrix-decision.md` — Deterministic rule for creating matrices without making scenarios depend on them
 - `references/publication-authorization-gate.md` — Autonomous exact-write dossier before Notion authorization
+- `references/deep-audit-contract.md` — Explicit complete and cross-refinement audits
+- `references/github-source-of-truth-contract.md` — Branch, Pull Request and shared-canon rules when a repository is registered
+- `references/codebase-verification-contract.md` — Conditional current-implementation evidence
+- `references/domain-and-design-sources.md` — Conditional design-hub and domain/architecture evidence for your own product
+- `references/dev-destination-handoff.md` — Optional adapter reference for an external dev-tracking destination
 - `references/examples-and-pitfalls.md` — Worked examples and common interaction failure patterns
 - `skills/refinement-judge/SKILL.md` — Independent adversarial gate before consequential actions
 - `skills/user-story-mapping/SKILL.md` — Journey, rules, variations, and release slices

@@ -19,11 +19,33 @@ If the host agent cannot technically pause mid-execution, end the response after
 
 Before asking a question:
 
-1. Check whether the answer is already present.
+1. Check the confirmed sources relevant to the current decision: the package, supplied
+   spec, approved decisions and any directly affected code, prototype or related package.
 2. Decide whether it is needed in the current phase.
 3. Explain the consequence only when it helps the user answer.
 4. Ask no more than three related questions together.
 5. Maintain the confirmed artifact language unless the user changes it.
+
+Do not perform a broad repository, Notion or cross-project audit merely to ask an ordinary
+question. Research enough to avoid asking for information already available, and cite the
+evidence actually used. If a required source is unavailable, state that limitation instead
+of implying it was checked.
+
+## Format for material product decisions
+
+Handle one decision topic per round. It may contain up to three tightly related
+subquestions when they share the same context and can be decided together.
+
+For a material ambiguity, contradiction or gap, provide:
+
+1. **Context:** what was found, with the relevant file/page and ID.
+2. **Practical example:** a concrete user situation when it materially clarifies the
+   consequence; use names, amounts or dates only when relevant.
+3. **Options:** distinct choices when genuine alternatives exist.
+4. **Recommendation:** the preferred choice and its evidence-based reason.
+
+Do not force multiple-choice options for a factual confirmation, and do not split one
+cohesive decision into several rounds merely to ask one sentence at a time.
 
 ## Handle Answers
 

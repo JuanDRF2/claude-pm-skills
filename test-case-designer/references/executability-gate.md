@@ -80,6 +80,18 @@ functional case; reference its controlled dataset and state only the values mate
 scenario. `Automate now` also requires `Executability: Ready` and is invalid while this
 contract is incomplete.
 
+## Journey-integrity gate
+
+Apply `journey-integrity-contract.md` to every critical connected journey. Before approving
+QA design, confirm that one `FTC-*` composes its atomic scenarios from the entry action to
+visible outcome, final completion and applicable downstream consistency. Require one thin
+complete validation path or an explicit Manual/Blocked decision with rationale and owner.
+
+Do not require every scenario to repeat the whole journey and do not accept execution-order
+dependencies between scenarios. Calculations, boundaries, failures and combinations may
+remain at lower test levels. Missing composition, applicable downstream evidence,
+independence or residual-risk disclosure makes QA design `Needs refinement` or `Blocked`.
+
 ## Basis
 
 - ISTQB Advanced Test Analyst v4.0 distinguishes abstract high-level cases from concrete low-level cases and emphasizes traceability, precision, completeness, required data, and clear expected results: https://www.istqb.org/wp-content/uploads/sdm-uploads/ISTQB-CTAL-TA-Syllabus-v4.0-EN.pdf

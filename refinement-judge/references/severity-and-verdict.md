@@ -73,6 +73,7 @@ requires at least one open `Low` or `Observation`; with no open findings use `PA
 
 With `FAIL`, block:
 
+- GitHub push, Pull Request or merge represented as an approved shared handoff
 - External Notion publication or update
 - Jira ticket creation or update
 - Approved final DEV/QA handoff

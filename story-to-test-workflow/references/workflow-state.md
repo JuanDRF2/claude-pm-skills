@@ -12,21 +12,40 @@ At each gate, maintain:
 - Selected scope:
 - Next action:
 - Markdown package path:
-- Shared storage mode:
-- Notion availability/destination state:
-- Notion root/page manifest:
-- Loaded remote snapshot:
-- Last synchronized snapshot:
+- Shared repository URL:
+- Canonical branch and observed commit:
+- Working branch and base commit:
+- Pull Request URL/status:
+- Last merged canonical commit:
+- Shared storage mode: github-main-v1 | local-only
 - Artifact language/audiences:
 - Optional Word export:
-- Notion URL and Word path:
-- Notion publication mode and page manifest:
-- Publication dossier/run: None | [digest, run path, verified/pending/blocked counts]
-- Post-publication receipts: None | [parity, Judge and audit receipt paths]
 - Project status and delivery statuses:
 - Derived artifacts: None | [artifact list and role]
 - Canonical base snapshot:
 ```
+
+Add this block only when Notion or another external derived view was explicitly requested,
+already registered and material to the current work, or known to contain a remote edit:
+
+```markdown
+## Derived Output State
+- Destination: Notion | Jira
+- State: Publication requested | Synced to commit <SHA> | Deferred | Stale or unknown | Unavailable
+- External identity/URL:
+- Model/baseline: None | native-pages-fast-v1 | legacy-recovery | [registered baseline]
+- Publication dossier/run: None | [digest, affected scope, verified/pending/blocked pages]
+- Post-publication receipts: None | [parity, Judge and audit receipt paths]
+```
+
+Do not add the block merely to record `Not requested`, and do not ask the user to choose a
+derived destination during ordinary refinement.
+
+For packages created before `github-main-v1`, preserve their existing fields and add the
+repository fields when the project is first changed in GitHub. Do not rewrite an unchanged
+package only to modernize metadata. A Pull Request is not the last merged canonical commit.
+Preserve legacy derived-output fields in old packages until that package is materially
+changed; do not treat them as required for new work.
 
 After every material approval, also maintain:
 

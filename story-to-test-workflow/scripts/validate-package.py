@@ -222,6 +222,155 @@ def scenario_clarity_warnings(sc_id: str, block: str) -> list[str]:
     return warnings
 
 
+def journey_integrity_checks(functional: str, coverage: str) -> tuple[list[str], list[str]]:
+    """Validate explicit journey composition while keeping historical adoption progressive."""
+    errors: list[str] = []
+    warnings: list[str] = []
+    ftc_hits = list(
+        re.finditer(r"^#{2}\s+(FTC-[A-Z0-9]+-\d{2,})\b", functional, re.MULTILINE)
+    )
+    declaration_pattern = re.compile(
+        r"(?im)^\s*[-*]?\s*\**(?:Journey integrity|Integridad del recorrido)\s*:\**\s*([^\n]+)"
+    )
+    critical_pattern = re.compile(
+        r"\b(payment|pago|purchase|compra|renewal|renovaci[oó]n|refund|reembolso|"
+        r"void|anulaci[oó]n|retry|reintento|duplicate|duplicad[oa]|idempoten|"
+        r"asynchronous|asincr[oó]nic|cross[ -]system|entre sistemas|integration|"
+        r"integraci[oó]n|identity|identidad|permission|permiso|destruct|elimin)\w*\b|"
+        r"(?:Priority/Risk|Prioridad/Riesgo)\s*:\**\s*(?:Critical|High|Cr[ií]tica|Alta)",
+        re.IGNORECASE,
+    )
+
+    has_critical_candidate = False
+    undeclared_critical: list[str] = []
+    for index, hit in enumerate(ftc_hits):
+        end = ftc_hits[index + 1].start() if index + 1 < len(ftc_hits) else len(functional)
+        block = functional[hit.start():end]
+        ftc_id = hit.group(1)
+        critical_candidate = bool(critical_pattern.search(block))
+        has_critical_candidate = has_critical_candidate or critical_candidate
+        declaration = declaration_pattern.search(block)
+        if not declaration:
+            if critical_candidate:
+                undeclared_critical.append(ftc_id)
+            continue
+
+        decision = declaration.group(1).strip().strip("* ")
+        required = bool(re.match(r"Required\b|Requerid[oa]\b", decision, re.IGNORECASE))
+        not_applicable = bool(
+            re.match(r"Not applicable\b|No aplica\b", decision, re.IGNORECASE)
+        )
+        if not required and not not_applicable:
+            errors.append(
+                f"{ftc_id} has an unsupported Journey integrity decision: {decision}. "
+                "Use Required or Not applicable with a reason."
+            )
+            continue
+        if not_applicable:
+            remainder = re.sub(
+                r"^(?:Not applicable|No aplica)\b\s*", "", decision, flags=re.IGNORECASE
+            ).strip(" —–-:.;")
+            if len(remainder.split()) < 2:
+                errors.append(
+                    f"{ftc_id} marks Journey integrity Not applicable without a meaningful reason."
+                )
+            continue
+
+        required_fields = {
+            "journey composition heading": r"^#{3,6}\s+(?:Journey composition|Composici[oó]n del recorrido)\b",
+            "entry action": r"(?:Entry action|Acci[oó]n de entrada)\s*:",
+            "visible outcome": r"(?:Visible outcome|Resultado visible)\s*:",
+            "completion condition": r"(?:Completion condition|Condici[oó]n final|Condici[oó]n de completitud)\s*:",
+            "downstream consistency": r"(?:Downstream consistency|Consistencia posterior)\s*:",
+            "composing scenarios": r"(?:Composing scenarios|Escenarios que lo componen)\s*:",
+            "end-to-end validation": r"(?:End-to-end validation|Validaci[oó]n de extremo a extremo)\s*:",
+            "scenario independence": r"(?:Scenario independence|Independencia de escenarios)\s*:",
+            "authorized evidence": r"(?:Authorized evidence|Evidencia autorizada)\s*:",
+            "residual risk": r"(?:Residual risk|Riesgo residual)\s*:",
+        }
+        missing = [
+            name
+            for name, pattern in required_fields.items()
+            if not re.search(pattern, block, re.IGNORECASE | re.MULTILINE)
+        ]
+        if missing:
+            errors.append(
+                f"{ftc_id} requires Journey integrity but lacks: {', '.join(missing)}."
+            )
+        composing = re.search(
+            r"(?:Composing scenarios|Escenarios que lo componen)\s*:\**\s*([^\n]+)",
+            block,
+            re.IGNORECASE,
+        )
+        if composing and not ID_PATTERNS["SC"].search(composing.group(1)):
+            errors.append(
+                f"{ftc_id} Journey composition must name its canonical SC-* scenarios."
+            )
+        e2e = re.search(
+            r"(?:End-to-end validation|Validaci[oó]n de extremo a extremo)\s*:\**\s*([^\n]+)",
+            block,
+            re.IGNORECASE,
+        )
+        if e2e and re.search(r"\bBlocked\b|\bBloquead[oa]\b", e2e.group(1), re.IGNORECASE):
+            if not re.search(r"\bowner\b|\bresponsable\b", e2e.group(1), re.IGNORECASE):
+                errors.append(
+                    f"{ftc_id} has a blocked end-to-end path without naming an owner/responsable."
+                )
+        downstream = re.search(
+            r"(?:Downstream consistency|Consistencia posterior)\s*:\**\s*([^\n]+)",
+            block,
+            re.IGNORECASE,
+        )
+        if downstream and re.match(
+            r"\s*(?:Not applicable|No aplica|N/?A)\b", downstream.group(1), re.IGNORECASE
+        ):
+            remainder = re.sub(
+                r"^\s*(?:Not applicable|No aplica|N/?A)\b\s*",
+                "",
+                downstream.group(1),
+                flags=re.IGNORECASE,
+            ).strip(" —–-:.;*")
+            if len(remainder.split()) < 2:
+                errors.append(
+                    f"{ftc_id} marks downstream consistency Not applicable without a meaningful reason."
+                )
+        residual = re.search(
+            r"(?:Residual risk|Riesgo residual)\s*:\**\s*([^\n]+)",
+            block,
+            re.IGNORECASE,
+        )
+        if residual and re.fullmatch(
+            r"\s*(?:None|Ninguno|Ninguna)\s*[.*]*", residual.group(1), re.IGNORECASE
+        ):
+            errors.append(
+                f"{ftc_id} declares no residual risk without a brief basis."
+            )
+
+    if undeclared_critical:
+        preview = ", ".join(undeclared_critical[:8])
+        remaining = len(undeclared_critical) - 8
+        suffix = f", and {remaining} more" if remaining else ""
+        warnings.append(
+            f"{len(undeclared_critical)} critical journey candidate FTC(s) have no Journey "
+            f"integrity/Integridad del recorrido decision: {preview}{suffix}. Review the "
+            "inventory before Gate 4."
+        )
+
+    inventory = re.search(
+        r"Journey integrity review|Revisi[oó]n de integridad del recorrido|"
+        r"Inventario de integridad del recorrido",
+        coverage,
+        re.IGNORECASE,
+    )
+    if has_critical_candidate and not inventory:
+        warnings.append(
+            "Critical journey candidates exist but 06-test-coverage.md has no Journey "
+            "Integrity review/inventory. Historical packages remain valid, but Gate 4 must "
+            "record Required or Not applicable before approving changed coverage."
+        )
+    return errors, warnings
+
+
 def definition_blocks(files: dict[Path, str], prefix: str) -> dict[str, str]:
     """Extract heading/table definition blocks for incremental contract checks."""
     pattern = ID_PATTERNS[prefix]
@@ -555,6 +704,9 @@ def strict_checks(root: Path, files: dict[Path, str]) -> tuple[list[str], list[s
                 errors.append(f"Coverage check has no scenario or ledger status: {check_id}")
         if not re.search(r"Grouping|Agrupaci[oó]n|Duplicate|Duplicad|Combin", functional, re.IGNORECASE):
             warnings.append("No check-grouping review found before functional cases.")
+        journey_errors, journey_warnings = journey_integrity_checks(functional, coverage)
+        errors.extend(journey_errors)
+        warnings.extend(journey_warnings)
 
     tc_hits = list(re.finditer(r"^#{2,6}\s+(TC-[A-Z0-9]+-\d{3,})\b", tests, re.MULTILINE))
     required = {

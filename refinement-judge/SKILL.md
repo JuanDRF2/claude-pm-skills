@@ -37,7 +37,7 @@ Require:
 7. The previous Judge report when this is a rerun. Preserve it as comparison evidence
    before replacing the canonical report.
 
-Do not treat derived HTML, Word, Notion, or Jira presentations as canonical sources. Use them only for parity checks.
+Do not treat derived HTML, Word, Notion, or Jira presentations as canonical sources. Use them only for parity checks when they are in the declared review scope.
 
 If original evidence is unavailable, do not claim source fidelity. Record the limitation as a blocking finding when the intended action depends on fidelity.
 
@@ -84,6 +84,12 @@ For a localized Notion publication, evaluate the remote write itself, not only p
 of its preview. Record `Action stage / Etapa de acción: Publication` and `Action scope /
 Alcance de acción: technical=N; editorial=N` using the frozen authorization dossier.
 
+For a GitHub handoff, inspect the configured canonical branch, observed base commit, exact
+diff, package path and repository exclusions. Confirm the proposed branch is not the
+canonical branch, every changed consumer is present, unrelated local work is excluded and
+no `_local`, transport evidence, generated export or secret enters the commit. Do not claim
+the shared canon changed until the merge commit is observed.
+
 ### 2. Reconstruct the source model
 
 Read the original sources and approved decision record before reading author conclusions. Extract:
@@ -114,6 +120,11 @@ For each high-risk scenario marked `Ready`, require the compact execution contra
 by the package and independently test whether another QA reviewer could reproduce it without
 inventing product behavior. Missing material decisions require `FAIL` or `Needs refinement`;
 a structurally valid Gherkin block is insufficient.
+
+For every declared or evidently applicable critical journey, apply the Journey Integrity
+section of `references/review-contract.md`. Reject a Gate 4 or consequential readiness claim
+when atomic scenarios exist but no `FTC-*` proves the connected user-to-business outcome,
+applicable downstream consistency and scenario independence.
 
 For Notion, obtain the native-page manifest, baseline and human-page manifest. In an initial
 publication or explicit full audit, inspect every registered page. In `Actualización
@@ -216,6 +227,11 @@ python3 scripts/validate-judge.py report \
 A `FAIL` may still allow a local draft preview if it is visibly labeled non-approved.
 
 Do not override `FAIL` yourself. A human may explicitly accept the risk by naming the action, accepted findings, owner, reason, and date. Record the override in the report; it does not convert the verdict to `PASS`.
+
+When the intended action is a GitHub handoff, a stale base, incomplete consumer closure,
+unexplained unrelated diff, direct push to the canonical branch or operational evidence in
+the commit is a source-integrity defect. A valid local package does not by itself prove that
+the remote branch or Pull Request contains the reviewed snapshot.
 
 When the intended action is a Notion publication, a missing, stale, duplicated or
 incorrectly linked required human page is a parity defect. A missing, altered or ambiguous

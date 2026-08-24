@@ -4,6 +4,7 @@
 
 - Testability audit
 - Risk and coverage strategy
+- Journey integrity review
 - Atomic coverage checks
 - Grouping review
 - Functional test case
@@ -18,6 +19,19 @@ List confirmed inputs, contradictions, blocked results, data/environment needs, 
 
 | Risk | Rationale | Technique | Coverage mode | Level |
 |---|---|---|---|---|
+
+## 2A. Journey Integrity Review
+
+Keep this inventory in `06-test-coverage.md`. Include every critical connected journey and
+any candidate that was evaluated and found genuinely isolated.
+
+| Journey / candidate FTC | Risk | Decision | Reason | Complete validation path | Downstream scope | Gap/owner |
+|---|---|---|---|---|---|---|
+| Purchase membership / FTC-MEM-01 | Critical | Required | Payment and membership must complete consistently | Thin E2E plus API checks | Payment, membership, relationships and duplicates | None |
+| View static help / FTC-HELP-01 | Low | Not applicable | One isolated read-only event | Component | Not applicable | None |
+
+Use only `Required` or `Not applicable` as the decision. A required journey receives the
+composition in its `FTC-*`; `Not applicable` always includes a concrete reason.
 
 ## 3. Atomic Coverage Checks
 
@@ -51,12 +65,29 @@ Keep these in `07-functional-test-cases.md`.
 - Automation recommendation:
 - QA review state: Draft/Approved/Blocked
 - Executability: Ready/Needs refinement/Blocked — [reason]
+- Journey integrity: Required/Not applicable — [risk-based reason]
 
 ### Preconditions
 - [Minimum setup before execution]
 
 ### Data and environment
 - [Controlled data, configuration, environment, integrations and source of every material value]
+
+### Journey composition
+
+Include this section when `Journey integrity: Required`; omit it for a justified isolated
+event.
+
+- **Entry action:** [User action or external trigger]
+- **Visible outcome:** [Understandable result for the user or authorized actor]
+- **Completion condition:** [Final observable processing signal]
+- **Downstream consistency:** [Applicable records/results, counts, relationships, values,
+  states, duplicates and idempotency, or Not applicable with reason]
+- **Composing scenarios:** [Canonical SC-IDs]
+- **End-to-end validation:** [Thin E2E, Integration or Manual path; or Blocked with reason and owner]
+- **Scenario independence:** [How each scenario creates or receives its own initial state]
+- **Authorized evidence:** [Approved UI, API, internal UI, query, record, message, receipt or log]
+- **Residual risk:** [Remaining unproven risk, or None with basis]
 
 ### [SC-ID] — [Exact canonical scenario title from the criterion]
 
@@ -100,6 +131,11 @@ For explicit High/Critical risk or critical-domain scenarios only, add the compa
 Every check must map to at least one scenario or carry a gap status. Do not create one scenario per check by default.
 
 Make the automation decision canonically on each `SC-*` under its criterion; the `FTC-*` recommendation is only the grouping strategy and must reuse the scenario decision verbatim. Do not infer `Automate now` from `Executability: Ready`, and do not use `Implemented`, `Passed`, or `Failed` without downstream evidence.
+
+The journey-level end-to-end decision is a composition strategy, not a replacement for the
+scenario-level automation fields. It may reference several independently executable
+scenarios. Do not create additional acceptance criteria for test mechanics or internal
+records.
 
 Use bold labels and whitespace to separate traceability metadata from Given/When/Then behavior. Use bullets only for actual collections, multiple expected results, or compact metadata groups.
 

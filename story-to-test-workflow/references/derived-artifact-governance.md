@@ -155,6 +155,18 @@ If that metadata is missing, perform a defensive review: mark the base snapshot 
 treat unmatched behavior as `Proposed` or `Unverifiable`, and do not claim historical
 fidelity.
 
+## Shared prototype references
+
+When design evidence for your own product/domain is in scope, read
+`domain-and-design-sources.md`. Prefer a verified, team-accessible design-hub URL over a
+person-specific absolute disk path. The hub is authoritative for the approved interaction
+presentation; canonical Markdown remains authoritative for product behavior.
+
+If a prototype is not published, use a workspace-relative reference when possible, label
+it `Pending shared publication` and do not imply that teammates can open it. Repository
+clone instructions are optional and may be shown only after confirming access; they must
+not be required to review the refinement.
+
 ## Closing the loop
 
 For an accepted change:

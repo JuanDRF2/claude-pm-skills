@@ -9,6 +9,9 @@
 5. Parity review
 6. Completion boundary
 7. Derived artifacts and product boundaries
+8. Review scope and sampling
+9. Cross-refinement coherence
+10. Domain architecture
 
 ## Evidence hierarchy
 
@@ -92,6 +95,28 @@ Check that:
   interact, verify explicit combination coverage; do not accept a generic dataset reference.
 - Reject `Automate now` when QA or Engineering must invent a material value, provider result,
   retry policy, state transition, evidence source or expected outcome.
+
+#### Journey integrity
+
+For payments, purchases, renewals, asynchronous completion and flows that create or update
+several related business results, check that:
+
+- one `FTC-*` composes the atomic `SC-*` scenarios from entry action through visible outcome,
+  final processing and applicable downstream consistency;
+- the complete path identifies authorized evidence, controlled correlation data or a visible
+  observability dependency;
+- scenarios remain independently executable and do not rely on execution order;
+- one thin E2E, Integration or Manual validation path exists, or a Blocked exception names
+  its reason, owner and residual risk;
+- lower-level tests carry calculations, boundaries, failures and combinations without
+  duplicating every variation in E2E;
+- internal records remain evidence rather than the only understandable business outcome;
+- automation classification does not erase functional coverage when execution stays manual.
+
+Do not require a journey composition for a genuinely isolated behavior with a recorded
+rationale. Do not accept `Not applicable` merely to avoid downstream or cross-system
+verification. Missing required composition blocks QA approval even when each individual
+scenario is syntactically valid.
 
 ### 6. Traceability
 
@@ -201,6 +226,43 @@ contradiction or unapproved scope injection as blocking.
 ## Sampling prohibition
 
 Do not claim package-wide `PASS` from a sample. Automated searches may narrow attention, but review every in-scope story and every high-risk rule. If size or access prevents full review, declare the limitation and use `FAIL` when the intended action requires complete assurance.
+
+Classify the review scope before reading:
+
+- `Localized`: inspect every changed source and its complete consumer closure. Prove why
+  unrelated artifacts are excluded; do not download or reread them merely to reconfirm.
+- `Package-wide`: inspect every canonical artifact in the named package.
+- `Cross-refinement deep audit`: inspect every canonical artifact in the exact named set of
+  packages and compare their shared behavior.
+- `Remote parity`: inspect only the remote identities required by the declared publication
+  or audit contract.
+
+A prior Judge `PASS` does not exempt an artifact in the current frozen scope. Conversely,
+a request to review one change does not authorize expansion to every package or every
+remote page. If a complete audit cannot be completed, state the unreviewed inventory and do
+not issue a global `PASS`.
+
+## Cross-refinement coherence
+
+For a declared cross-refinement audit, verify that shared rules, field/state mappings,
+closed decisions, prototype behavior and owner-package contracts agree across the selected
+packages. Read the complete selected canonical set before concluding; evidence in one
+package may resolve a question or expose a contradiction in another.
+
+Do not use a hard-coded list of project IDs as proof of shared scope. Derive relationships
+from registered contracts, traceability and the current source inventory.
+
+## Domain architecture
+
+When the reviewed behavior creates or changes domain vocabulary, ownership, events or
+cross-Bounded-Context flow, compare it with the authoritative architecture evidence in the
+source inventory. Check entity and aggregate names, context ownership, event existence and
+cross-context responsibilities.
+
+Architecture evidence governs terminology and ownership; it does not silently override an
+approved product decision. If the source is unavailable, stale or omits a new concept,
+record a traceability limitation with an owner and severity proportional to the intended
+action. Do not invent the missing architecture or claim it was verified.
 
 ## Completion boundary
 

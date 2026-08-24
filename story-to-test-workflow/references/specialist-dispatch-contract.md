@@ -39,6 +39,11 @@ can write externally or change an approved artifact.
 | registered Notion synchronization | `sync-refinement-package-notion` |
 | optional Word export | `build-refinement-document` |
 
+GitHub checkout, branch, commit, push and Pull Request operations follow
+`github-source-of-truth-contract.md` through the host's available Git capability. They do
+not require a separate specialist or GitHub plugin. If the host cannot authenticate, keep
+the validated local commit and report the exact blocked external action.
+
 ## Hard stops
 
 Stop instead of improvising when:
@@ -56,9 +61,9 @@ choices and ask for a decision.
 
 ## Notion invariant
 
-Any request that creates or changes the shared refinement in Notion must use
+Any request that creates or changes the optional derived refinement in Notion must use
 `publish-refinement-to-notion` for initial native publication or
 `sync-refinement-package-notion` for a registered project. If the active host has no
-compatible Notion connection, generate only the declared pending export and report
-`Local draft — publication pending`. Never create a custom substitute and describe it as a
-skill-compliant publication.
+compatible Notion connection, report `Notion view unavailable`; this does not block the
+GitHub handoff. Never create a custom substitute and describe it as a skill-compliant
+Notion publication.

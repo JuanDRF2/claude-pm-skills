@@ -221,6 +221,82 @@ def main() -> int:
         errors, _warnings = validator.strict_checks(root, validator.read_files(root))
         assert not any("Jira/master acceptance criterion differs" in error for error in errors)
 
+    # Journey Integrity composes atomic scenarios without inventing another ID namespace.
+    complete_journey = """
+## FTC-MEM-01 — Comprar una membresía
+
+- **Historias:** US-MEM-01
+- **Prioridad/Riesgo:** Critical
+- **Integridad del recorrido:** Required — compra, pago y activación relacionados
+
+### Composición del recorrido
+
+- **Acción de entrada:** la persona confirma la compra.
+- **Resultado visible:** la compra queda confirmada y la membresía activa.
+- **Condición final:** el procesamiento informa finalización confirmada.
+- **Consistencia posterior:** existe un pago y una membresía relacionados, sin duplicados.
+- **Escenarios que lo componen:** SC-MEM-01-01, SC-MEM-01-02
+- **Validación de extremo a extremo:** E2E del camino principal.
+- **Independencia de escenarios:** cada escenario crea su propio comprador y estado inicial.
+- **Evidencia autorizada:** confirmación visible y consulta interna permitida.
+- **Riesgo residual:** las variaciones de cálculo se cubren por API.
+"""
+    errors, warnings = validator.journey_integrity_checks(
+        complete_journey, "## Revisión de integridad del recorrido\n"
+    )
+    assert not errors, "\n".join(errors)
+    assert not warnings, "\n".join(warnings)
+
+    incomplete_journey = complete_journey.replace(
+        "- **Consistencia posterior:** existe un pago y una membresía relacionados, sin duplicados.\n",
+        "",
+    )
+    errors, _warnings = validator.journey_integrity_checks(
+        incomplete_journey, "## Revisión de integridad del recorrido\n"
+    )
+    assert any("downstream consistency" in error for error in errors), errors
+
+    blocked_without_owner = complete_journey.replace(
+        "E2E del camino principal.", "Blocked — falta ambiente."
+    )
+    errors, _warnings = validator.journey_integrity_checks(
+        blocked_without_owner, "## Revisión de integridad del recorrido\n"
+    )
+    assert any("owner/responsable" in error for error in errors), errors
+
+    downstream_without_reason = complete_journey.replace(
+        "existe un pago y una membresía relacionados, sin duplicados.", "Not applicable."
+    )
+    errors, _warnings = validator.journey_integrity_checks(
+        downstream_without_reason, "## Revisión de integridad del recorrido\n"
+    )
+    assert any("downstream consistency" in error for error in errors), errors
+
+    residual_without_basis = complete_journey.replace(
+        "las variaciones de cálculo se cubren por API.", "None"
+    )
+    errors, _warnings = validator.journey_integrity_checks(
+        residual_without_basis, "## Revisión de integridad del recorrido\n"
+    )
+    assert any("no residual risk" in error for error in errors), errors
+
+    isolated_without_reason = complete_journey.replace(
+        "Required — compra, pago y activación relacionados", "Not applicable"
+    )
+    errors, _warnings = validator.journey_integrity_checks(
+        isolated_without_reason, "## Revisión de integridad del recorrido\n"
+    )
+    assert any("without a meaningful reason" in error for error in errors), errors
+
+    undeclared_critical = complete_journey.replace(
+        "- **Integridad del recorrido:** Required — compra, pago y activación relacionados\n",
+        "",
+    )
+    errors, warnings = validator.journey_integrity_checks(undeclared_critical, "")
+    assert not errors, errors
+    assert any("critical journey candidate" in warning for warning in warnings), warnings
+    assert any("no Journey Integrity review" in warning for warning in warnings), warnings
+
     # Clarity checks must inspect split story volumes and flag incomplete scenario prose.
     with tempfile.TemporaryDirectory() as temporary:
         root = Path(temporary)

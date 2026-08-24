@@ -36,21 +36,22 @@ Keep stable IDs in headings so text search remains useful.
 
 ## Shared storage
 
-Markdown defines the package structure. For Notion-connected teamwork, publish each
-registered Markdown as one native page. A manifest and baseline relate the local checkout
-to stable Notion page IDs and verified hashes. Human pages are derived presentations; they
-do not replace the canonical numbered documents.
+Markdown defines the package structure. In a registered GitHub repository, the configured
+canonical branch is the shared documentary source of truth. A local branch or Pull Request
+contains proposed changes until merged. Record repository, branch and observed commit in
+workflow state; use `github-source-of-truth-contract.md` for checkout and release behavior.
 
 Treat numbered project documents as canonical unless the workflow contract marks one
 otherwise. Treat `jira/*.md` and `handoffs/*.md` as generated views: publish them for
 consumers, but regenerate them from canonical units and do not accept independent edits as
 new product truth.
 
-Record the Notion root, collaborative-page manifest, baseline snapshot and verification
-scope in `00-workflow-state.md` and `09-package-index.md`. Use
-`publish-refinement-to-notion` for initial creation and
-`sync-refinement-package-notion` thereafter. Update only the proven affected pages and
-preserve previous ZIPs, if any, as historical evidence rather than an active dependency.
+Notion is optional. When requested, publish each registered Markdown as one native page. A
+manifest and baseline relate the GitHub-derived checkout to stable Notion page IDs and
+verified hashes. Human pages are derived presentations; they do not replace the canonical
+numbered documents. Use `publish-refinement-to-notion` for initial creation and
+`sync-refinement-package-notion` thereafter, always from the merged commit unless the user
+explicitly requests a labeled preview.
 
 ## Shared packages
 
@@ -58,9 +59,10 @@ Keep cross-project contracts under `artifacts/_shared/<slug>/`. Do not move a sh
 contract into the owner's local project folder merely because its Notion presentation is
 owned by that project.
 
-For a feature-owned contract, publish its visible page inside the canonical Notion page of
-the owner feature. Register its native pages in a separate manifest and baseline from the
-owner's main refinement. Consumer projects link to the readable shared-contract page.
+For a feature-owned contract, keep its Markdown under `_shared/` and record its owner and
+consumers. If a Notion view is requested, publish it inside the owner feature's page and
+register a separate manifest and baseline. Consumers link to the canonical Markdown and may
+also expose the readable derived page.
 
 For a global standard without a feature owner, require a confirmed shared-standards hub.
 Never reuse a prior project's destination as the default.

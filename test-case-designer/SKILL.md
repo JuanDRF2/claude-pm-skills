@@ -138,6 +138,11 @@ Prefer the least expensive level that can prove the behavior:
 
 Do not duplicate identical assertions at every level without a risk-based reason.
 
+For a critical connected journey, read `references/journey-integrity-contract.md`. Require
+one complete validation path while keeping variations at the lowest useful level. The path
+may be automated, manual or explicitly blocked; automation value never defines whether the
+functional journey is covered.
+
 ### Step 6: Write Atomic Coverage Checks
 
 Create `CHK-*` items for the smallest independently traceable verification. A check states what must be proven, risk, level, and evidence; it is not an executable test case or a TestManager file.
@@ -155,6 +160,12 @@ Follow `references/output-schema.md`. Each case must contain:
 - A scenario-level automation decision, rationale, priority, level, dependencies, and implementation status
 
 Start from the canonical `SC-*` scenarios under the acceptance criteria. Group their checks by feature or primary action into `FTC-*` cases. Reuse every scenario ID and approved behavior exactly; never create a second QA scenario namespace for the same flow. Add another expected result instead of another scenario when the same action proves several inseparable consequences. Expected results must cover business consistency, not only UI messages.
+
+When journey integrity is required, use the `FTC-*` to compose the atomic scenarios into
+the complete user-to-business outcome. Record entry action, visible outcome, completion
+condition, downstream consistency, composing scenarios, end-to-end validation,
+independence, authorized evidence and residual risk. Do not repeat the full journey in each
+scenario or make scenarios depend on execution order.
 
 #### Plain-language and scenario-boundary contract
 
@@ -329,5 +340,6 @@ submission and rejected payment remain separate because their triggers and outco
 - `references/risk-model.md` — Lightweight risk model and coverage depth
 - `references/output-schema.md` — Required output and test-case templates
 - `references/executability-gate.md` — Readiness criteria for a QA-reviewable downstream handoff
+- `references/journey-integrity-contract.md` — Risk-based composition of atomic scenarios into a complete journey
 - `skills/user-story/SKILL.md` and `skills/user-story/references/golden-example.md` — Source format and complete canonical example
 - `skills/user-story-mapping/SKILL.md` — Source variations, states, and rules
