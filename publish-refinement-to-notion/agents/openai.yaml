@@ -1,4 +1,4 @@
 interface:
   display_name: "Publish Refinement to Notion"
-  short_description: "Publish refinement artifacts as a readable Notion page"
-  default_prompt: "Use $publish-refinement-to-notion to publish this approved Markdown refinement package as a clear Notion refinement workspace."
+  short_description: "Publish a derived Notion view from an approved GitHub commit"
+  default_prompt: "Use $publish-refinement-to-notion to publish a Notion view derived from the approved Markdown commit in GitHub, with one native page per Markdown file and complete human-readable views."

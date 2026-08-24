@@ -3,9 +3,10 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 
-const serializer = process.argv[2] || new URL("./serialize-notion-fetch.mjs", import.meta.url).pathname;
+const serializer = process.argv[2] || fileURLToPath(new URL("./serialize-notion-fetch.mjs", import.meta.url));
 const root = fs.mkdtempSync(path.join(os.tmpdir(), "notion-fetch-serializer-"));
 try {
   const out = path.join(root, "remote.md");
@@ -41,6 +42,51 @@ try {
 - Vigente
 `,
   );
+
+  const fencedInput = [
+    "<page><content>",
+    "## Escenario",
+    "```gherkin",
+    "Dado un caso",
+    "Entonces conserva la tabla",
+    "",
+    "Ejemplos:",
+    "| Caso | Resultado |",
+    "|---|---|",
+    "| 1 | visible |",
+    "```",
+    "## Literales",
+    "~~~~text",
+    "# no es heading",
+    "> no es cita",
+    "| no | es | tabla |",
+    "~~~~",
+    "</content></page>",
+  ].join("\n");
+  const fencedExpected = [
+    "## Escenario", "", "```gherkin", "Dado un caso",
+    "Entonces conserva la tabla", "", "Ejemplos:", "| Caso | Resultado |",
+    "|---|---|", "| 1 | visible |", "```", "", "## Literales", "",
+    "~~~~text", "# no es heading", "> no es cita", "| no | es | tabla |",
+    "~~~~", "",
+  ].join("\n");
+  const fenced = spawnSync(process.execPath, [serializer, "--out", out], {
+    input: fencedInput,
+    encoding: "utf8",
+  });
+  assert.equal(fenced.status, 0, fenced.stderr);
+  assert.equal(fs.readFileSync(out, "utf8"), fencedExpected);
+
+  const fencedBase = path.join(root, "fenced-base.md");
+  fs.writeFileSync(fencedBase, fencedExpected);
+  const fencedEquivalent = spawnSync(
+    process.execPath,
+    [serializer, "--out", out, "--base", fencedBase],
+    { input: fencedInput, encoding: "utf8" },
+  );
+  assert.equal(fencedEquivalent.status, 0, fencedEquivalent.stderr);
+  assert.equal(JSON.parse(fencedEquivalent.stdout).equivalent, true);
+  assert.equal(fs.readFileSync(out, "utf8"), fencedExpected);
 
   const incomplete = spawnSync(process.execPath, [serializer, "--out", out], {
     input: "<page><content>truncated",
@@ -84,7 +130,7 @@ try {
   );
   assert.equal(changed.status, 0, changed.stderr);
   assert.equal(JSON.parse(changed.stdout).equivalent, false);
-  console.log(JSON.stringify({ ok: true, tests: 4 }));
+  console.log(JSON.stringify({ ok: true, tests: 6 }));
 } finally {
   fs.rmSync(root, { recursive: true, force: true });
 }

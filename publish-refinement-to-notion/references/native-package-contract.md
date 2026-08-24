@@ -1,70 +1,55 @@
-# Contrato del paquete nativo de Notion
+# Contrato del paquete nativo
 
-## Modos
+## Fuente y presentación
 
-### Publicación completa
+La vista derivada de Notion usa `native-pages-fast-v1`:
 
-Es el modo predeterminado cuando el usuario pide publicar, republicar o generar el refinamiento sin limitar la acción a páginas concretas. Crear o actualizar:
+- cada Markdown canónico o derivado tiene una página nativa 1:1 bajo `Paquete Markdown`;
+- portada, historias y materiales son presentaciones humanas derivadas;
+- el manifiesto une ruta local, identidad semántica y `notion_page_id`;
+- el baseline guarda hashes y contenido remoto para detectar concurrencia.
 
-1. Portada del proyecto.
-2. Una página autosuficiente por historia.
-3. Las seis páginas auxiliares obligatorias.
+Se requiere identificar repositorio, rama y commit fuente, pero no un plugin de GitHub,
+Notion CLI ni token personal. Un snapshot no mergeado se etiqueta como preview.
 
-### Actualización localizada
+## Inventario técnico
 
-Usarla cuando el usuario nombra historias, secciones o páginas concretas. Actualizar solo ese alcance y cualquier conteo, estado, enlace o resumen de portada cuya verdad haya cambiado. Preservar las demás páginas y registrar qué quedó fuera del alcance.
+Publicar todos los Markdown regulares del contrato del orquestador, incluidos archivos
+numerados, `jira/*.md` y `handoffs/*.md`. Excluir `_local`, previews, respaldos, receipts,
+archivos temporales y herramientas.
 
-No convertir automáticamente una corrección puntual en una republicación completa.
+Mantener la estructura de carpetas mediante contenedores nativos. Un mismo Markdown no
+puede aparecer dos veces en el manifiesto y una página no puede representar dos archivos.
 
-## Seis páginas auxiliares obligatorias
+## Identidad
 
-| Página nativa | Fuente canónica |
-|---|---|
-| Reglas, decisiones y preguntas | `02-rules-and-questions.md` |
-| Plan funcional de pruebas | `07-functional-test-cases.md` |
-| Matriz de cobertura y automatización | `06-test-coverage.md` y `10-automation-matrix.md`, cuando exista |
-| Pendientes, riesgos y preparación | `08-traceability-and-risks.md` y readiness de `00-workflow-state.md` |
-| Handoff DEV | `handoffs/dev-handoff.md` |
-| Handoff QA | `handoffs/qa-handoff.md` |
+Registrar como mínimo proyecto, checkout, repositorio y commit fuente; página raíz y página padre; contenedor interno,
+`Paquete Markdown` e historial; `id`, rol, ruta y `notion_page_id` de cada unidad; IDs de
+presentaciones humanas; encoding y snapshot del manifiesto.
 
-Si `10-automation-matrix.md` no existe, utilizar exclusivamente la estrategia canónica por escenario registrada en `07-functional-test-cases.md`; no inventar otra clasificación.
+Resolver actualizaciones por ID, no por título. Los títulos ayudan a leer, no son una clave
+segura.
 
-Cada página debe:
+## Baseline inicial
 
-- conservar IDs, idioma, estados, owners y relaciones;
-- incluir el contenido completo necesario para su propósito;
-- declarar el snapshot o fecha de la fuente;
-- enlazar a la portada y, cuando aporte valor, a las historias relacionadas;
-- evitar copiar escenarios con una redacción diferente a la canónica.
+Después del primer readback, capturar la versión remota serializada y el hash exacto local
+de cada unidad. El baseline queda fuera del paquete, bajo `_local/notion-sync/`.
 
-La portada debe enlazar estas páginas desde la sección 9 y conservar sus bloques nativos dentro del único desplegable final `Subpáginas internas del proyecto`. No mostrar esos bloques nuevamente como elementos sueltos.
+Las siguientes actualizaciones consultan solo las páginas afectadas. Una auditoría global
+se ejecuta únicamente por señal de drift, cambio de serializador/manifiesto, evidencia
+faltante o solicitud explícita.
 
-## Ausencias legítimas
+## Presentaciones humanas
 
-`No aplica` significa que el entregable no corresponde al alcance por una decisión explícita. `No generado` significa que falta el artefacto canónico requerido y debe indicar cuál falta.
+Las presentaciones no sustituyen los Markdown técnicos. Deben ser completas para la
+revisión y derivarse del mismo snapshot aprobado. Una historia visible incluye sus reglas,
+criterios, escenarios, checks, casos funcionales, cobertura y riesgos aplicables.
 
-La inexistencia previa de una página en Notion no es una razón válida para usar ninguno de esos estados. En una publicación completa, si existe el artefacto canónico aplicable, la página se crea.
+La portada conserva navegación y contexto. Si tiene páginas hijas, solo admite patches
+localizados sobre secciones administradas.
 
-## Identidad y duplicados
+## Migración
 
-Antes de crear, buscar por destino, relación con la portada y título canónico. Actualizar la página ya enlazada desde la portada. No crear variantes como `Título (1)`, `Título nuevo` o `Título — fecha`.
-
-Si existen duplicados:
-
-1. conservar como canónica la página enlazada desde la portada o la que tenga identidad registrada en el manifiesto;
-2. no borrar ni fusionar contenido ajeno sin autorización;
-3. registrar los duplicados como observación y corregir los enlaces de navegación.
-
-## Manifiesto y verificación
-
-Registrar por página: tipo, título, URL, acción (`Creada`, `Actualizada`, `Preservada` o `No generada`), fuente canónica y snapshot.
-
-En una publicación completa, volver a leer la portada, todas las páginas auxiliares y todas las historias. Confirmar:
-
-- seis páginas auxiliares presentes y enlazadas;
-- cantidad correcta de historias;
-- títulos canónicos sin duplicados;
-- misma versión del paquete;
-- contenido derivado de su fuente asignada;
-- ausencia de `No aplica` o `No generado` cuando la fuente aplicable sí existe.
-- todos los bloques nativos de historias y materiales contenidos una sola vez dentro del desplegable final, sin duplicación visual.
+Un espejo nativo existente puede adoptarse sin republicar: descubrir jerarquía, resolver
+IDs, validar el paquete y capturar un baseline completo una vez. Cualquier mecanismo de
+publicación anterior queda fuera del flujo vigente.

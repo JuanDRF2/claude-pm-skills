@@ -1,13 +1,23 @@
 # Contrato del manifiesto de páginas
 
+## Contenido
+
+- [Ejemplo](#ejemplo)
+- [Reglas](#reglas)
+
 Cada proyecto debe tener un manifiesto estable que relacione identidad semántica, página de
 Notion y artefacto local.
+
+## Ejemplo
 
 ```json
 {
   "schema_version": 1,
   "project": "pay-by-link",
   "package_kind": "project",
+  "source_repository": "https://github.com/org/documentation",
+  "source_branch": "main",
+  "source_commit": "observed-merge-sha",
   "notion_parent_page_id": "uuid-destino-elegido",
   "notion_root_page_id": "uuid-pagina-colaborativa-proyecto",
   "notion_internal_container_page_id": "uuid-subpaginas-internas-opcional",
@@ -15,6 +25,7 @@ Notion y artefacto local.
   "audit_log_page_id": "uuid-historial-sincronizacion",
   "audit_policy": "verified-events-only",
   "audit_entry_mode": "append-only-child-pages",
+  "checkout_root": "artifacts/pay-by-link",
   "units": [
     {
       "id": "00-workflow-state",
@@ -44,8 +55,21 @@ Notion y artefacto local.
 
 ## Reglas
 
+- `checkout_root` identifica el único paquete Markdown editable del computador:
+  `artifacts/<project-slug>/` para proyectos y `artifacts/_shared/<contract-slug>/` para
+  contratos compartidos. El slug puede diferir de la clave del registro; en ese caso se
+  conserva explícitamente como `canonical_checkout_root`. Nunca puede apuntar a
+  `artifacts/_local/`.
+- `source_repository`, `source_branch` y `source_commit` identifican el snapshot GitHub del
+  cual se deriva la vista. Son obligatorios para registros nuevos bajo `github-main-v1`.
+  Un manifiesto anterior puede incorporarlos en su siguiente actualización verificada sin
+  republicar todo el proyecto.
+- `state_root` sí pertenece a `artifacts/_local/notion-sync/<project>/` y conserva solo
+  snapshots, respaldos, readbacks, outbox, recibos y auditoría operacional.
+- Si un registro legacy usa `_local/notion-checkouts/`, bloquear registro/publicación y usar
+  `migrate-checkout-root`; no copiar contenido ni seleccionar una versión silenciosamente.
 - `notion_parent_page_id` identifica el destino elegido por el usuario.
-- `notion_root_page_id` identifica la página colaborativa canónica, hija directa del destino.
+- `notion_root_page_id` identifica la página colaborativa derivada, hija directa del destino.
 - `notion_internal_container_page_id` es opcional. Cuando existe, identifica el único
   contenedor técnico hijo directo de la página colaborativa; no pertenece a `units` ni
   `presentations`.

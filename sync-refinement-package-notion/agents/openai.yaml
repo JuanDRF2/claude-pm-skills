@@ -1,4 +1,4 @@
 interface:
   display_name: "Sync Refinement Package Notion"
-  short_description: "Sincroniza refinamientos con Notion de forma segura"
-  default_prompt: "Usa $sync-refinement-package-notion para descubrir, registrar, comparar o publicar un paquete mediante Notion sin sobrescribir cambios concurrentes."
+  short_description: "Sincroniza una vista derivada de Notion"
+  default_prompt: "Usa $sync-refinement-package-notion para comparar o actualizar la vista nativa de Notion desde el commit canónico de GitHub, leyendo y escribiendo solo el alcance afectado."

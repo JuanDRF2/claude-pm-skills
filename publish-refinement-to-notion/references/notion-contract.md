@@ -1,18 +1,16 @@
 # Contrato de publicación en Notion
 
-## Portada del proyecto
+## Paquete técnico nativo
 
-Leer y aplicar completamente [project-cover-template.md](project-cover-template.md). Sus diez secciones, títulos y orden son obligatorios para publicaciones nuevas y republicaciones completas.
+Aplicar [native-package-contract.md](native-package-contract.md). Crear una página por cada
+Markdown bajo `Paquete Markdown` y registrar sus IDs. La página del proyecto sigue siendo
+hija del destino elegido.
 
-La portada debe combinar:
+## Vista colaborativa obligatoria
 
-- la lectura editorial de objetivo, alcance y decisiones;
-- el control de estado, inventario, `Refinement Judge`, pendientes y readiness;
-- la navegación agrupada hacia historias y material de refinamiento.
-
-## Paquete nativo mínimo
-
-En una publicación completa, aplicar `native-package-contract.md`: portada, una página por historia y seis páginas auxiliares obligatorias. En una actualización localizada, preservar las páginas no afectadas y actualizar los resúmenes o enlaces de portada cuya verdad cambie.
+Leer [project-cover-template.md](project-cover-template.md) para toda publicación completa.
+La vista de revisión es obligatoria, `derived`, enlaza la release vigente y queda excluida
+del snapshot canónico. Nunca usarla para reconstruir Markdown.
 
 No usar `No aplica` porque una página auxiliar todavía no exista en Notion. La aplicabilidad depende del alcance aprobado; la generación depende de la existencia del artefacto Markdown canónico.
 
@@ -24,13 +22,15 @@ Cuando exista `11-refinement-judge-report.md`, publicar su veredicto, fecha, sna
 
 ### Uniformidad
 
-- No sustituir los títulos numerados por sinónimos.
-- No mover pendientes, riesgos, decisiones o readiness a lugares distintos de la plantilla.
-- Una página auxiliar puede contener detalle adicional, pero la portada conserva el resumen y su enlace.
-- Una actualización localizada no obliga a reconstruir contenido ajeno; sí debe acercar progresivamente la portada a la plantilla sin borrar decisiones o enlaces vigentes.
-- Una publicación nueva o republicación completa debe cumplir la plantilla en su totalidad.
+- Representar cada archivo numerado y derivado registrado como una sola página técnica.
+- No mover contenido entre Markdown durante la publicación.
+- Preservar páginas no afectadas en una actualización localizada.
+- Exigir paridad Markdown de páginas técnicas y paridad semántica de la vista humana.
 
 ## Página de historia
+
+Aplicar [story-page-template.md](story-page-template.md) como estructura exacta. Este
+contrato define el contenido; la plantilla define su jerarquía de lectura verificable.
 
 La página debe ser autosuficiente y revisable como futuro ticket Jira. Un revisor no debe necesitar abrir el paquete Markdown, otra subpágina ni un enlace local para comprender o aprobar la historia. Los enlaces al paquete canónico son trazabilidad adicional, no sustitutos del contenido.
 
@@ -67,7 +67,9 @@ La página debe ser autosuficiente y revisable como futuro ticket Jira. Un revis
 - No anidar un bloque `<page>` debajo de un guion vacío. El patrón `-\n  <page ...>` crea un elemento de lista vacío y espacio vertical innecesario.
 - Usar enlaces Markdown normales en las secciones 7 y 9.
 - Conservar todos los bloques `<page>` únicamente dentro de un desplegable cerrado llamado `Subpáginas internas del proyecto`, después de la sección 10. Este contenedor preserva la jerarquía real sin duplicar la navegación visible.
-- Dentro del desplegable, agrupar primero `Historias` y después `Material de refinamiento`. Escribir cada bloque `<page>` directamente, nunca como hijo de una lista.
+- Dentro del desplegable, agrupar en este orden: `Historias`, `Material de refinamiento` y
+  `Operación y auditoría`. Colocar únicamente `Historial de sincronización` bajo el último
+  grupo. Escribir cada bloque `<page>` directamente, nunca como hijo de una lista.
 - No dejar bloques `<page>` sueltos antes o después del desplegable.
 - No insertar líneas vacías entre historias consecutivas del mismo grupo. Separar solamente el siguiente encabezado de release, slice, outcome o área.
 - No mostrar siglas solas: `Comprobación de cobertura · CHK-PBL-001`.
@@ -85,10 +87,22 @@ Después de publicar, comprobar:
 - agrupación del índice y separación de activas, diferidas y retiradas;
 - ausencia de guiones sin texto, bloques `<page>` anidados en listas, espacios artificiales y enlaces duplicados en el índice;
 - existencia de un solo desplegable final `Subpáginas internas del proyecto`, cerrado por defecto, que contenga todos los bloques `<page>` y no repita enlaces editoriales;
+- presencia única de `Paquete Markdown` e `Historial de sincronización` bajo `Paquete y
+  operación`, separados de `Material de refinamiento`;
+- cuando el equipo confirme un destino de desarrollo externo, presencia de una única nota
+  `Destino de desarrollo: <nombre>` en la sección 9 enlazada a `Handoff DEV`, sin una
+  sección 11 ni duplicación del mapping;
 - coherencia entre estado de publicación, veredicto del Judge y readiness;
 - funcionamiento de desplegables y tablas;
+- destino funcional de cada enlace interno según el page ID del manifiesto; una URL con
+  forma `https://*.md` es inválida aunque el texto visible sea correcto;
 - ausencia de decisiones inventadas;
 - privacidad y ubicación correctas.
+- relación padre-hijo exacta entre destino, proyecto, `Paquete Markdown` e historial;
 - ausencia de placeholders o referencias que obliguen a abandonar Notion para revisar el ticket.
-- en publicación completa, presencia y enlace de las seis páginas auxiliares, identidad única de sus títulos y paridad con sus fuentes canónicas;
+- en publicación completa, baseline y manifiesto nativo válidos;
 - manifiesto de páginas creadas, actualizadas, preservadas y no generadas.
+
+Materializar un plan y ejecutar `validate-notion-presentation.mjs` sobre el payload previo y
+el readback. No promover la release ni cerrar auditoría si cualquiera de los receipts tiene
+`ok: false`.

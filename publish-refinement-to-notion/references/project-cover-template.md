@@ -1,4 +1,4 @@
-# Plantilla canónica de portada
+# Plantilla editorial de portada
 
 Usar esta estructura para toda página principal de refinamiento en Notion. Conservar exactamente el orden y los títulos. El contenido cambia por proyecto; la arquitectura de lectura no.
 
@@ -52,7 +52,7 @@ Usar esta estructura para toda página principal de refinamiento en Notion. Cons
 - **Escenarios canónicos:** [total].
 - **Comprobaciones de cobertura:** [total].
 - **Casos funcionales:** [total].
-- **Automatización:** [Automate now, Automate later, Blocked y Not planned].
+- **Automatización:** [Automate now, Automate later, Manual y Blocked].
 
 ## 5. Alcance
 
@@ -103,7 +103,7 @@ Omitir solamente los grupos sin elementos; conservar la sección `Índice de his
 
 Mostrar como máximo diez elementos combinados. Enlazar la página detallada cuando existan más.
 
-## 9. Material de refinamiento
+## 9. Paquete Markdown y materiales
 
 - [Reglas, decisiones y preguntas](url)
 - [Plan funcional de pruebas](url)
@@ -111,8 +111,18 @@ Mostrar como máximo diez elementos combinados. Enlazar la página detallada cua
 - [Pendientes, riesgos y preparación](url)
 - [Handoff DEV](url)
 - [Handoff QA](url)
+- [Abrir Paquete Markdown nativo](url)
+- **Baseline verificado:** [hash]
+- **Snapshot del manifiesto:** [hash]
+- [Historial de sincronización](url)
 
-En una publicación completa, estos seis enlaces son obligatorios cuando sus fuentes canónicas existen. No usar `No aplica` por la simple ausencia previa de una página en Notion.
+La vista colaborativa conserva los seis materiales habituales y ofrece acceso al paquete
+nativo 1:1 y a su auditoría. El manifiesto y baseline conectan esas páginas con el checkout
+Markdown. Cuando el equipo confirme un destino de desarrollo externo, mostrar la línea
+compacta de destino dentro de esta sección reemplazando el enlace genérico por
+`- **Destino de desarrollo:** <nombre> — [Handoff DEV](url)`. Conservar todo el mapping en
+`Handoff DEV`. Si no está confirmado, mantener el enlace genérico; no escribir `No aplica`
+ni crear una sección adicional.
 
 ## 10. Próximo paso
 
@@ -133,6 +143,11 @@ En una publicación completa, estos seis enlaces son obligatorios cuando sus fue
 <page url="URL_DE_NOTION">Pendientes, riesgos y preparación</page>
 <page url="URL_DE_NOTION">Handoff DEV</page>
 <page url="URL_DE_NOTION">Handoff QA</page>
+
+### Paquete y operación
+
+<page url="URL_DE_NOTION">Paquete Markdown</page>
+<page url="URL_DE_NOTION">Historial de sincronización</page>
 
 </details>
 ```
@@ -156,7 +171,9 @@ En una publicación completa, estos seis enlaces son obligatorios cuando sus fue
 - El desplegable existe para preservar la relación padre-hijo en Notion; no es navegación primaria.
 - Mantenerlo cerrado por defecto y después de `## 10. Próximo paso`.
 - Incluir una sola vez cada subpágina real.
-- Agrupar historias y material con subtítulos humanos.
+- Agrupar historias, material y operación con subtítulos humanos.
+- `Paquete Markdown` e `Historial de sincronización` deben aparecer una sola vez bajo
+  `Paquete y operación`; nunca bajo `Material de refinamiento`.
 - Las secciones 7 y 9 conservan los enlaces visibles. El contenedor no debe aparecer como una segunda lista editorial.
 - No mostrar bloques `<page>` fuera de este contenedor.
 
@@ -167,6 +184,8 @@ En una publicación completa, estos seis enlaces son obligatorios cuando sus fue
 - Decisiones críticas: máximo diez; enlazar el catálogo completo.
 - Pendientes y riesgos: máximo diez elementos combinados.
 - Material de refinamiento: enlaces con nombres humanos, no rutas ni siglas solas.
+- Destino de desarrollo: una sola línea en la sección 9 cuando esté confirmado; el detalle
+  permanece en `Handoff DEV`.
 - Índice: agrupar siempre; ordenar según el story map o release slices canónicos.
 - Índice: una línea por historia, sin guiones vacíos ni separación entre elementos consecutivos.
 

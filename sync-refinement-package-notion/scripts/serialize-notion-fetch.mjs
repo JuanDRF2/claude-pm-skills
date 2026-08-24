@@ -2,6 +2,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { verifyMarkdownReadback } from "./markdown-transport.mjs";
 
 const args = process.argv.slice(2);
 const value = (name) => {
@@ -82,11 +83,32 @@ body = body.replace(/<table([^>]*)>([\s\S]*?)<\/table>/gi, (match, attrs, table,
 });
 const sourceLines = body.split("\n").map((line) => line.replace(/[ \t]+$/g, ""));
 const formatted = [];
+let fence = null;
 const blank = () => {
   if (formatted.length && formatted.at(-1) !== "") formatted.push("");
 };
+const fenceMarker = (line) => line.match(/^\s{0,3}(`{3,}|~{3,})/u)?.[1] || null;
+const closesFence = (line, activeFence) => {
+  const marker = line.match(/^\s{0,3}(`{3,}|~{3,})\s*$/u)?.[1] || null;
+  return Boolean(
+    marker &&
+    marker[0] === activeFence.character &&
+    marker.length >= activeFence.length
+  );
+};
 for (let index = 0; index < sourceLines.length; index += 1) {
   const line = sourceLines[index];
+  if (fence) {
+    formatted.push(line);
+    if (closesFence(line, fence)) fence = null;
+    continue;
+  }
+  const marker = fenceMarker(line);
+  if (marker) {
+    fence = { character: marker[0], length: marker.length };
+    formatted.push(line);
+    continue;
+  }
   const previous = sourceLines[index - 1] || "";
   const next = sourceLines[index + 1] || "";
   const heading = /^#{1,6}\s/.test(line);
@@ -100,43 +122,6 @@ for (let index = 0; index < sourceLines.length; index += 1) {
 }
 body = formatted.join("\n");
 body = `${body.replace(/\n*$/g, "")}\n`;
-
-const semantic = (text, manifest = null, unit = null) => {
-  let normalized = text.replace(/\r\n?/g, "\n");
-  normalized = normalized.replace(
-    /<mention-page\s+url="([^"]+)"[^>]*>[\s\S]*?<\/mention-page>/gi,
-    "$1",
-  );
-  if (manifest && unit) {
-    const current = manifest.units.find((item) => item.id === unit);
-    const currentDir = path.posix.dirname(current?.local_path || ".");
-    for (const target of manifest.units || []) {
-      const compact = String(target.notion_page_id || "").replace(/-/g, "");
-      if (!compact || !target.local_path) continue;
-      let relative = path.posix.relative(currentDir, target.local_path);
-      if (!relative.startsWith(".")) relative = `./${relative}`;
-      if (currentDir === ".") relative = relative.replace(/^\.\//, "");
-      normalized = normalized.replace(
-        new RegExp(`https://(?:www\\.)?(?:app\\.)?notion\\.(?:com|so)/p/${compact}`, "gi"),
-        relative,
-      );
-    }
-  }
-  return normalized
-    .replace(/\\\$/g, "$")
-    .replace(/\*{4}(`[^`]+`)\*{4}/g, "$1")
-    .replace(/\[([^\]]+)\]\((https:\/\/[^)]+)\)\[([^\]]+)\]\(\2\)/g, "[$1$3]($2)")
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
-    .replace(/<\/?page>/gi, "")
-    .replace(/[`*_\\]/g, "")
-    .replace(/\|\s*:?-+:?\s*(?=\|)/g, "|---")
-    .split("\n")
-    .map((line) => line.replace(/^\s*(?:#{1,6}|[-+>])\s*/, "").trimEnd())
-    .filter((line) => !/^\|(?:\s*(?:---)?\s*\|)+$/.test(line))
-    .filter((line) => line.trim() !== "")
-    .join("\n")
-    .trim();
-};
 
 let equivalent = null;
 if (baseFile) {
@@ -153,7 +138,7 @@ if (baseFile) {
     manifest = JSON.parse(fs.readFileSync(manifestFile, "utf8"));
   }
   const base = fs.readFileSync(baseFile, "utf8");
-  equivalent = semantic(body, manifest, unitId) === semantic(base, manifest, unitId);
+  equivalent = verifyMarkdownReadback(base, body, { manifest, unitId }).ok;
   if (equivalent) body = `${base.replace(/\r\n?/g, "\n").replace(/\n*$/g, "")}\n`;
 }
 

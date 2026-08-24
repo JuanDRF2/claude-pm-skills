@@ -41,16 +41,29 @@ const fold = (text) =>
 const ids = (body, prefix) =>
   unique([...body.matchAll(new RegExp(`\\b${prefix}-[A-Z0-9]+(?:-[A-Z0-9]+)*\\b`, "g"))].map((m) => m[0]));
 
+const escaped = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const summaryBlock = (lines, index, indent) => {
+  const closing = new RegExp(`^${escaped(indent)}</details>\\s*$`);
+  let end = index + 1;
+  while (end < lines.length && !closing.test(lines[end])) end += 1;
+  return lines.slice(index, Math.min(end + 1, lines.length)).join("\n");
+};
+
 const scenarioBlocks = (body) => {
   const lines = body.split("\n");
   const blocks = new Map();
   for (let index = 0; index < lines.length; index += 1) {
-    const heading = lines[index].match(/^(#{3,6})\s+.*?\b(SC-[A-Z0-9]+(?:-[A-Z0-9]+)*)\b/);
+    const heading = lines[index].match(/^\s*(#{3,6})\s+.*?\b(SC-[A-Z0-9]+(?:-[A-Z0-9]+)*)\b/);
+    const summary = lines[index].match(/^(\s*)<summary>.*?\b(SC-[A-Z0-9]+(?:-[A-Z0-9]+)*)\b.*<\/summary>\s*$/i);
+    if (summary) {
+      blocks.set(summary[2], summaryBlock(lines, index, summary[1]));
+      continue;
+    }
     if (!heading) continue;
     const level = heading[1].length;
     let end = index + 1;
     while (end < lines.length) {
-      const next = lines[end].match(/^(#{1,6})\s+/);
+      const next = lines[end].match(/^\s*(#{1,6})\s+/);
       if (next && next[1].length <= level) break;
       end += 1;
     }
@@ -62,12 +75,17 @@ const acceptanceBlocks = (body) => {
   const lines = body.split("\n");
   const blocks = new Map();
   for (let index = 0; index < lines.length; index += 1) {
-    const heading = lines[index].match(/^(#{2,6})\s+.*?\b(AC-[A-Z0-9]+(?:-[A-Z0-9]+)*)\b/);
+    const heading = lines[index].match(/^\s*(#{2,6})\s+.*?\b(AC-[A-Z0-9]+(?:-[A-Z0-9]+)*)\b/);
+    const summary = lines[index].match(/^(\s*)<summary>.*?\b(AC-[A-Z0-9]+(?:-[A-Z0-9]+)*)\b.*<\/summary>\s*$/i);
+    if (summary) {
+      blocks.set(summary[2], summaryBlock(lines, index, summary[1]));
+      continue;
+    }
     if (!heading) continue;
     const level = heading[1].length;
     let end = index + 1;
     while (end < lines.length) {
-      const next = lines[end].match(/^(#{1,6})\s+/);
+      const next = lines[end].match(/^\s*(#{1,6})\s+/);
       if (next && next[1].length <= level) break;
       end += 1;
     }

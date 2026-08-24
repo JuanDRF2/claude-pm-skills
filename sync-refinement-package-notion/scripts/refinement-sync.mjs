@@ -2,6 +2,31 @@
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
+import {
+  buildPatchPlan,
+  normalizeBuffer,
+  sha256,
+  verifyMarkdownReadback,
+  verifyThreeWayPatch,
+} from "./markdown-transport.mjs";
+
+// Commands may exit immediately after printing large manifests. Synchronously drain the
+// complete buffer because one write to a pipe may stop at its platform buffer size.
+const writeAll = (fd, value) => {
+  const buffer = Buffer.from(value);
+  const retrySignal = new Int32Array(new SharedArrayBuffer(4));
+  let offset = 0;
+  while (offset < buffer.length) {
+    try {
+      offset += fs.writeSync(fd, buffer, offset, buffer.length - offset);
+    } catch (error) {
+      if (error?.code !== "EAGAIN") throw error;
+      Atomics.wait(retrySignal, 0, 0, 1);
+    }
+  }
+};
+console.log = (...values) => writeAll(process.stdout.fd, `${values.join(" ")}\n`);
+console.error = (...values) => writeAll(process.stderr.fd, `${values.join(" ")}\n`);
 
 const cwd = process.cwd();
 const argv = process.argv.slice(2);
@@ -18,7 +43,7 @@ const fail = (message, details = {}) => {
 };
 
 if (!command || !project) {
-  fail("Usage: refinement-sync <discover|register|status|start|publish|reconcile|recover|baseline|audit> <project> [options]");
+  fail("Usage: refinement-sync <discover|register|migrate-checkout-root|status|start|publish|reconcile|recover|baseline|audit> <project> [options]");
 }
 
 const registryPath = path.resolve(
@@ -32,6 +57,22 @@ const portableRelative = (candidate, label) => {
     fail(`${label} must be inside the current workspace`, { path: candidate });
   }
   return relative;
+};
+const canonicalCheckoutRoot = (projectName, packageKind = "project") =>
+  ["shared-contract", "shared-standard"].includes(packageKind)
+    ? `artifacts/_shared/${projectName}`
+    : `artifacts/${projectName}`;
+const normalizeWorkspacePath = (candidate) =>
+  path.relative(cwd, path.resolve(cwd, candidate)).split(path.sep).join("/");
+const isOperationalLocalRoot = (candidate) =>
+  normalizeWorkspacePath(candidate) === "artifacts/_local" ||
+  normalizeWorkspacePath(candidate).startsWith("artifacts/_local/");
+const isCanonicalCheckoutRoot = (candidate, packageKind = "project") => {
+  const relative = normalizeWorkspacePath(candidate);
+  if (!relative.startsWith("artifacts/") || isOperationalLocalRoot(relative)) return false;
+  return ["shared-contract", "shared-standard"].includes(packageKind)
+    ? relative.startsWith("artifacts/_shared/")
+    : !relative.startsWith("artifacts/_shared/");
 };
 const readJson = (file, label) => {
   if (!file || !fs.existsSync(file)) fail(`${label} not found`, { path: file || null });
@@ -54,6 +95,13 @@ const duplicateValues = (values) => {
 if (command === "discover") {
   const treeArg = value("--tree");
   if (!treeArg) fail("--tree is required for discover");
+  const sourceRepository = value("--source-repository");
+  const sourceBranch = value("--source-branch");
+  const sourceCommit = value("--source-commit");
+  const sourceValues = [sourceRepository, sourceBranch, sourceCommit];
+  if (sourceValues.some(Boolean) && !sourceValues.every((item) => typeof item === "string" && item.trim())) {
+    fail("--source-repository, --source-branch and --source-commit must be provided together");
+  }
   const tree = readJson(path.resolve(cwd, treeArg), "Page tree");
   const pages = Array.isArray(tree.pages) ? tree.pages : [];
   const errors = [];
@@ -215,6 +263,14 @@ if (command === "discover") {
     schema_version: 1,
     project,
     package_kind: tree.package_kind || "project",
+    ...(sourceValues.every(Boolean)
+      ? {
+          source_model: "github-main-v1",
+          source_repository: sourceRepository,
+          source_branch: sourceBranch,
+          source_commit: sourceCommit,
+        }
+      : {}),
     notion_parent_page_id: parentId,
     notion_root_page_id: rootId,
     ...(internal ? { notion_internal_container_page_id: internal.id } : {}),
@@ -225,7 +281,7 @@ if (command === "discover") {
     transport_encoding: "notion-inner-markdown-lf-v1",
     state_root: tree.state_root || `artifacts/_local/notion-sync/${project}`,
     checkout_root:
-      tree.checkout_root || `artifacts/_local/notion-checkouts/${project}`,
+      tree.checkout_root || canonicalCheckoutRoot(project, tree.package_kind || "project"),
     discovery: {
       read_at: tree.read_at,
       unclassified_pages: unclassifiedPages,
@@ -320,6 +376,26 @@ if (command === "register") {
     if (typeof candidate[field] !== "string" || !candidate[field].trim()) {
       errors.push(`missing manifest field: ${field}`);
     }
+  }
+  const sourceFields = ["source_repository", "source_branch", "source_commit"];
+  const presentSourceFields = sourceFields.filter(
+    (field) => typeof candidate[field] === "string" && candidate[field].trim(),
+  );
+  if (candidate.source_model !== undefined && candidate.source_model !== "github-main-v1") {
+    errors.push(`unsupported source_model: ${candidate.source_model}`);
+  }
+  if (candidate.source_model === "github-main-v1" || presentSourceFields.length > 0) {
+    if (candidate.source_model !== "github-main-v1") {
+      errors.push("source_model must be github-main-v1 when GitHub source fields are present");
+    }
+    for (const field of sourceFields) {
+      if (typeof candidate[field] !== "string" || !candidate[field].trim()) {
+        errors.push(`missing manifest field: ${field}`);
+      }
+    }
+  }
+  if (candidate.checkout_root && !isCanonicalCheckoutRoot(candidate.checkout_root, candidate.package_kind || "project")) {
+    errors.push("checkout_root must be a canonical artifacts project path outside artifacts/_local");
   }
   const internalContainer = candidate.notion_internal_container_page_id;
   if (
@@ -419,6 +495,14 @@ if (command === "register") {
       : {}),
     notion_package_page_id: candidate.notion_package_page_id,
     audit_log_page_id: candidate.audit_log_page_id,
+    ...(candidate.source_model === "github-main-v1"
+      ? {
+          source_model: candidate.source_model,
+          source_repository: candidate.source_repository,
+          source_branch: candidate.source_branch,
+          source_commit: candidate.source_commit,
+        }
+      : {}),
   };
   const existing = registry.projects[project];
   const identityConflicts = existing
@@ -470,12 +554,37 @@ const stateRoot = path.resolve(cwd, manifest.state_root || entry.state_root);
 const checkoutRoot = path.resolve(cwd, manifest.checkout_root || entry.checkout_root);
 const remoteDir = value("--remote-dir") ? path.resolve(cwd, value("--remote-dir")) : null;
 
-const normalize = (buffer) => {
-  const text = buffer.toString("utf8").replace(/\r\n?/g, "\n");
-  return Buffer.from(`${text.replace(/\n*$/g, "")}\n`);
+const normalize = normalizeBuffer;
+const sha = sha256;
+const fileSha256 = (file) =>
+  crypto.createHash("sha256").update(fs.readFileSync(file)).digest("hex");
+const requirePlanText = (item, field, errors, label) => {
+  if (typeof item?.[field] !== "string" || !item[field].trim()) {
+    errors.push(`${label} must include ${field}`);
+  }
 };
-const sha = (buffer) =>
-  crypto.createHash("sha256").update(normalize(buffer)).digest("hex");
+const validatePlanEntries = ({ entries, label, allowedClassifications, knownIds, errors }) => {
+  if (!Array.isArray(entries)) {
+    errors.push(`${label} must be an array`);
+    return [];
+  }
+  const ids = [];
+  for (const item of entries) {
+    requirePlanText(item, "id", errors, label);
+    requirePlanText(item, "classification", errors, `${label} ${item?.id || "<unknown>"}`);
+    requirePlanText(item, "reason", errors, `${label} ${item?.id || "<unknown>"}`);
+    if (item?.id) ids.push(item.id);
+    if (item?.id && !knownIds.has(item.id)) errors.push(`${label} contains unknown id: ${item.id}`);
+    if (item?.classification && !allowedClassifications.includes(item.classification)) {
+      errors.push(`${label} has unsupported classification for ${item.id}: ${item.classification}`);
+    }
+  }
+  const duplicates = duplicateValues(ids);
+  if (duplicates.length) errors.push(`${label} contains duplicate ids: ${duplicates.join(", ")}`);
+  return ids;
+};
+const verifyReadback = (expected, actual, options = {}) =>
+  verifyMarkdownReadback(expected, actual, { manifest, ...options });
 const read = (file) => (fs.existsSync(file) ? fs.readFileSync(file) : null);
 const write = (file, body) => {
   fs.mkdirSync(path.dirname(file), { recursive: true });
@@ -495,7 +604,130 @@ const base = fs.existsSync(baseFile)
   ? JSON.parse(fs.readFileSync(baseFile, "utf8"))
   : { units: [] };
 const baseMap = new Map((base.units || []).map((unit) => [unit.id, unit.sha256]));
+const baseSourceMap = new Map(
+  (base.units || []).map((unit) => [unit.id, unit.source_sha256 || null]),
+);
 const stamp = () => new Date().toISOString().replace(/[:.]/g, "-");
+
+const actualCheckoutRootRelative = normalizeWorkspacePath(checkoutRoot);
+const configuredCanonicalRoot = manifest.canonical_checkout_root || entry.canonical_checkout_root;
+const expectedCheckoutRootRelative = configuredCanonicalRoot
+  ? normalizeWorkspacePath(configuredCanonicalRoot)
+  : isCanonicalCheckoutRoot(actualCheckoutRootRelative, manifest.package_kind || "project")
+    ? actualCheckoutRootRelative
+    : canonicalCheckoutRoot(project, manifest.package_kind || "project");
+
+if (command === "migrate-checkout-root") {
+  const targetRelative = value("--target")
+    ? portableRelative(value("--target"), "Migration target")
+    : expectedCheckoutRootRelative;
+  if (!isCanonicalCheckoutRoot(targetRelative, manifest.package_kind || "project")) {
+    fail("Migration target must be a canonical artifacts project path outside artifacts/_local", {
+      received: targetRelative,
+      package_kind: manifest.package_kind || "project",
+    });
+  }
+  if (configuredCanonicalRoot && normalizeWorkspacePath(targetRelative) !== expectedCheckoutRootRelative) {
+    fail("Migration target differs from the configured canonical root", {
+      expected: expectedCheckoutRootRelative,
+      received: targetRelative,
+    });
+  }
+  if (!isOperationalLocalRoot(actualCheckoutRootRelative)) {
+    fail("Registered checkout_root is not a legacy operational root", {
+      checkout_root: actualCheckoutRootRelative,
+      expected: expectedCheckoutRootRelative,
+    });
+  }
+  const targetRoot = path.resolve(cwd, targetRelative);
+  const migrationRows = manifest.units.map((unit) => {
+    const legacyBody = read(unitPath(checkoutRoot, unit));
+    const targetBody = read(unitPath(targetRoot, unit));
+    const baseSha = baseMap.get(unit.id) || unit.sha256 || null;
+    const sourceSha = baseSourceMap.get(unit.id) || unit.source_sha256 || baseSha;
+    const legacySha = legacyBody ? sha(legacyBody) : null;
+    const targetSha = targetBody ? sha(targetBody) : null;
+    let state;
+    if (!targetBody) state = "target_missing";
+    else if (!legacyBody && sourceSha && targetSha === sourceSha) state = "target_only";
+    else if (!legacyBody && !sourceSha) state = "target_only_unverified";
+    else if (!legacyBody) state = "target_only_changed";
+    else if (legacySha === targetSha) state = "aligned";
+    else if (baseSha && sourceSha && legacySha === baseSha && targetSha === sourceSha) {
+      state = "aligned_dual_representation";
+    }
+    else if (baseSha && legacySha === baseSha && targetSha !== baseSha) state = "target_changed";
+    else if (baseSha && targetSha === baseSha && legacySha !== baseSha) state = "legacy_only_change";
+    else state = "diverged";
+    return {
+      id: unit.id,
+      local_path: unit.local_path,
+      base_sha256: baseSha,
+      base_source_sha256: sourceSha,
+      legacy_sha256: legacySha,
+      target_sha256: targetSha,
+      state,
+      blocking: [
+        "target_missing",
+        "target_only_unverified",
+        "target_only_changed",
+        "legacy_only_change",
+        "diverged",
+      ].includes(state),
+    };
+  });
+  const blockers = migrationRows.filter((row) => row.blocking);
+  const result = {
+    ok: blockers.length === 0,
+    operation: flag("--apply")
+      ? "migrate-checkout-root-apply"
+      : "migrate-checkout-root-preview",
+    project,
+    legacy_checkout_root: actualCheckoutRootRelative,
+    canonical_checkout_root: normalizeWorkspacePath(targetRelative),
+    rows: migrationRows,
+    blockers,
+    notion_write: false,
+  };
+  if (flag("--preview")) {
+    console.log(JSON.stringify(result, null, 2));
+    process.exit(blockers.length ? 2 : 0);
+  }
+  if (flag("--apply")) {
+    if (blockers.length) fail("Checkout-root migration requires reconciliation", result);
+    if (!flag("--ack-canonical-root") || !value("--reason")) {
+      fail("--ack-canonical-root and --reason are required");
+    }
+    const backupRoot = path.join(stateRoot, "checkout-root-migrations", stamp());
+    write(path.join(backupRoot, "manifest.json"), Buffer.from(`${JSON.stringify(manifest, null, 2)}\n`));
+    write(path.join(backupRoot, "projects.json"), Buffer.from(`${JSON.stringify(registry, null, 2)}\n`));
+    manifest.checkout_root = normalizeWorkspacePath(targetRelative);
+    manifest.canonical_checkout_root = normalizeWorkspacePath(targetRelative);
+    manifest.checkout_root_migrated_at = new Date().toISOString();
+    manifest.checkout_root_migration_reason = value("--reason");
+    registry.projects[project] = {
+      ...entry,
+      checkout_root: normalizeWorkspacePath(targetRelative),
+      canonical_checkout_root: normalizeWorkspacePath(targetRelative),
+    };
+    write(manifestPath, Buffer.from(`${JSON.stringify(manifest, null, 2)}\n`));
+    write(registryPath, Buffer.from(`${JSON.stringify(registry, null, 2)}\n`));
+    console.log(JSON.stringify({ ...result, ok: true, backup: backupRoot }, null, 2));
+    process.exit(0);
+  }
+  fail("Use migrate-checkout-root --preview or --apply");
+}
+
+if (
+  !isCanonicalCheckoutRoot(actualCheckoutRootRelative, manifest.package_kind || "project") ||
+  actualCheckoutRootRelative !== expectedCheckoutRootRelative
+) {
+  fail("Registered checkout_root is not the canonical project package", {
+    checkout_root: actualCheckoutRootRelative,
+    expected_checkout_root: expectedCheckoutRootRelative,
+    next_action: `refinement-sync migrate-checkout-root ${project} --preview`,
+  });
+}
 
 function recommendWriteStrategy(remote, local) {
   if (!remote || !local) return null;
@@ -517,14 +749,27 @@ function recommendWriteStrategy(remote, local) {
   const changeRatio = after.length ? changedBytes / after.length : 1;
   const largePage = after.length >= 100_000;
   const localized = changeRatio <= 0.2;
+  const candidate = largePage || localized ? buildPatchPlan(remote, local) : null;
+  const writeMode = candidate?.strategy === "patch" ? "patch" : "replace";
   return {
-    recommended_write_mode: largePage || localized ? "patch" : "replace",
+    recommended_write_mode: writeMode,
     final_bytes: Buffer.byteLength(after),
     estimated_changed_bytes: Buffer.byteLength(after.slice(prefix, after.length - suffix)),
     estimated_change_ratio: Number(changeRatio.toFixed(4)),
-    reason: largePage ? "large-page" : localized ? "localized-delta" : "broad-delta",
+    reason: candidate?.reason || (largePage ? "large-page" : localized ? "localized-delta" : "broad-delta"),
+    patch_plan: writeMode === "patch" ? candidate : null,
+    fallback_write_mode: writeMode === "patch" ? "replace" : null,
     verification: "full-unit-readback-required",
   };
+}
+
+function hydrateWriteStrategy(row) {
+  const unit = manifest.units.find((item) => item.id === row.id);
+  if (!unit) return row;
+  const remote = read(unitPath(remoteDir, unit));
+  const local = read(unitPath(checkoutRoot, unit));
+  const strategy = recommendWriteStrategy(remote, local);
+  return strategy ? { ...row, ...strategy } : row;
 }
 
 function inspect() {
@@ -533,9 +778,15 @@ function inspect() {
     const local = read(unitPath(checkoutRoot, unit));
     const remote = read(unitPath(remoteDir, unit));
     const baseSha = baseMap.get(unit.id) || unit.sha256;
+    const baseSourceSha =
+      baseSourceMap.get(unit.id) || unit.source_sha256 || baseSha;
     const localSha = local && sha(local);
     const remoteSha = remote && sha(remote);
-    const localChanged = !!localSha && localSha !== baseSha;
+    // The editable Markdown and Notion's native readback are two representations
+    // of the same unit. During legacy migrations some canonical files may already
+    // contain the transport representation, so either verified baseline is safe.
+    const localChanged =
+      !!localSha && localSha !== baseSourceSha && localSha !== baseSha;
     const remoteChanged = !!remoteSha && remoteSha !== baseSha;
     let state = "unchanged";
     if (!local) state = "local_missing";
@@ -550,6 +801,7 @@ function inspect() {
       role: unit.role,
       local_path: unit.local_path,
       base_sha256: baseSha,
+      base_source_sha256: baseSourceSha,
       local_sha256: localSha || null,
       remote_sha256: remoteSha || null,
       state,
@@ -584,6 +836,197 @@ function inspect() {
   };
 }
 
+function loadWritePlan(report) {
+  const planArg = value("--write-plan");
+  const allLocalChanges = flag("--all-local-changes");
+  if (planArg && allLocalChanges) {
+    fail("--write-plan and --all-local-changes are mutually exclusive");
+  }
+  const changed = report.rows.filter((item) => item.state === "local_changed");
+  if (!planArg) {
+    if (!allLocalChanges) {
+      fail("Publish scope approval is required", {
+        next_action: "Provide --write-plan <plan.json> or explicitly use --all-local-changes",
+        detected_local_changes: changed,
+      });
+    }
+    return {
+      mode: "all-local-changes",
+      file: null,
+      sha256: null,
+      units: changed,
+      excluded: [],
+    };
+  }
+
+  const planRelative = portableRelative(planArg, "Write plan");
+  const planPath = path.resolve(cwd, planRelative);
+  const plan = readJson(planPath, "Write plan");
+  const errors = [];
+  if (plan.schema_version !== 1) errors.push("write plan schema_version must be 1");
+  if (plan.project !== project) errors.push(`write plan project must be ${project}`);
+  if (plan.base_snapshot !== manifest.snapshot) {
+    errors.push("write plan base_snapshot does not match the current manifest snapshot");
+  }
+  const changedById = new Map(changed.map((item) => [item.id, item]));
+  const knownIds = new Set(manifest.units.map((item) => item.id));
+  const selectedIds = validatePlanEntries({
+    entries: plan.units,
+    label: "write plan units",
+    allowedClassifications: ["approved_scope", "required_derivative"],
+    knownIds,
+    errors,
+  });
+  const excludedIds = validatePlanEntries({
+    entries: plan.excluded_units,
+    label: "write plan excluded_units",
+    allowedClassifications: ["historical_out_of_scope", "deferred", "rejected"],
+    knownIds,
+    errors,
+  });
+  const overlap = selectedIds.filter((id) => excludedIds.includes(id));
+  if (overlap.length) errors.push(`write plan ids cannot be selected and excluded: ${overlap.join(", ")}`);
+  const classifiedIds = new Set([...selectedIds, ...excludedIds]);
+  const unclassified = changed.filter((item) => !classifiedIds.has(item.id)).map((item) => item.id);
+  if (unclassified.length) {
+    errors.push(`write plan leaves local changes unclassified: ${unclassified.join(", ")}`);
+  }
+  const staleIds = [...classifiedIds].filter((id) => !changedById.has(id));
+  if (staleIds.length) errors.push(`write plan includes units that are not local_changed: ${staleIds.join(", ")}`);
+
+  const validateHashes = (entries, label) => {
+    for (const item of entries || []) {
+      const current = changedById.get(item.id);
+      if (!current) continue;
+      if (item.local_sha256 !== current.local_sha256) {
+        errors.push(`${label} local_sha256 is stale for ${item.id}`);
+      }
+      if (item.remote_sha256 !== current.remote_sha256) {
+        errors.push(`${label} remote_sha256 is stale for ${item.id}`);
+      }
+    }
+  };
+  validateHashes(plan.units, "write plan units");
+  validateHashes(plan.excluded_units, "write plan excluded_units");
+  if (errors.length) {
+    fail("Write plan validation failed", {
+      errors,
+      plan: planPath,
+      detected_local_changes: changed.map((item) => item.id),
+    });
+  }
+
+  const selectedById = new Map(plan.units.map((item) => [item.id, item]));
+  const excludedById = new Map(plan.excluded_units.map((item) => [item.id, item]));
+  return {
+    mode: "approved-plan",
+    file: planRelative,
+    sha256: fileSha256(planPath),
+    units: changed
+      .filter((item) => selectedById.has(item.id))
+      .map((item) => ({
+        ...item,
+        scope_classification: selectedById.get(item.id).classification,
+        scope_reason: selectedById.get(item.id).reason,
+      })),
+    excluded: changed
+      .filter((item) => excludedById.has(item.id))
+      .map((item) => ({
+        ...item,
+        scope_classification: excludedById.get(item.id).classification,
+        scope_reason: excludedById.get(item.id).reason,
+      })),
+  };
+}
+
+function loadPresentationPlan(report) {
+  const planArg = value("--presentation-plan");
+  const candidates = report.presentations.filter((item) =>
+    ["presentation_drift", "unbaselined"].includes(item.state),
+  );
+  if (!candidates.length && !planArg) {
+    return { file: null, sha256: null, selected: [], excluded: [] };
+  }
+  if (!planArg) {
+    fail("Presentation baseline plan is required", {
+      next_action: "Classify every candidate and provide --presentation-plan <plan.json>",
+      presentation_candidates: candidates,
+    });
+  }
+
+  const planRelative = portableRelative(planArg, "Presentation plan");
+  const planPath = path.resolve(cwd, planRelative);
+  const plan = readJson(planPath, "Presentation plan");
+  const errors = [];
+  if (plan.schema_version !== 1) errors.push("presentation plan schema_version must be 1");
+  if (plan.project !== project) errors.push(`presentation plan project must be ${project}`);
+  if (plan.base_snapshot !== manifest.snapshot) {
+    errors.push("presentation plan base_snapshot does not match the current manifest snapshot");
+  }
+  const candidateById = new Map(candidates.map((item) => [item.id, item]));
+  const knownIds = new Set(candidates.map((item) => item.id));
+  const selectedIds = validatePlanEntries({
+    entries: plan.presentations,
+    label: "presentation plan presentations",
+    allowedClassifications: ["equivalent"],
+    knownIds,
+    errors,
+  });
+  const excludedIds = validatePlanEntries({
+    entries: plan.excluded_presentations,
+    label: "presentation plan excluded_presentations",
+    allowedClassifications: ["real_difference", "blocked", "deferred"],
+    knownIds,
+    errors,
+  });
+  const overlap = selectedIds.filter((id) => excludedIds.includes(id));
+  if (overlap.length) {
+    errors.push(`presentation ids cannot be selected and excluded: ${overlap.join(", ")}`);
+  }
+  const classifiedIds = new Set([...selectedIds, ...excludedIds]);
+  const unclassified = candidates.filter((item) => !classifiedIds.has(item.id)).map((item) => item.id);
+  if (unclassified.length) {
+    errors.push(`presentation plan leaves candidates unclassified: ${unclassified.join(", ")}`);
+  }
+
+  const validateHashes = (entries, label) => {
+    for (const item of entries || []) {
+      const current = candidateById.get(item.id);
+      if (!current) continue;
+      if (item.remote_sha256 !== current.remote_sha256) {
+        errors.push(`${label} remote_sha256 is stale for ${item.id}`);
+      }
+      if (!Object.prototype.hasOwnProperty.call(item, "base_sha256")) {
+        errors.push(`${label} must include base_sha256 for ${item.id}`);
+      } else if (item.base_sha256 !== current.base_sha256) {
+        errors.push(`${label} base_sha256 is stale for ${item.id}`);
+      }
+    }
+  };
+  validateHashes(plan.presentations, "presentation plan presentations");
+  validateHashes(plan.excluded_presentations, "presentation plan excluded_presentations");
+  if (errors.length) {
+    fail("Presentation plan validation failed", {
+      errors,
+      plan: planPath,
+      presentation_candidates: candidates.map((item) => item.id),
+    });
+  }
+
+  const selectedById = new Map(plan.presentations.map((item) => [item.id, item]));
+  const excludedById = new Map(plan.excluded_presentations.map((item) => [item.id, item]));
+  return {
+    file: planRelative,
+    sha256: fileSha256(planPath),
+    selected: candidates
+      .filter((item) => selectedById.has(item.id))
+      .map((item) => ({ ...item, ...selectedById.get(item.id) })),
+    excluded: candidates
+      .filter((item) => excludedById.has(item.id))
+      .map((item) => ({ ...item, ...excludedById.get(item.id) })),
+  };
+}
+
 function snapshot(units) {
   return crypto
     .createHash("sha256")
@@ -591,11 +1034,21 @@ function snapshot(units) {
     .digest("hex");
 }
 
-function updateBase(sourceRoot) {
+function updateBase(sourceRoot, options = {}) {
+  const preserveSourceIds = options.preserveSourceIds || new Set();
   const units = manifest.units.map((unit) => {
     const body = read(unitPath(sourceRoot, unit));
     if (!body) fail("Missing verified unit", { id: unit.id });
-    return { ...unit, sha256: sha(body), bytes: normalize(body).length };
+    const local = read(unitPath(checkoutRoot, unit));
+    if (!local) fail("Missing canonical source unit", { id: unit.id });
+    const priorSourceSha =
+      baseSourceMap.get(unit.id) || unit.source_sha256 || baseMap.get(unit.id) || unit.sha256;
+    return {
+      ...unit,
+      source_sha256: preserveSourceIds.has(unit.id) ? priorSourceSha : sha(local),
+      sha256: sha(body),
+      bytes: normalize(body).length,
+    };
   });
   const nextSnapshot = snapshot(units);
   write(
@@ -611,98 +1064,46 @@ function updateBase(sourceRoot) {
   return nextSnapshot;
 }
 
-function crc32(buffer) {
-  let crc = 0xffffffff;
-  for (const byte of buffer) {
-    crc ^= byte;
-    for (let bit = 0; bit < 8; bit += 1) {
-      crc = (crc >>> 1) ^ (0xedb88320 & -(crc & 1));
-    }
-  }
-  return (crc ^ 0xffffffff) >>> 0;
-}
-
-function createZip(entries) {
-  const localParts = [];
-  const centralParts = [];
-  let offset = 0;
-  for (const entry of entries) {
-    const name = Buffer.from(entry.name.replaceAll(path.sep, "/"));
-    const body = entry.body;
-    const crc = crc32(body);
-    const local = Buffer.alloc(30);
-    local.writeUInt32LE(0x04034b50, 0);
-    local.writeUInt16LE(20, 4);
-    local.writeUInt16LE(0x0800, 6);
-    local.writeUInt16LE(0, 8);
-    local.writeUInt32LE(crc, 14);
-    local.writeUInt32LE(body.length, 18);
-    local.writeUInt32LE(body.length, 22);
-    local.writeUInt16LE(name.length, 26);
-    localParts.push(local, name, body);
-
-    const central = Buffer.alloc(46);
-    central.writeUInt32LE(0x02014b50, 0);
-    central.writeUInt16LE(20, 4);
-    central.writeUInt16LE(20, 6);
-    central.writeUInt16LE(0x0800, 8);
-    central.writeUInt16LE(0, 10);
-    central.writeUInt32LE(crc, 16);
-    central.writeUInt32LE(body.length, 20);
-    central.writeUInt32LE(body.length, 24);
-    central.writeUInt16LE(name.length, 28);
-    central.writeUInt32LE(offset, 42);
-    centralParts.push(central, name);
-    offset += local.length + name.length + body.length;
-  }
-  const centralBody = Buffer.concat(centralParts);
-  const end = Buffer.alloc(22);
-  end.writeUInt32LE(0x06054b50, 0);
-  end.writeUInt16LE(entries.length, 8);
-  end.writeUInt16LE(entries.length, 10);
-  end.writeUInt32LE(centralBody.length, 12);
-  end.writeUInt32LE(offset, 16);
-  return Buffer.concat([...localParts, centralBody, end]);
-}
-
-function exportCheckout() {
-  const exportStamp = stamp();
-  const exportRoot = path.join(stateRoot, "exports");
-  const entries = manifest.units.map((unit) => {
-    const body = read(unitPath(checkoutRoot, unit));
-    if (!body) fail("Cannot export missing checkout unit", { id: unit.id });
-    return { id: unit.id, role: unit.role, name: safeRel(unit.local_path), body: normalize(body) };
+function updateTransportBaseline(sourceRoot, reason) {
+  const units = manifest.units.map((unit) => {
+    const remote = read(unitPath(sourceRoot, unit));
+    const local = read(unitPath(checkoutRoot, unit));
+    if (!remote) fail("Missing remote transport unit", { id: unit.id });
+    if (!local) fail("Missing canonical source unit", { id: unit.id });
+    const priorTransportSha = baseMap.get(unit.id) || unit.sha256 || null;
+    const priorSourceSha =
+      baseSourceMap.get(unit.id) || unit.source_sha256 || priorTransportSha;
+    const localSha = sha(local);
+    // Repair checkouts that were previously overwritten with a verified Notion
+    // readback, but never absorb a genuine local edit into the source baseline.
+    const nextSourceSha =
+      priorTransportSha && localSha === priorTransportSha
+        ? localSha
+        : priorSourceSha;
+    const normalized = normalize(remote);
+    write(unitPath(path.join(stateRoot, "base"), unit), normalized);
+    write(unitPath(path.join(stateRoot, "remote-readback"), unit), normalized);
+    return {
+      ...unit,
+      source_sha256: nextSourceSha,
+      sha256: sha(remote),
+      bytes: normalized.length,
+    };
   });
-  const zipPath = path.join(exportRoot, `${project}-${exportStamp}.zip`);
-  const exportManifestPath = path.join(
-    exportRoot,
-    `${project}-${exportStamp}.manifest.json`,
-  );
-  write(zipPath, createZip(entries));
+  const nextSnapshot = snapshot(units);
   write(
-    exportManifestPath,
+    baseFile,
     Buffer.from(
-      `${JSON.stringify(
-        {
-          schema_version: 1,
-          project,
-          snapshot: manifest.snapshot,
-          transport_encoding: "notion-inner-markdown-lf-v1",
-          zip_sha256: crypto.createHash("sha256").update(read(zipPath)).digest("hex"),
-          files: entries.map((item) => ({
-            id: item.id,
-            role: item.role,
-            path: item.name,
-            bytes: item.body.length,
-            sha256: sha(item.body),
-          })),
-        },
-        null,
-        2,
-      )}\n`,
+      `${JSON.stringify({ schema_version: 1, project, snapshot: nextSnapshot, units }, null, 2)}\n`,
     ),
   );
-  return { zip: zipPath, manifest: exportManifestPath };
+  manifest.snapshot = nextSnapshot;
+  manifest.units = units;
+  manifest.transport_baseline_at = new Date().toISOString();
+  manifest.transport_baseline_reason = reason;
+  manifest.transport_encoding = "notion-inner-markdown-lf-v1";
+  write(manifestPath, Buffer.from(`${JSON.stringify(manifest, null, 2)}\n`));
+  return nextSnapshot;
 }
 
 function auditIdentity() {
@@ -722,7 +1123,7 @@ function auditIdentity() {
   return audit;
 }
 
-function prepareAuditEvent(operation, writeSet, finalSnapshot, outbox) {
+function prepareAuditEvent(operation, writeSet, finalSnapshot, outbox, readbackVerification) {
   if (!manifest.audit_log_page_id) return null;
   if (!writeSet.audit) fail("Verified operation is missing audit identity");
   const eventId = stamp();
@@ -740,13 +1141,12 @@ function prepareAuditEvent(operation, writeSet, finalSnapshot, outbox) {
   )];
   const storyAggregateChanged = affected.some((item) => item.local_path === "05-user-stories.md");
   const editorialVerificationRequired = expectedEditorialStories.length > 0 || storyAggregateChanged;
+  const title = `${new Date().toISOString().slice(0, 10)} · ${operation} verificada`;
   const event = {
-    schema_version: 1,
+    schema_version: 2,
     event_id: eventId,
     project,
-    audit_status: editorialVerificationRequired
-      ? "pending_editorial_verification"
-      : "pending_notion_entry",
+    audit_status: "pending_post_publication_verification",
     audit_log_page_id: manifest.audit_log_page_id,
     operation,
     ...writeSet.audit,
@@ -756,12 +1156,20 @@ function prepareAuditEvent(operation, writeSet, finalSnapshot, outbox) {
     editorial_verification_required: editorialVerificationRequired,
     expected_editorial_stories: expectedEditorialStories,
     editorial_scope_unresolved: storyAggregateChanged && expectedEditorialStories.length === 0,
+    presentation_verification_required: true,
+    post_publication_judge_required: true,
     readback: {
       pages_expected: affected.length,
       pages_verified: affected.length,
       mismatches: 0,
+      verification: readbackVerification,
     },
     outbox: path.relative(cwd, outbox),
+    audit_entry: {
+      parent_page_id: manifest.audit_log_page_id,
+      title,
+      payload_path: path.relative(cwd, markdownPath),
+    },
   };
   write(eventPath, Buffer.from(`${JSON.stringify(event, null, 2)}\n`));
   const markdown = `## Responsables
@@ -796,7 +1204,7 @@ ${affected.map((item) => `- ${item.local_path}`).join("\n") || "- Ninguna"}
     event: eventPath,
     markdown: markdownPath,
     parent_page_id: manifest.audit_log_page_id,
-    title: `${new Date().toISOString().slice(0, 10)} · ${operation} verificada`,
+    title,
   };
 }
 
@@ -805,42 +1213,87 @@ function verifyOutbox(operation) {
   const outboxArg = value("--outbox");
   if (!outboxArg) fail("--outbox is required for --verify");
   const outbox = path.resolve(cwd, outboxArg);
-  const mismatches = [];
-  for (const unit of manifest.units) {
-    const expected = read(unitPath(outbox, unit));
-    if (!expected) continue;
-    const actual = read(unitPath(remoteDir, unit));
-    if (!actual || sha(expected) !== sha(actual)) mismatches.push(unit.id);
+  const writeSetPath = path.join(outbox, "write-set.json");
+  if (!fs.existsSync(writeSetPath)) fail("Verified outbox is missing write-set.json", { outbox });
+  const writeSet = JSON.parse(fs.readFileSync(writeSetPath, "utf8"));
+  const backupRoot = writeSet.backup ? path.resolve(cwd, writeSet.backup) : null;
+  const writeRows = new Map((writeSet.units || []).map((item) => [item.id, item]));
+  const expectedIds = new Set((writeSet.units || []).map((item) => item.id));
+  const excludedSourceIds = new Set((writeSet.excluded_units || []).map((item) => item.id));
+  const manifestIds = new Set(manifest.units.map((unit) => unit.id));
+  const unknownIds = [...expectedIds].filter((id) => !manifestIds.has(id));
+  const unknownExcludedIds = [...excludedSourceIds].filter((id) => !manifestIds.has(id));
+  const overlappingIds = [...expectedIds].filter((id) => excludedSourceIds.has(id));
+  if (unknownIds.length || unknownExcludedIds.length || overlappingIds.length) {
+    fail("Verified outbox contains an invalid scope", {
+      unknown_units: unknownIds,
+      unknown_excluded_units: unknownExcludedIds,
+      overlapping_units: overlappingIds,
+    });
   }
-  if (mismatches.length) fail("Readback mismatch", { mismatches });
+  const mismatches = [];
+  const readbackVerification = [];
+  for (const unit of manifest.units) {
+    const actual = read(unitPath(remoteDir, unit));
+    let verification;
+    if (expectedIds.has(unit.id)) {
+      const expected = read(unitPath(outbox, unit));
+      const row = writeRows.get(unit.id);
+      const prior = backupRoot ? read(unitPath(backupRoot, unit)) : null;
+      verification = expected
+        ? row?.recommended_write_mode === "patch" && prior
+          ? verifyThreeWayPatch({
+            base: prior,
+            target: expected,
+            actual,
+            options: { manifest, unitId: unit.id },
+          })
+          : verifyReadback(expected, actual, { unitId: unit.id })
+        : { ok: false, mode: "missing-outbox-unit" };
+    } else {
+      const baseSha = baseMap.get(unit.id) || unit.sha256 || null;
+      verification = !actual
+        ? { ok: false, mode: "missing" }
+        : !baseSha
+          ? { ok: false, mode: "unverified-preserved-unit" }
+          : sha(actual) === baseSha
+            ? { ok: true, mode: "preserved" }
+            : { ok: false, mode: "unexpected-preserved-change" };
+    }
+    readbackVerification.push({
+      id: unit.id,
+      mode: verification.mode,
+      equivalence_mode: verification.equivalence_mode || null,
+      unexpected_functional_change: verification.unexpected_functional_change ?? false,
+    });
+    if (!verification.ok) mismatches.push(unit.id);
+  }
+  if (mismatches.length) {
+    fail("Readback mismatch", { mismatches, verification: readbackVerification });
+  }
   for (const unit of manifest.units) {
     const body = read(unitPath(remoteDir, unit));
     if (!body) fail("Readback is incomplete", { id: unit.id });
     const normalized = normalize(body);
-    write(unitPath(checkoutRoot, unit), normalized);
     write(unitPath(path.join(stateRoot, "base"), unit), normalized);
     write(unitPath(path.join(stateRoot, "remote-readback"), unit), normalized);
   }
-  const finalSnapshot = updateBase(remoteDir);
-  const writeSetPath = path.join(outbox, "write-set.json");
-  const writeSet = fs.existsSync(writeSetPath)
-    ? JSON.parse(fs.readFileSync(writeSetPath, "utf8"))
-    : {};
-  const exported = exportCheckout();
+  const finalSnapshot = updateBase(remoteDir, { preserveSourceIds: excludedSourceIds });
   const auditEvent = prepareAuditEvent(
     operation,
     writeSet,
     finalSnapshot,
     outbox,
+    readbackVerification,
   );
-  return { outbox, finalSnapshot, exported, auditEvent };
+  return { outbox, finalSnapshot, auditEvent, readbackVerification };
 }
 
 if (command === "audit") {
   if (!flag("--complete")) fail("Use audit --complete");
   const eventArg = value("--event");
-  const entryPageId = value("--entry-page-id");
-  if (!eventArg || !entryPageId) fail("--event and --entry-page-id are required");
+  const entryReceiptArg = value("--entry-receipt");
+  if (!eventArg || !entryReceiptArg) fail("--event and --entry-receipt are required");
   const eventPath = path.resolve(cwd, eventArg);
   const event = JSON.parse(fs.readFileSync(eventPath, "utf8"));
   const markdownPath = eventPath.replace(/\.json$/i, ".md");
@@ -851,6 +1304,57 @@ if (command === "audit") {
   if (missingAuditSections.length || /^\s*\{/u.test(auditMarkdown)) {
     fail("Audit Markdown failed preflight", { path: markdownPath, missing: missingAuditSections });
   }
+  const entryReceiptPath = path.resolve(cwd, entryReceiptArg);
+  const entryReceipt = readJson(entryReceiptPath, "Audit entry readback receipt");
+  const expectedEntry = event.audit_entry || {};
+  const expectedPayloadSha = crypto.createHash("sha256").update(fs.readFileSync(markdownPath)).digest("hex");
+  const readbackPath = entryReceipt.readback_path
+    ? path.resolve(cwd, entryReceipt.readback_path)
+    : null;
+  const entryReceiptErrors = [];
+  if (entryReceipt.parent_page_id !== expectedEntry.parent_page_id) entryReceiptErrors.push("parent_page_id mismatch");
+  if (entryReceipt.title !== expectedEntry.title) entryReceiptErrors.push("title mismatch");
+  if (entryReceipt.payload_sha256 !== expectedPayloadSha) entryReceiptErrors.push("payload_sha256 mismatch");
+  if (!entryReceipt.entry_page_id) entryReceiptErrors.push("entry_page_id missing");
+  if (entryReceipt.duplicate_count !== 0) entryReceiptErrors.push("duplicate_count must be 0");
+  if (!entryReceipt.checked_at) entryReceiptErrors.push("checked_at missing");
+  if (!readbackPath || !fs.existsSync(readbackPath)) entryReceiptErrors.push("readback_path missing");
+  else {
+    const actualReadbackSha = crypto.createHash("sha256").update(fs.readFileSync(readbackPath)).digest("hex");
+    if (entryReceipt.readback_sha256 !== actualReadbackSha) entryReceiptErrors.push("readback_sha256 mismatch");
+    if (!verifyReadback(fs.readFileSync(markdownPath), fs.readFileSync(readbackPath)).ok) {
+      entryReceiptErrors.push("audit readback is not equivalent to payload");
+    }
+  }
+  if (entryReceiptErrors.length) fail("Audit entry readback receipt failed", { errors: entryReceiptErrors });
+  event.audit_entry_receipt = {
+    path: path.relative(cwd, entryReceiptPath),
+    sha256: crypto.createHash("sha256").update(fs.readFileSync(entryReceiptPath)).digest("hex"),
+    entry_page_id: entryReceipt.entry_page_id,
+    readback_sha256: entryReceipt.readback_sha256,
+    duplicate_count: entryReceipt.duplicate_count,
+    checked_at: entryReceipt.checked_at,
+  };
+  const presentationReceiptArg = value("--presentation-receipt");
+  if (!presentationReceiptArg) fail("--presentation-receipt is required");
+  const presentationReceiptPath = path.resolve(cwd, presentationReceiptArg);
+  const presentationReceipt = readJson(presentationReceiptPath, "Presentation parity receipt");
+  if (
+    presentationReceipt.ok !== true ||
+    presentationReceipt.project !== project ||
+    presentationReceipt.final_snapshot !== event.final_snapshot ||
+    presentationReceipt.presentations_expected !== presentationReceipt.presentations_verified
+  ) {
+    fail("Presentation parity receipt failed", { path: presentationReceiptPath });
+  }
+  event.presentation_verification = {
+    receipt: path.relative(cwd, presentationReceiptPath),
+    sha256: crypto.createHash("sha256").update(fs.readFileSync(presentationReceiptPath)).digest("hex"),
+    checked_at: presentationReceipt.checked_at || null,
+    expected: presentationReceipt.presentations_expected,
+    verified: presentationReceipt.presentations_verified,
+    by_type: presentationReceipt.by_type || {},
+  };
   if (event.editorial_verification_required) {
     if (event.editorial_scope_unresolved) {
       fail("Editorial scope is unresolved; regenerate affected jira views before audit completion");
@@ -877,57 +1381,111 @@ if (command === "audit") {
       checked_at: editorialReceipt.checked_at || null,
       stories_verified: [...verifiedStories],
     };
-    const judgeReportArg = value("--judge-report");
-    if (!judgeReportArg) fail("--judge-report is required after editorial verification");
-    const judgeReportPath = path.resolve(cwd, judgeReportArg);
-    if (!fs.existsSync(judgeReportPath)) fail("Post-publication Judge report is missing", { path: judgeReportPath });
-    const judgeReport = fs.readFileSync(judgeReportPath, "utf8");
-    const verdictMatch = judgeReport.match(
-      /(?:Verdict|Veredicto)\s*:\s*(PASS WITH OBSERVATIONS|PASS CON OBSERVACIONES|PASS|FAIL)\b/i,
-    );
-    const snapshotMatch = judgeReport.match(
-      /(?:Reviewed snapshot SHA-256|Snapshot revisado SHA-256)\s*:\s*`?([a-f0-9]{64})`?/i,
-    );
-    const actionMatch = judgeReport.match(
-      /(?:Intended action|Acci[oó]n evaluada)\s*:[^\n]*(?:Notion|paridad|publication|publicaci[oó]n)/i,
-    );
-    const allowedVerdicts = new Set(["PASS", "PASS WITH OBSERVATIONS", "PASS CON OBSERVACIONES"]);
-    const verdict = verdictMatch?.[1]?.toUpperCase() || null;
-    const overrideMatch = judgeReport.match(/(?:Human override|Excepci[oó]n humana)\s*:\s*([^\n]+)/i);
-    const overrideText = overrideMatch?.[1]?.trim() || "";
-    const validOverride = flag("--accept-judge-override")
-      && verdict === "FAIL"
-      && !/^(?:None|Ninguna)$/i.test(overrideText)
-      && /(?:Notion|publicaci[oó]n)/i.test(overrideText)
-      && /(?:Finding|Hallazgo)/i.test(overrideText)
-      && /(?:Owner|Responsable)/i.test(overrideText)
-      && /(?:Reason|Raz[oó]n|Motivo)/i.test(overrideText)
-      && /\b\d{4}-\d{2}-\d{2}\b/.test(overrideText);
-    if (!verdict || (!allowedVerdicts.has(verdict) && !validOverride) || !actionMatch) {
-      fail("Post-publication Judge did not authorize Notion editorial completion", { verdict });
-    }
-    if (!snapshotMatch || snapshotMatch[1].toLowerCase() !== event.final_snapshot) {
-      fail("Post-publication Judge reviewed a different snapshot", {
-        expected: event.final_snapshot,
-        reviewed: snapshotMatch?.[1] || null,
-      });
-    }
-    event.post_publication_judge = {
-      report: path.relative(cwd, judgeReportPath),
-      sha256: crypto.createHash("sha256").update(judgeReport).digest("hex"),
-      verdict,
-      reviewed_snapshot: snapshotMatch[1].toLowerCase(),
-      human_override: validOverride ? overrideText : null,
-    };
   }
+  const judgeReportArg = value("--judge-report");
+  if (!judgeReportArg) fail("--judge-report is required for every audit completion");
+  const judgeReportPath = path.resolve(cwd, judgeReportArg);
+  if (!fs.existsSync(judgeReportPath)) fail("Post-publication Judge report is missing", { path: judgeReportPath });
+  const judgeReport = fs.readFileSync(judgeReportPath, "utf8");
+  const verdictMatch = judgeReport.match(
+    /(?:Verdict|Veredicto)\s*:\s*(PASS WITH OBSERVATIONS|PASS CON OBSERVACIONES|PASS|FAIL)\b/i,
+  );
+  const snapshotMatch = judgeReport.match(
+    /(?:Reviewed snapshot SHA-256|Snapshot revisado SHA-256)\s*:\s*`?([a-f0-9]{64})`?/i,
+  );
+  const stageMatch = judgeReport.match(/(?:Action stage|Etapa de acci[oó]n)\s*:\s*([^\n]+)/i);
+  const actionMatch = judgeReport.match(
+    /(?:Intended action|Acci[oó]n evaluada)\s*:[^\n]*(?:Notion|paridad|publication|publicaci[oó]n)/i,
+  );
+  const allowedVerdicts = new Set(["PASS", "PASS WITH OBSERVATIONS", "PASS CON OBSERVACIONES"]);
+  const verdict = verdictMatch?.[1]?.toUpperCase() || null;
+  const overrideMatch = judgeReport.match(/(?:Human override|Excepci[oó]n humana)\s*:\s*([^\n]+)/i);
+  const overrideText = overrideMatch?.[1]?.trim() || "";
+  const validOverride = flag("--accept-judge-override")
+    && verdict === "FAIL"
+    && !/^(?:None|Ninguna)$/i.test(overrideText)
+    && /(?:Notion|publicaci[oó]n)/i.test(overrideText)
+    && /(?:Finding|Hallazgo)/i.test(overrideText)
+    && /(?:Owner|Responsable)/i.test(overrideText)
+    && /(?:Reason|Raz[oó]n|Motivo)/i.test(overrideText)
+    && /\b\d{4}-\d{2}-\d{2}\b/.test(overrideText);
+  if (!verdict || (!allowedVerdicts.has(verdict) && !validOverride) || !actionMatch || stageMatch?.[1]?.trim() !== "Post-publication") {
+    fail("Post-publication Judge did not authorize audit completion", { verdict, stage: stageMatch?.[1] || null });
+  }
+  if (!snapshotMatch || snapshotMatch[1].toLowerCase() !== event.final_snapshot) {
+    fail("Post-publication Judge reviewed a different snapshot", {
+      expected: event.final_snapshot,
+      reviewed: snapshotMatch?.[1] || null,
+    });
+  }
+  event.post_publication_judge = {
+    report: path.relative(cwd, judgeReportPath),
+    sha256: crypto.createHash("sha256").update(judgeReport).digest("hex"),
+    verdict,
+    stage: "Post-publication",
+    reviewed_snapshot: snapshotMatch[1].toLowerCase(),
+    human_override: validOverride ? overrideText : null,
+  };
+  const publicationRunArg = value("--publication-run-receipt");
+  if (!publicationRunArg) fail("--publication-run-receipt is required for audit completion");
+  const publicationRunPath = path.resolve(cwd, publicationRunArg);
+  const publicationRun = readJson(publicationRunPath, "Publication run receipt");
+  const projectRun = publicationRun.projects?.[project];
+  const runErrors = [];
+  if (
+    publicationRun.schema_version !== 2 ||
+    publicationRun.operation !== "notion-publication-run-receipt" ||
+    publicationRun.status !== "verified"
+  ) runErrors.push("receipt must be a verified schema-2 publication run");
+  if (!projectRun || projectRun.verified !== projectRun.total || projectRun.pending || projectRun.failed || projectRun.blocked) {
+    runErrors.push("project pages are not fully verified");
+  }
+  if (publicationRun.final_snapshots?.[project] !== event.final_snapshot) runErrors.push("final snapshot mismatch");
+  if (publicationRun.metrics?.metadata_checks !== 1) runErrors.push("exactly one final metadata check is required");
+  if (publicationRun.metrics?.metadata_pages_checked !== publicationRun.freshness_pages_expected) {
+    runErrors.push("metadata coverage is incomplete");
+  }
+  if (publicationRun.metrics?.content_reads < publicationRun.pages_total) runErrors.push("content readback metrics are incomplete");
+  if (publicationRun.metrics?.writes < publicationRun.pages_total) runErrors.push("write metrics are incomplete");
+  const acknowledgedMetrics = new Set(
+    (publicationRun.budget_overruns || []).flatMap((item) => (item.exceeded || []).map((entry) => entry.metric)),
+  );
+  for (const [metric, budget] of Object.entries(publicationRun.operation_budget || {})) {
+    if (
+      Number(publicationRun.metrics?.[metric] || 0) > Number(budget) &&
+      !acknowledgedMetrics.has(metric)
+    ) runErrors.push(`unexplained operation budget overrun: ${metric}`);
+  }
+  if (runErrors.length) fail("Publication run receipt failed", { errors: runErrors });
+  event.schema_version = 3;
+  event.dossier_sha256 = publicationRun.dossier_sha256;
+  event.technical_readback = event.readback;
+  event.readback = {
+    pages_expected: projectRun.total,
+    pages_verified: projectRun.verified,
+    mismatches: 0,
+  };
+  event.publication_run = {
+    receipt: path.relative(cwd, publicationRunPath),
+    sha256: crypto.createHash("sha256").update(fs.readFileSync(publicationRunPath)).digest("hex"),
+    status: publicationRun.status,
+    pages_total: projectRun.total,
+    pages_verified: projectRun.verified,
+    metrics: publicationRun.metrics,
+    operation_budget: publicationRun.operation_budget,
+    budget_overruns: publicationRun.budget_overruns || [],
+    started_at: publicationRun.started_at,
+    completed_at: publicationRun.completed_at,
+    duration_ms: publicationRun.duration_ms,
+  };
   event.audit_status = "complete";
-  event.entry_page_id = entryPageId;
+  event.entry_page_id = entryReceipt.entry_page_id;
   event.completed_at = new Date().toISOString();
   const receipt = path.join(stateRoot, "receipts", `${event.event_id}.json`);
   write(receipt, Buffer.from(`${JSON.stringify(event, null, 2)}\n`));
   console.log(
     JSON.stringify(
-      { ok: true, operation: "audit-complete", project, entry_page_id: entryPageId, receipt },
+      { ok: true, operation: "audit-complete", project, entry_page_id: entryReceipt.entry_page_id, receipt },
       null,
       2,
     ),
@@ -943,14 +1501,48 @@ if (command === "status" || command === "reconcile") {
 
 if (command === "baseline") {
   const report = inspect();
-  const candidates = report.presentations.filter((item) =>
+  const transportOnly = flag("--transport-only");
+  const presentationOnly = flag("--presentation-only");
+  if (transportOnly && presentationOnly) {
+    fail("--transport-only and --presentation-only are mutually exclusive");
+  }
+  const applyTransport = !presentationOnly;
+  const applyPresentations = !transportOnly;
+  const presentationCandidates = report.presentations.filter((item) =>
     ["presentation_drift", "unbaselined"].includes(item.state),
   );
-  const blockers = report.presentations.filter((item) => item.state === "remote_missing");
+  if (transportOnly && value("--presentation-plan")) {
+    fail("--presentation-plan cannot be used with --transport-only");
+  }
+  const presentationPlan = applyPresentations
+    ? loadPresentationPlan(report)
+    : { file: null, sha256: null, selected: [], excluded: [] };
+  const transportCandidates = report.rows.filter(
+    (item) => item.remote_sha256 && item.remote_sha256 !== item.base_sha256,
+  );
+  const blockers = [
+    ...(applyTransport ? report.rows.filter((item) => item.state === "remote_missing") : []),
+    ...(applyPresentations
+      ? report.presentations.filter((item) => item.state === "remote_missing")
+      : []),
+  ];
   if (flag("--preview")) {
     console.log(
       JSON.stringify(
-        { ok: blockers.length === 0, operation: "baseline-preview", project, candidates, blockers },
+        {
+          ok: blockers.length === 0,
+          operation: "baseline-preview",
+          project,
+          scope: transportOnly ? "transport" : presentationOnly ? "presentation" : "all",
+          transport_candidates: transportCandidates,
+          presentation_candidates: presentationCandidates,
+          presentation_plan: presentationPlan.file
+            ? { file: presentationPlan.file, sha256: presentationPlan.sha256 }
+            : null,
+          selected_presentations: presentationPlan.selected,
+          excluded_presentations: presentationPlan.excluded,
+          blockers,
+        },
         null,
         2,
       ),
@@ -958,16 +1550,33 @@ if (command === "baseline") {
     process.exit(blockers.length ? 2 : 0);
   }
   if (flag("--apply")) {
-    if (!flag("--ack-presentation-drift") || !value("--reason")) {
-      fail("--ack-presentation-drift and --reason are required");
+    if (!value("--reason")) fail("--reason is required");
+    if (applyPresentations && presentationPlan.selected.length && !flag("--ack-presentation-drift")) {
+      fail("--ack-presentation-drift is required");
     }
-    if (blockers.length) fail("Cannot baseline missing presentations", { blockers });
-    for (const presentation of manifest.presentations || []) {
-      const body = read(unitPath(remoteDir, presentation));
-      presentation.base_sha256 = sha(body);
+    if (applyTransport && transportCandidates.length && !flag("--ack-transport-drift")) {
+      fail("--ack-transport-drift is required");
     }
-    manifest.presentation_baseline_at = new Date().toISOString();
-    manifest.presentation_baseline_reason = value("--reason");
+    if (blockers.length) fail("Cannot baseline missing remote content", { blockers });
+    const nextSnapshot = applyTransport
+      ? updateTransportBaseline(remoteDir, value("--reason"))
+      : manifest.snapshot;
+    if (applyPresentations) {
+      const selectedIds = new Set(presentationPlan.selected.map((item) => item.id));
+      for (const presentation of manifest.presentations || []) {
+        if (!selectedIds.has(presentation.id)) continue;
+        const body = read(unitPath(remoteDir, presentation));
+        presentation.base_sha256 = sha(body);
+      }
+      const baselineAt = new Date().toISOString();
+      if (presentationPlan.excluded.length) {
+        manifest.presentation_baseline_partial_at = baselineAt;
+      } else {
+        manifest.presentation_baseline_at = baselineAt;
+      }
+      manifest.presentation_baseline_reason = value("--reason");
+      manifest.presentation_baseline_plan_sha256 = presentationPlan.sha256;
+    }
     manifest.transport_encoding = "notion-inner-markdown-lf-v1";
     write(manifestPath, Buffer.from(`${JSON.stringify(manifest, null, 2)}\n`));
     console.log(
@@ -976,10 +1585,17 @@ if (command === "baseline") {
           ok: true,
           operation: "baseline-apply",
           project,
-          updated: (manifest.presentations || []).map((item) => ({
-            id: item.id,
-            base_sha256: item.base_sha256,
-          })),
+          scope: transportOnly ? "transport" : presentationOnly ? "presentation" : "all",
+          snapshot: nextSnapshot,
+          updated_transport_units: applyTransport ? transportCandidates.map((item) => item.id) : [],
+          presentation_plan_sha256: presentationPlan.sha256,
+          updated_presentations: applyPresentations
+            ? presentationPlan.selected.map((item) => {
+              const presentation = manifest.presentations.find((candidate) => candidate.id === item.id);
+              return { id: item.id, base_sha256: presentation.base_sha256 };
+            })
+            : [],
+          excluded_presentations: presentationPlan.excluded,
         },
         null,
         2,
@@ -992,6 +1608,18 @@ if (command === "baseline") {
 
 if (command === "start") {
   const report = inspect();
+  const sourceReconciliation = report.rows.filter(
+    (item) =>
+      item.state === "remote_changed" &&
+      item.base_source_sha256 &&
+      item.base_source_sha256 !== item.base_sha256,
+  );
+  if (sourceReconciliation.length) {
+    fail("Start requires source reconciliation for dual representations", {
+      blockers: sourceReconciliation,
+      next_action: "Classify transport drift or reconcile the remote change into the canonical source",
+    });
+  }
   const blockers = report.rows.filter((item) =>
     ["conflict", "local_changed", "remote_missing"].includes(item.state),
   );
@@ -1001,9 +1629,12 @@ if (command === "start") {
       presentation_drift: report.presentation_drift,
     });
   }
+  const rowsById = new Map(report.rows.map((item) => [item.id, item]));
   for (const unit of manifest.units) {
     const body = normalize(read(unitPath(remoteDir, unit)));
-    write(unitPath(checkoutRoot, unit), body);
+    if (rowsById.get(unit.id)?.state === "remote_changed") {
+      write(unitPath(checkoutRoot, unit), body);
+    }
     write(unitPath(path.join(stateRoot, "base"), unit), body);
     write(unitPath(path.join(stateRoot, "remote-readback"), unit), body);
   }
@@ -1034,8 +1665,8 @@ if (command === "publish") {
           operation: "publish-verify",
           project,
           snapshot: verified.finalSnapshot,
-          export: verified.exported,
           audit_event: verified.auditEvent,
+          readback_verification: verified.readbackVerification,
         },
         null,
         2,
@@ -1044,7 +1675,9 @@ if (command === "publish") {
     process.exit(0);
   }
   const report = inspect();
-  const changed = report.rows.filter((item) => item.state === "local_changed");
+  const detectedLocalChanges = report.rows.filter((item) => item.state === "local_changed");
+  const writeScope = loadWritePlan(report);
+  const changed = writeScope.units.map(hydrateWriteStrategy);
   const blockers = report.rows.filter((item) =>
     ["conflict", "remote_changed", "remote_missing", "local_missing"].includes(item.state),
   );
@@ -1059,6 +1692,13 @@ if (command === "publish") {
           operation: "publish-preview",
           project,
           write_set: changed,
+          excluded_local_changes: writeScope.excluded,
+          detected_local_changes: detectedLocalChanges,
+          write_scope: {
+            mode: writeScope.mode,
+            plan: writeScope.file,
+            sha256: writeScope.sha256,
+          },
           blockers,
           presentation_blockers: presentationBlockers,
           presentation_drift: report.presentation_drift,
@@ -1095,7 +1735,15 @@ if (command === "publish") {
             operation: "publish",
             created_at: new Date().toISOString(),
             base_snapshot: manifest.snapshot,
+            backup: path.relative(cwd, backup),
             units: changed,
+            excluded_units: writeScope.excluded,
+            detected_local_changes: detectedLocalChanges.map((item) => item.id),
+            write_scope: {
+              mode: writeScope.mode,
+              plan: writeScope.file,
+              sha256: writeScope.sha256,
+            },
             audit,
           },
           null,
@@ -1112,6 +1760,13 @@ if (command === "publish") {
           backup,
           outbox,
           write_set: changed,
+          excluded_local_changes: writeScope.excluded,
+          detected_local_changes: detectedLocalChanges,
+          write_scope: {
+            mode: writeScope.mode,
+            plan: writeScope.file,
+            sha256: writeScope.sha256,
+          },
           presentation_drift: report.presentation_drift,
         },
         null,
@@ -1133,8 +1788,8 @@ if (command === "recover") {
           operation: "recover-verify",
           project,
           snapshot: verified.finalSnapshot,
-          export: verified.exported,
           audit_event: verified.auditEvent,
+          readback_verification: verified.readbackVerification,
         },
         null,
         2,

@@ -1,143 +1,101 @@
-# Contrato de sincronización
+# Contrato de sincronización nativa
 
 ## Autoridad
 
-Notion es la fuente compartida. Markdown es un checkout local ligado a un snapshot. El ZIP
-es respaldo y portabilidad, no una fuente editable paralela.
+El Markdown mergeado en la rama canónica de GitHub es el canon documental compartido.
+Notion es una vista colaborativa derivada. El manifiesto y baseline vinculan el commit
+fuente con las páginas por identidad estable.
 
-## Transporte
+La autenticación pertenece a la IA o persona que ejecuta el flujo. No pedir, almacenar ni
+compartir tokens. El conector realiza transporte; los scripts locales calculan impacto,
+conflictos, estrategias y evidencia.
 
-La autenticación pertenece al actor que ejecuta el flujo. Usar la conexión de Notion de la
-IA activa y validar workspace, actor y capacidades antes de leer. Otra IA usa su propio
-conector; el paquete no solicita, comparte ni administra tokens.
+## Serialización
 
-El transporte entrega Markdown identificado por `unit.id` al motor neutral. El motor
-calcula snapshots, detecta conflictos y decide si una escritura es segura; el conector no
-reimplementa esas reglas. No guardar tokens ni asumir que una conexión de una IA puede
-exportarse a otra.
+Guardar el Markdown interior de la página, sin envoltorios ni metadata del conector. Usar
+UTF-8, LF y un salto final. Conservar contenido y estructura significativa. Una respuesta
+truncada o incompleta no sirve como readback.
 
-### Serialización estable
+Cada entrada mantiene:
 
-Para cada página nativa, guardar únicamente el Markdown interior de `<content>`, sin el
-envoltorio `<page>`, propiedades ni metadatos del conector. Codificar en UTF-8, convertir
-saltos de línea a LF y terminar con exactamente un salto de línea. Conservar el resto de
-los bytes Markdown, incluidos espacios significativos. Aplicar la misma normalización a unidades y presentaciones antes de calcular
-SHA-256. Una respuesta truncada o sin `<content>` válido no es serializable.
+- repositorio, rama y commit GitHub fuente del snapshot;
+- `source_sha256`: Markdown local exacto;
+- `remote_sha256`: readback remoto exacto;
+- contenido remoto base para comparación de tres vías;
+- `notion_page_id`, ruta y rol.
 
-## Estado
+## Estado local
 
-Guardar bajo `artifacts/_local/notion-sync/<project>/`:
+Guardar evidencia bajo `artifacts/_local/notion-sync/<project>/`: baseline, backups,
+conflictos, dossiers, readbacks y receipts. El checkout editable vive en
+`artifacts/<slug>/` o `artifacts/_shared/<slug>/`, nunca en `_local/`.
 
-- `base.json`: snapshot y hashes cargados al comenzar;
-- `remote.json`: última lectura remota;
-- `working.json`: hashes locales;
-- `backups/<timestamp>/`: contenido remoto previo a una publicación;
-- `conflicts/<timestamp>.json`: conflictos sin resolver;
-- `receipts/<timestamp>.json`: readback final.
+## Start y baseline
 
-## Snapshot
+Sin baseline confiable:
 
-Calcularlo sobre contenido normalizado y la identidad estable de cada unidad, no sobre URLs
-pre-firmadas de archivos, timestamps de Notion ni datos operativos.
+1. leer el manifiesto;
+2. descargar y serializar todas las páginas registradas;
+3. comparar la captura con el checkout obtenido de GitHub; no reemplazarlo automáticamente;
+4. bloquear truncación, identidades faltantes y diferencias no reconciliadas; una edición
+   material remota se convierte en propuesta para una rama/PR;
+5. capturar el baseline completo con `fast-sync.mjs capture`.
 
-Los comentarios no cambian el snapshot. Una decisión discutida en comentarios solo cambia
-el snapshot cuando se incorpora al contenido canónico.
+Esta lectura completa no se repite en cada publicación.
 
-## Start
+## Estado y plan
 
-1. Leer el manifiesto de páginas.
-2. Descargar todas las unidades canónicas.
-3. Fallar ante truncación o bloque desconocido no resuelto.
-4. Comparar base, remoto y local.
-5. Actualizar automáticamente solo cuando el local no tenga cambios.
-6. Conservar ambos lados y pasar a reconciliación cuando local y remoto cambiaron.
+`status` compara localmente checkout y baseline. `plan` aplica el grafo de impacto y exige
+que toda diferencia local esté seleccionada o excluida con razón. Las diferencias
+históricas quedan fuera del write set.
 
-## Publish
+Validar el paquete completo antes de publicar. La optimización reduce I/O remoto, no la
+trazabilidad ni los controles locales.
 
-1. Generar preview desde una lectura remota fresca.
-2. Validar y ejecutar Judge.
-3. Respaldar cada página afectada.
-4. Aplicar cambios localizados cuando sea posible.
-5. Actualizar el registro/snapshot actual al final.
-6. En actualización localizada, leer nuevamente cada unidad escrita y reconstruir el paquete
-   completo con los hashes verificados de las unidades `preserve`. En publicación inicial,
-   leer todas las unidades.
-7. Si falla, mantener el snapshot anterior y ofrecer `recover`.
-8. Después del readback, generar un ZIP del checkout verificado y su manifiesto SHA-256.
+## Preflight y publicación
 
-### Plan de escritura eficiente
+1. Leer solo páginas técnicas/editoriales seleccionadas.
+2. Comparar base, target local y remoto.
+3. Suprimir no-op como `verification-only`.
+4. Bloquear conflicto solo en la página y dependientes afectados.
+5. Congelar payloads, estrategias, hashes, backups y auditoría condicionada.
+6. Ejecutar Judge y pedir autorización del digest exacto.
+7. Antes de cada write, confirmar de nuevo solo esa página.
+8. Respaldar, escribir y releer completamente.
+9. Verificar exacto o `markdown-semantic` con comparador versionado.
+10. Actualizar baseline únicamente para páginas verificadas.
+11. Ejecutar Judge posterior y crear auditoría idempotente.
 
-Clasificar cada unidad modificada como:
-
-- `patch`: delta pequeño o página grande; aplicar únicamente bloques con anclas únicas;
-- `replace`: contenido acotado cuya sustitución completa es más segura;
-- `preserve`: sin cambio final; excluir del write set y conservar su hash verificado;
-- `blocked`: conflicto, base no confiable, ancla ambigua o impacto incompleto.
-
-El motor recomienda la estrategia usando tamaño y proporción del delta, pero el conector
-debe degradar a `replace` o detenerse si no puede aplicar un patch inequívoco. Después de
-cualquier estrategia, leer la página completa y exigir equivalencia con el archivo final.
-Un patch no cambia el estándar de resultado ni permite verificación parcial.
+Una página verificada no vuelve a una continuación. Una falla se recupera con su backup y
+no invalida páginas independientes ya verificadas.
 
 ## Reconciliación
 
-Usar comparación de tres vías. La ausencia de colisión textual no prueba compatibilidad:
-ejecutar validación de IDs, trazabilidad y contradicciones antes de combinar.
+Cuando remoto y GitHub cambiaron respecto a la base, preservar ambos y clasificar el
+conflicto. Combinar requiere decisión humana, una rama/PR y validación de reglas, IDs y
+trazabilidad; la ausencia de colisión textual no demuestra compatibilidad. Notion nunca se
+promueve directamente sobre la rama canónica.
 
-`reconcile` clasifica y reporta; no escribe ni decide. Una resolución aprobada modifica el
-checkout local o adopta el remoto mediante `start`, y cualquier escritura en Notion pasa
-por `publish --preview`, `--apply` y `--verify`. El evento auditable pertenece a esa
-operación verificada, no al análisis de reconciliación.
+## Alcance de evidencia
 
-## Drift de presentación
+- `localized-verified`: se verificó todo el cambio declarado, no todo el proyecto remoto.
+- `globally-audited`: se releyó el manifiesto completo en esta ejecución.
 
-Registrar portada, historias editoriales y páginas auxiliares relevantes en
-`manifest.presentations` y comparar su hash remoto con `base_sha256`.
+No usar lenguaje de alineación global para una operación localizada. Ejecutar `full-audit`
+solo por solicitud, baseline inicial, cambio incompatible de manifiesto/serializador,
+evidencia ausente o señal real de drift global.
 
-- `presentation_drift`: clasificar como mejora editorial, decisión canónica nueva o
-  edición accidental antes de regenerar.
-- Una mejora compatible puede conservarse y actualizar su baseline.
-- Una decisión nueva se incorpora primero a la unidad canónica correspondiente.
-- Una edición accidental se recupera desde el último snapshot verificado.
+## Presentaciones
 
-El drift editorial no convierte una página derivada en fuente canónica.
-Actualizar un baseline solo con `baseline --preview` y `baseline --apply
---ack-presentation-drift`, después de readback y una razón registrada. Esta operación no
-cambia Notion.
+Portada, historias y materiales se registran en `manifest.presentations`. Una decisión nueva
+se incorpora primero al Markdown mediante rama, revisión y merge. Una mejora editorial
+compatible puede preservarse; una edición accidental se recupera desde su baseline.
 
-## Historial de sincronización
+Nunca hacer `replace` sobre una portada con subpáginas o bloques no administrados. Resolver
+enlaces relativos a `notion_page_id` antes de congelar payloads.
 
-Cada proyecto registra `audit_log_page_id`. Crear una subpágina append-only únicamente
-después de una publicación o recuperación verificadas. Una reconciliación o decisión de
-gobernanza se registra cuando su cambio se materializa y verifica mediante una de esas
-operaciones. Registrar separadamente autor del cambio, actor de publicación, autorizador,
-autor de la decisión e IA/conector. No inventar identidades ni asumir que son la misma
-persona.
+## Historial
 
-`Historial de sincronización` es hermano de `Paquete Markdown`. Ambos son hijos directos
-del contenedor interno registrado cuando existe; en manifiestos sin ese campo, ambos son
-hijos directos de la raíz canónica. Es único por manifiesto y jerarquía, no por
-coincidencia de título. La portada
-lo enlaza después de `Paquete Markdown` en la sección 9 y agrupa su bloque `<page>` bajo
-`Operación y auditoría`. Para `shared-contract`, aplicar la misma regla dentro de la página
-visible del contrato propietario.
-
-El historial visible queda fuera del snapshot canónico. El receipt local conserva hashes,
-IDs, backup, outbox y rollback. Si la publicación se verificó pero falla la entrada de
-Notion, marcar `pending_notion_entry` y reintentar sin repetir la publicación.
-
-Cuando el write set afecte `05-user-stories.md` o `jira/*.md`, marcar el evento como
-`pending_editorial_verification`. No cambiarlo a `complete` hasta que:
-
-1. cada historia afectada tenga readback completo;
-2. `verify-editorial-parity.mjs` confirme `AC`, `SC`, `CHK`, `FTC` y cláusulas de escenario;
-3. el Judge posterior a Notion emita un veredicto permitido;
-4. el receipt editorial cubra todas las historias esperadas.
-
-El cierre debe recibir el reporte del Judge, comprobar `PASS` o `PASS WITH OBSERVATIONS`,
-la acción de paridad/publicación de Notion y el mismo snapshot final. La instrucción textual
-de ejecutar el Judge no sustituye esta evidencia determinista.
-Un `FAIL` solo puede cerrar el evento con una excepción humana explícita ya registrada que
-nombre acción de Notion, hallazgos aceptados, responsable, motivo y fecha.
-
-Un resumen, un enlace o una comprobación de presencia no satisface este gate.
+Crear una subpágina append-only únicamente después de una publicación o recuperación
+verificada. El evento incluye alcance localizado/global, páginas escritas y no-op, hashes,
+Judge y receipt. No auditar previews o intentos fallidos como publicación completa.
