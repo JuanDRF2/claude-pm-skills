@@ -105,9 +105,29 @@ This produces insight about causality, not just preference.
 
 ### Interview guide structure
 
+Real sessions rarely get the full time you planned — a participant's actual availability on the
+day is often shorter than what was scheduled. Before the session, mark which Parts are
+load-bearing for your core research question and which are cuttable, and reconfirm available time
+at the start of the session itself, not just when scheduling it.
+
+| If you have | Do this |
+|---|---|
+| Full time (45 min) | All parts, in order |
+| ~20–25 min | Compress Part 1 to 1–2 questions, keep Parts 2–4 full, light or skip Part 5 |
+| <15 min | Part 2 and Part 3 only — skip Part 1, 4, and 5; brief Part 6 |
+
+**Never cut Part 2 (the triggering moment) and enough of Part 3 (struggle/workarounds) to
+understand what stood between the participant and progress** — that's the core of any JTBD
+interview. Everything else is negotiable under time pressure; that isn't.
+
 **Part 0 — Setup (3 min)**
 - Introduce yourself and the purpose of the session (without priming)
-- Get consent to record
+- Get consent to record. In a formal/scheduled research session, a brief explicit ask is enough
+  ("Mind if I record this so I can focus on the conversation instead of notes?"). In an informal
+  setting — a friend, a small business owner, anyone outside a scheduled research program — say
+  it plainly and casually instead of reading a script: "I'm going to take some notes/record this
+  so I don't forget anything you tell me, is that okay?" Naming it lands better than skipping it
+  because it feels awkward.
 - Set expectations: "There are no right or wrong answers. I'm here to learn from you, not to test you."
 - Warm-up: "Tell me a bit about your role and what a typical week looks like."
 
@@ -148,10 +168,33 @@ If the team has specific hypotheses, probe them here — at the end, after the u
 
 Write 2–3 targeted probes for the specific assumptions being tested.
 
+If any of those hypotheses come from research you did on the participant or their company before
+the session (their public profile, their business, prior interactions), treat everything you
+learned as something to confirm in their words, not a fact to assert. Stating it as already-known
+can read as invasive rather than diligent — especially outside a formal research relationship,
+where the participant has no reason to expect you dug that deep.
+
 **Part 6 — Wrap-up (2 min)**
 - "Is there anything else you think I should know about this?"
 - "If you could tell the team building this one thing, what would it be?"
 - Thank and explain next steps
+
+### Optional — closing with an ask (informal discovery, not formal research)
+
+Skip this for formal or internal product research, where staying neutral matters. It applies only
+when the interview doubles as informal customer discovery — a founder, consultant, or freelancer
+talking to a prospect or lead — and you intend to make a small ask at the end.
+
+- Keep the ask small and time-boxed: name a specific next artifact and a short deadline ("can I
+  send you a mockup of this by Friday?") rather than an open-ended offer. Specific and small is
+  easier to say yes to than abstract and open.
+- State plainly that the ask requires nothing further from them.
+- Give an explicit, low-cost way to decline in the same breath ("and if it's not useful, no
+  worries at all"). This reduces polite yeses that evaporate later — a real no now is worth more
+  than a soft yes you can't act on.
+- Never engineer away their ability to decline (e.g. declaring next steps as already decided
+  instead of asking) to inflate your yes-rate. That trades the relationship for a short-term
+  conversion, and it shows.
 
 ### Forbidden question types
 
