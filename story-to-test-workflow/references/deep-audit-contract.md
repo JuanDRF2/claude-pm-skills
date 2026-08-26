@@ -18,6 +18,17 @@ Freeze the mode, package list, snapshot and intended action before evaluation. A
 searches may create the inventory and locate risk, but they do not replace semantic review
 of every canonical artifact in the frozen deep-audit scope.
 
+## When to propose cross-refinement
+
+Use `external-dependency-contract.md` to distinguish a direct dependency check from a wider
+audit. Propose an exact cross-refinement scope when a contradiction crosses package
+boundaries, a material shared contract changed, several packages implement the same
+critical behavior, or a global readiness claim depends on their combined coherence.
+
+The proposal must name the evidence, packages and intended decision. Do not execute it
+without the user's scope approval, and do not use fixed counts of packages or external
+rules as a substitute for risk.
+
 ## Evidence before questions
 
 Build the source inventory and complete the selected evidence pass before asking product

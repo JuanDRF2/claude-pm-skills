@@ -195,6 +195,11 @@ def main() -> int:
         split_story = """
 ## US-HH-01 — Sincronizar teléfono
 
+### Historia
+**Como** responsable de datos
+**quiero** sincronizar el teléfono
+**para** conservar un contacto vigente.
+
 ### AC-HH-01-01 — Campo protegido
 **Condición de aceptación:** el sistema conserva `Account.Phone` como campo de negocio.
 #### SC-HH-01-01 — Sincronización
@@ -220,6 +225,24 @@ def main() -> int:
         jira.write_text(split_story, encoding="utf-8")
         errors, _warnings = validator.strict_checks(root, validator.read_files(root))
         assert not any("Jira/master acceptance criterion differs" in error for error in errors)
+
+        jira.write_text(
+            """# US-HH-01 — Sincronizar teléfono
+
+### Historia
+**Como** responsable de datos
+**quiero** sincronizar el teléfono
+**para** conservar un contacto vigente.
+
+AC-HH-01-01; SC-HH-01-01. Consulta el paquete canónico.
+""",
+            encoding="utf-8",
+        )
+        errors, _warnings = validator.strict_checks(root, validator.read_files(root))
+        assert any(
+            "missing canonical acceptance criterion behavior" in error for error in errors
+        ), errors
+        assert any("missing canonical scenario behavior" in error for error in errors), errors
 
     # Journey Integrity composes atomic scenarios without inventing another ID namespace.
     complete_journey = """

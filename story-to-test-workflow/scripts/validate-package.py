@@ -143,6 +143,38 @@ def canonical_story_text(root: Path, files: dict[Path, str]) -> str:
     return "\n\n".join(files.get(volume, "") for volume in volumes)
 
 
+def story_blocks(text: str) -> dict[str, str]:
+    """Extract story definitions headed by a level-two US-* heading."""
+    heading = re.compile(
+        r"^##(?!#)\s+(US-[A-Z0-9]+-\d{2,}[A-Za-z]?)\b.*$", re.MULTILINE
+    )
+    hits = list(heading.finditer(text))
+    blocks: dict[str, str] = {}
+    for index, hit in enumerate(hits):
+        end = hits[index + 1].start() if index + 1 < len(hits) else len(text)
+        blocks.setdefault(hit.group(1), text[hit.start():end])
+    return blocks
+
+
+def canonical_story_blocks(
+    root: Path, files: dict[Path, str], errors: list[str]
+) -> dict[str, str]:
+    """Merge canonical stories across split volumes and reject conflicting definitions."""
+    merged: dict[str, str] = {}
+    origins: dict[str, str] = {}
+    for volume in sorted(root.glob("05-user-stories*.md"), key=lambda item: item.name):
+        for us_id, block in story_blocks(files.get(volume, "")).items():
+            if us_id in merged and merged[us_id] != block:
+                errors.append(
+                    f"Conflicting canonical user story: {us_id} in "
+                    f"{origins[us_id]} and {volume.name}"
+                )
+                continue
+            merged[us_id] = block
+            origins[us_id] = volume.name
+    return merged
+
+
 def scenario_blocks(text: str) -> dict[str, str]:
     """Extract one canonical block per SC for cross-volume clarity warnings."""
     hits = list(ID_PATTERNS["SC"].finditer(text))
@@ -515,6 +547,7 @@ def strict_checks(root: Path, files: dict[Path, str]) -> tuple[list[str], list[s
         )
 
     master = canonical_acceptance_blocks(root, files, errors)
+    canonical_stories = canonical_story_blocks(root, files, errors)
     for ac_id, block in master.items():
         when_count = len(re.findall(
             r"(?:^|\s)(?:-\s*)?(?:\*\*)?(?:When|Cuando)\s*:?(?:\*\*)?\s*:?",
@@ -663,11 +696,53 @@ def strict_checks(root: Path, files: dict[Path, str]) -> tuple[list[str], list[s
     for sc_id, block in scenario_blocks(canonical_story_text(root, files)).items():
         warnings.extend(scenario_clarity_warnings(sc_id, block))
 
-    for jira in (root / "jira").glob("US-*.md") if (root / "jira").is_dir() else []:
-        jira_blocks = acceptance_blocks(jira.read_text(encoding="utf-8"))
+    jira_dir = root / "jira"
+    for us_id, story_block in canonical_stories.items():
+        jira = jira_dir / f"{us_id}.md"
+        if not jira.is_file():
+            continue
+
+        jira_text = jira.read_text(encoding="utf-8")
+        if not (
+            re.search(r"\b(?:As a|Como)\b", jira_text, re.IGNORECASE)
+            and re.search(r"\b(?:I want|quiero)\b", jira_text, re.IGNORECASE)
+            and re.search(r"\b(?:so that|in order to|para)\b", jira_text, re.IGNORECASE)
+        ):
+            errors.append(
+                f"Jira view is not self-contained; user-story statement is incomplete: {jira.name}"
+            )
+
+        expected_acs = definitions_in_text(story_block, "AC")
+        jira_blocks = acceptance_blocks(jira_text)
+        for ac_id in sorted(expected_acs):
+            if ac_id not in jira_blocks:
+                errors.append(
+                    f"Jira view is missing canonical acceptance criterion behavior: "
+                    f"{jira.name} / {ac_id}"
+                )
+            elif ac_id in master and jira_blocks[ac_id] != master[ac_id]:
+                errors.append(
+                    f"Jira/master acceptance criterion differs: {jira.name} / {ac_id}"
+                )
+
+        # Preserve parity checks for any additional AC projected into the ticket, even
+        # when that AC is not owned by this story's canonical block.
         for ac_id, jira_block in jira_blocks.items():
-            if ac_id in master and jira_block != master[ac_id]:
-                errors.append(f"Jira/master acceptance criterion differs: {jira.name} / {ac_id}")
+            if (
+                ac_id not in expected_acs
+                and ac_id in master
+                and jira_block != master[ac_id]
+            ):
+                errors.append(
+                    f"Jira/master acceptance criterion differs: {jira.name} / {ac_id}"
+                )
+
+        expected_scenarios = definitions_in_text(story_block, "SC")
+        jira_scenarios = definitions_in_text(jira_text, "SC")
+        for sc_id in sorted(expected_scenarios - jira_scenarios):
+            errors.append(
+                f"Jira view is missing canonical scenario behavior: {jira.name} / {sc_id}"
+            )
 
     functional = files.get(root / "07-functional-test-cases.md", "")
     tests = functional or files.get(root / "07-test-cases.md", "")
@@ -877,12 +952,15 @@ def validate(
     state_text = files.get(root / "00-workflow-state.md", "")
     no_tracker_mode = bool(re.search(r"solo\s*\+?\s*AI|no\s+tracker|sin\s+tracker|sin\s+tablero", state_text, re.IGNORECASE))
     if not no_tracker_mode:
-        jira_files = list((root / "jira").glob("US-*.md")) if (root / "jira").is_dir() else []
         # Candidate stories in the map/release slices are intentionally not tickets yet.
         # Only stories formally defined in the approved story artifact require Jira views.
-        story_defs = definitions_in_text(files.get(root / "05-user-stories.md", ""), "US")
-        if story_defs and len(jira_files) < len(story_defs):
-            errors.append(f"Jira views ({len(jira_files)}) are fewer than story IDs ({len(story_defs)}).")
+        # Glob across split 05-user-stories*.md volumes, same as canonical_story_blocks.
+        story_defs: set[str] = set()
+        for volume in root.glob("05-user-stories*.md"):
+            story_defs.update(definitions_in_text(files.get(volume, ""), "US"))
+        for us_id in sorted(story_defs):
+            if not (root / "jira" / f"{us_id}.md").is_file():
+                errors.append(f"Missing Jira view for canonical story: {us_id}")
 
     all_text = "\n".join(files.values())
     traceability_text = re.sub(r"`[^`\n]*`", "", all_text)

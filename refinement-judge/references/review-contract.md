@@ -10,8 +10,9 @@
 6. Completion boundary
 7. Derived artifacts and product boundaries
 8. Review scope and sampling
-9. Cross-refinement coherence
-10. Domain architecture
+9. Referenced external dependencies
+10. Cross-refinement coherence
+11. Domain architecture
 
 ## Evidence hierarchy
 
@@ -241,6 +242,13 @@ A prior Judge `PASS` does not exempt an artifact in the current frozen scope. Co
 a request to review one change does not authorize expansion to every package or every
 remote page. If a complete audit cannot be completed, state the unreviewed inventory and do
 not issue a global `PASS`.
+
+## Referenced external dependencies
+
+Directly consumed rules, mappings and shared contracts remain in review scope even when a
+full cross-refinement audit is not. When they exist, read and apply
+`external-dependency-review.md`. A different ID prefix alone is not proof of a dependency,
+and a localized dependency check does not authorize reviewing unrelated packages.
 
 ## Cross-refinement coherence
 

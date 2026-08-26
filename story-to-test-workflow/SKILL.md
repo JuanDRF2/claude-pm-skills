@@ -141,6 +141,12 @@ Every route uses the same guided loop and decision gates. Infer one internal rou
 
 Routes are internal choices, not interaction styles. Always guide the user. A requested fast draft stays provisional and returns to the guided loop before approval or publication. For the extension route, read `references/extend-approved-package.md` in Phase 0.
 
+When the source inventory proves that a package consumes rules, mappings or a shared
+contract owned elsewhere, read `references/external-dependency-contract.md`. Verify the
+directly referenced source subset inside the current scope. If the evidence indicates
+broader cross-package risk, propose an exact cross-refinement audit and wait for the user's
+scope decision; do not expand automatically.
+
 Read `references/codebase-verification-contract.md` only when a material claim depends on
 current implemented behavior, an integration contract or technical feasibility — not for
 ordinary copy changes or future behavior Product is still defining. When design evidence or
@@ -578,6 +584,7 @@ Read `references/examples-and-pitfalls.md` only when the user requests an exampl
 - `references/matrix-decision.md` — Deterministic rule for creating matrices without making scenarios depend on them
 - `references/publication-authorization-gate.md` — Autonomous exact-write dossier before Notion authorization
 - `references/deep-audit-contract.md` — Explicit complete and cross-refinement audits
+- `references/external-dependency-contract.md` — direct external-rule verification and when to propose a cross-refinement audit
 - `references/github-source-of-truth-contract.md` — Branch, Pull Request and shared-canon rules when a repository is registered
 - `references/codebase-verification-contract.md` — Conditional current-implementation evidence
 - `references/domain-and-design-sources.md` — Conditional design-hub and domain/architecture evidence for your own product

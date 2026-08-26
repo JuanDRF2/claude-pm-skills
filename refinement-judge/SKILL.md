@@ -96,11 +96,15 @@ Read the original sources and approved decision record before reading author con
 
 - Objective, users, actors, systems and in-scope outcomes
 - Confirmed rules and their authority
+- Directly consumed external rules, mappings or shared contracts and their owner sources
 - Explicit exclusions and deferred behavior
 - Open questions, owners and blocking state
 - Failure, recovery, payment, permission, data and integration risks
 
 Read `references/review-contract.md` completely before the semantic audit.
+
+When direct external dependencies are present, also read
+`references/external-dependency-review.md` completely before evaluating them.
 
 ### 3. Audit adversarially
 
@@ -125,6 +129,12 @@ For every declared or evidently applicable critical journey, apply the Journey I
 section of `references/review-contract.md`. Reject a Gate 4 or consequential readiness claim
 when atomic scenarios exist but no `FTC-*` proves the connected user-to-business outcome,
 applicable downstream consistency and scenario independence.
+
+When the package declares direct external dependencies, apply
+`references/external-dependency-review.md`. Internal preflight and traceability do not prove
+that an owner rule is still current. Verify the referenced source subset or record the
+exact unverified dependency and limit the verdict accordingly; do not silently expand into
+a full cross-refinement audit.
 
 For Notion, obtain the native-page manifest, baseline and human-page manifest. In an initial
 publication or explicit full audit, inspect every registered page. In `Actualización
@@ -273,6 +283,8 @@ Never edit the product package while acting as Judge.
 ## Resources
 
 - `references/review-contract.md` — evidence order and audit dimensions
+- `references/external-dependency-review.md` — conditional checks for directly consumed
+  external rules and contracts
 - `references/severity-and-verdict.md` — severity, verdict and override rules
 - `references/report-schema.md` — required Markdown report format
 - `scripts/validate-judge.py` — deterministic preflight, snapshot and report validation
