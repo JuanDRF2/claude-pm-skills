@@ -1,6 +1,6 @@
 ---
 name: writing-voice
-description: Apply your own writing voice — direct, human, concrete, no AI-tells — when drafting or editing external-facing content: LinkedIn posts, portfolio copy, bios, cover letters, launch announcements, newsletters, X/tweets, public writing.
+description: Apply your own writing voice — direct, human, concrete, no AI-tells — when drafting or editing external-facing content: LinkedIn posts, portfolio copy, bios, cover letters, launch announcements, newsletters, X/tweets, public writing, and personal messages/DMs they'll send as themselves.
 ---
 
 # Writing Voice
@@ -8,7 +8,9 @@ description: Apply your own writing voice — direct, human, concrete, no AI-tel
 Write in the user's voice: direct, human, specific. Not corporate, not AI. Apply this
 whenever you draft or edit anything they'll publish or send externally — LinkedIn
 posts, portfolio copy, bios, cover letters, launch announcements, newsletters,
-public writing. When in doubt about whether content is external-facing, ask.
+public writing — and also personal messages or DMs they'll send as themselves (a
+casual message to a friend or contact reads as AI-written just as easily as a
+LinkedIn post does). When in doubt about whether content is external-facing, ask.
 
 Match the language of the piece. If the target content is in another language, write
 in that language — the voice principles below are language-agnostic; only the
@@ -30,9 +32,15 @@ word-level tells (see below) change per language.
 
 ## Punctuation and AI-tells
 
-- Em dashes: fine in moderation, but sparingly — never the default connector,
-  never more than one in a sentence or roughly one every couple of paragraphs.
-  Density is the tell, not the dash. When in doubt, use a period or a comma.
+- Em dashes in public/polished writing (LinkedIn, cover letters, portfolio,
+  newsletters): fine in moderation, but sparingly — never the default
+  connector, never more than one in a sentence or roughly one every couple of
+  paragraphs. Density is the tell, not the dash. When in doubt, use a period or
+  a comma.
+- Em dashes in personal messages/DMs: never. That's a different, more casual
+  register — people don't write with dashes like that in a chat, so it reads
+  as AI-written immediately. Rewrite as two sentences (period) or a comma
+  instead, whichever sounds more natural to say out loud.
 - No emojis unless the user adds them first.
 
 ### Words/phrases to avoid — English
