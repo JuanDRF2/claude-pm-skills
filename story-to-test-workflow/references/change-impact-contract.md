@@ -11,6 +11,7 @@ Resolver consumidores por IDs y relaciones explícitas:
 BR/MAP → US → AC → SC
 SC → CHK/evidencia y decisión de automatización
 FTC agrupa SC
+US/AC/SC ↔ integrations/taxonomy-mapping.md cuando Product Taxonomy aplica
 05-user-stories*.md → jira/*.md → payload técnico → presentación editorial
 Jira, handoffs y vistas consumen los IDs y el formato funcional que presentan
 ```
@@ -35,6 +36,7 @@ contradicción semántica.
 | `08-traceability-and-risks.md` | relación o riesgo residual |
 | `09-package-index.md` | inventario, estado, snapshot o navegación |
 | `10-design-and-spec-deltas.md` | diferencia material de diseño o SPEC, cuando aplique |
+| `integrations/taxonomy-mapping.md` | historia, criterio, escenario, Journey, Outcome, canal, código remoto o evidencia afectada |
 | matrices aplicables | combinación, dataset o decisión de automatización |
 | `jira/*.md` | historia consumidora afectada |
 | `handoffs/dev-handoff.md` | instrucción, dependencia, fallo u observabilidad necesaria para DEV |
@@ -49,6 +51,12 @@ inline que evita autolinks, estructura y nivel de listas, destinos de enlaces y 
 variación puede no cambiar la regla de producto y aun así exigir regenerar Jira, payload o
 presentación. El validador debe comparar todos los volúmenes `05-user-stories*.md` contra
 sus derivados Jira, no solamente `05-user-stories.md`.
+
+Retirar o sustituir un ID es un cambio propagable. Clasifica como `update` cada consumidor
+activo que todavía lo presente como trabajo, cobertura o readiness; agrega o actualiza el
+registro histórico canónico y conserva las vistas históricas únicamente en sus secciones
+separadas. No clasifiques como `preserve` un Jira, handoff, matriz activa o caso funcional
+que todavía incluya el ID retirado.
 
 ## Plan de impacto
 

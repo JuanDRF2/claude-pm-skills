@@ -13,6 +13,7 @@
 9. Referenced external dependencies
 10. Cross-refinement coherence
 11. Domain architecture
+12. Product Taxonomy alignment
 
 ## Evidence hierarchy
 
@@ -130,6 +131,13 @@ FTC/SC → AC → US → BR → source/decision
 
 Check definitions, references, parity, orphan items, broken links and silently renumbered IDs.
 
+When the package has retired or superseded `US-*`, `AC-*` or `SC-*` identifiers, verify
+that one canonical registry preserves their lifecycle evidence outside every active story.
+Confirm that active traceability, Jira, handoffs, releases, coverage, functional cases and
+readiness counts exclude them; historical traceability remains separately labeled; no ID
+is simultaneously active and retired or reused for different behavior. Matching numeric
+suffixes across different prefixes are not the same identity.
+
 ### 7. Risk and readiness
 
 Check high-impact areas proportionally:
@@ -223,6 +231,38 @@ When HTML, prototypes, designs or generated SPECs are in scope, check that:
 
 Treat missing reconciliation as a scope/source-integrity defect. Treat a material
 contradiction or unapproved scope injection as blocking.
+
+### 12. Product Taxonomy alignment
+
+Apply only when the package declares Product Taxonomy required, contains an existing
+mapping in the affected scope, or the intended development-destination handoff depends on
+it.
+
+Check that:
+
+- merged refinement Markdown remains authority for package behavior while Product Taxonomy
+  remains authority for its hierarchy, business codes and remote statuses;
+- `integrations/taxonomy-mapping.md` follows the specialist contract and its source commit
+  matches the reviewed package snapshot or is explicitly `Stale`;
+- every active `US-*`, `AC-*` and `SC-*` is mapped or has an explicit permitted disposition,
+  owner and rationale; retired IDs do not remain active;
+- story/Journey many-to-many relationships are explicit rather than inferred from suffixes;
+- each declared Journey belongs to its JTBD, has one valid channel and covers only Outcomes
+  from that JTBD;
+- each `ACR-*` belongs to the declared Journey and each `SCN-*` to the declared `ACR-*`;
+- `Verified` has targeted live evidence for every affected remote identity and no Pending or
+  Blocked item;
+- a localized review proves the complete affected relationship closure without claiming a
+  global Taxonomy audit;
+- proposed creates or updates remain separate from executed writes, and readback evidence
+  exists for every claimed mutation;
+- development-destination completion is not treated as QA verification, automation or
+  Journey coverage without the corresponding evidence.
+
+When the current host lacks the Taxonomy MCP, report the unverified inventory and capability
+limitation. Do not invent codes or treat application source code as live data. Lack of MCP
+does not block Gates 1–4; for Gate 5 use the recorded handoff policy and block only the named
+action that requires verified alignment.
 
 ## Sampling prohibition
 

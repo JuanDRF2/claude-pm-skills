@@ -57,6 +57,7 @@ Write the report in the package language. Use the translated headings shown belo
 | Risk and readiness | Pass/Fail/Limited | [...] |
 | Presentation parity | Pass/Fail/Not applicable/Limited | [...] |
 | Derived artifacts and product boundaries | Pass/Fail/Not applicable/Limited | [...] |
+| Product Taxonomy alignment | Pass/Fail/Not applicable/Limited | [...] |
 
 ## Required corrections / Correcciones requeridas
 

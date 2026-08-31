@@ -18,6 +18,9 @@ approved sources and decisions → Markdown on canonical branch → derived view
 - A working tree, branch or Pull Request is a proposal until merged.
 - Notion, Jira and other presentations are derived. An edit there becomes a proposed
   input and must be reconciled into Markdown through the normal review flow.
+- Product Taxonomy is not a presentation: it owns its hierarchy, business codes and remote
+  statuses. GitHub owns the reviewed cross-reference at
+  `integrations/taxonomy-mapping.md`; neither source silently overwrites the other.
 - `_local/`, backups, readbacks, dossiers, receipts and generated exports never enter the
   shared canon.
 

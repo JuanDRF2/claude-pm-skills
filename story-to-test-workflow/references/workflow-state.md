@@ -41,6 +41,24 @@ already registered and material to the current work, or known to contain a remot
 Do not add the block merely to record `Not requested`, and do not ask the user to choose a
 derived destination during ordinary refinement.
 
+Add this block after Gate 4 only when Product Taxonomy applies, an existing mapping is in
+scope, or post-delivery reconciliation was requested:
+
+```markdown
+## Taxonomy Alignment State
+- Taxonomy required / Taxonomy requerido: Yes | No
+- Handoff policy / Política de handoff: Verified required | Approved exception allowed
+- MCP capability / Capacidad MCP: Available | Unavailable | Not checked
+- Mapping path / Ruta del mapping: integrations/taxonomy-mapping.md | None
+- Mapping status / Estado del mapping: Draft | Verified | Stale | Blocked
+- Last remote evidence / Última evidencia remota: None | [date and receipt]
+- Owner / Responsable:
+- Handoff consequence / Consecuencia para el handoff:
+```
+
+Do not describe `Unavailable` as a product defect. It is an execution limitation whose
+handoff consequence follows the recorded team policy. Never store a token or secret.
+
 For packages created before `github-main-v1`, preserve their existing fields and add the
 repository fields when the project is first changed in GitHub. Do not rewrite an unchanged
 package only to modernize metadata. A Pull Request is not the last merged canonical commit.

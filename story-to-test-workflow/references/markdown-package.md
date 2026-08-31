@@ -46,6 +46,12 @@ otherwise. Treat `jira/*.md` and `handoffs/*.md` as generated views: publish the
 consumers, but regenerate them from canonical units and do not accept independent edits as
 new product truth.
 
+When Product Taxonomy applies, keep the versioned cross-reference at
+`integrations/taxonomy-mapping.md`. It is optional for packages with no declared Taxonomy
+scope and must not be created as an empty placeholder. Read the mapping contract through
+`sync-refinement-package-taxonomy`; do not duplicate Taxonomy hierarchy throughout stories
+or treat its remote codes as package-owned identifiers.
+
 Notion is optional. When requested, publish each registered Markdown as one native page. A
 manifest and baseline relate the GitHub-derived checkout to stable Notion page IDs and
 verified hashes. Human pages are derived presentations; they do not replace the canonical

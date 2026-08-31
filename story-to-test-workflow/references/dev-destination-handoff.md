@@ -25,6 +25,20 @@ prerequisite for reading the refinement.
 Record destination identifiers only after observing their creation. Preserve the canonical
 IDs in every mapped item so changes can be traced back.
 
+## Product Taxonomy
+
+When `taxonomy-alignment.md` declares Taxonomy applicable, add one compact section to
+`handoffs/dev-handoff.md` with the mapping link, Product, Feature, JTBDs, Journeys,
+Outcomes, mapping status and whether post-delivery reconciliation is required. Do not copy
+the complete mapping into the handoff.
+
+The destination consumes the approved refinement and observed Taxonomy codes. It does not
+create missing product decisions, invent codes or rerun refinement merely because
+development starts. If a verified mapping is required but unavailable, preserve the named
+blocker or approved exception. On completion, return implemented scope, deviations and QA
+evidence to `story-to-test-workflow`; invoke `sync-refinement-package-taxonomy reconcile`
+separately.
+
 ## Placement
 
 Keep the detailed mapping in `handoffs/dev-handoff.md`. Do not duplicate proposals,

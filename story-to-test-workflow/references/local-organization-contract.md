@@ -29,6 +29,8 @@ artifacts/
 ```
 
 - Keep normal refinement projects directly under `artifacts/<project-slug>/`.
+- Keep the optional Product Taxonomy cross-reference inside its project at
+  `integrations/taxonomy-mapping.md`; do not create a parallel global mapping folder.
 - Put authoritative cross-project Markdown under `_shared/`.
 - Put historical deltas and independent audits under `_reviews/`.
 - Put executable generators, normalizers and publication helpers under `_local/tooling/`.
@@ -37,6 +39,10 @@ artifacts/
 - Store Notion manifests, snapshots, readbacks, outboxes, backups and receipts under
   `_local/notion-sync/<project>/`; they are operational evidence, not canonical
   refinement artifacts.
+- Store Taxonomy previews, raw reads and write/readback receipts under
+  `_local/taxonomy-sync/<project>/`. Keep only the durable relationship, verification date,
+  source commit and evidence summary in `integrations/taxonomy-mapping.md`; never commit
+  credentials or raw production responses.
 - Treat project-level `tools/`, `scripts/`, `notion-export/` and `_notion-updates/` as local-only until they are moved under `_local/`.
 - Include `_local/` in the backup created before local normalization.
 - Keep Notion exports inside their source project only when needed locally; operational

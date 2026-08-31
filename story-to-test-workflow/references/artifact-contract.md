@@ -15,7 +15,13 @@ Use the artifact language for prose and headings. Keep these identifiers languag
 | Functional scenario | `SC-` | `SC-MEM-02-01` |
 | Judge finding | `JUDGE-` | `JUDGE-MEM-001` |
 
-Preserve IDs after approval. Record superseded items rather than silently reusing their identifiers for different behavior. Judge IDs also preserve their original title and defect meaning across reruns; partial corrections update status and residual scope instead of repurposing the ID.
+Preserve IDs after approval. Record superseded items rather than silently reusing their
+identifiers for different behavior. Preserving an ID does not keep its retired behavior in
+an active story, test or delivery view. When a `US-*`, `AC-*` or `SC-*` is retired or
+superseded, apply `retired-identifier-contract.md`.
+
+Judge IDs also preserve their original title and defect meaning across reruns; partial
+corrections update status and residual scope instead of repurposing the ID.
 
 ## Phase Handoffs
 
@@ -71,17 +77,18 @@ Never label an item Covered merely because a document exists. Coverage requires 
 
 | File | Primary content | Written after |
 |---|---|---|
-| `00-workflow-state.md` | Current phase, approvals, decision checkpoint, stale consumers, questions, next action | Every approved gate and material decision |
+| `00-workflow-state.md` | Current phase, approvals, decision checkpoint, stale consumers, questions, next action and link/summary for retired IDs | Every approved gate and material decision |
 | `01-project-understanding.md` | Objective, actors, scope, known systems | Gate 1 |
 | `02-rules-and-questions.md` | Rules, sources, questions, assumptions, owners | Gate 1 |
 | `03-story-map.md` | Journey, variations, alternate and recovery paths | Gate 1 |
 | `04-release-slices.md` | Selected deliveries, dependencies, deferred scope | Gate 2 |
-| `05-user-stories.md` | Stories, criteria, quality requirements | Gate 3 |
+| `05-user-stories.md` | Active stories/criteria plus the canonical retired-ID registry outside all `## US-*` blocks | Gate 3 |
 | `06-test-coverage.md` | Risk analysis and coverage matrix | Gate 4 |
 | `07-functional-test-cases.md` | Grouped functional cases and QA-reviewable scenarios | Gate 4 |
-| `08-traceability-and-risks.md` | Rule-to-test coverage and remaining risk | Gate 4/final audit |
+| `08-traceability-and-risks.md` | Active rule-to-test coverage, separately labeled retired history and remaining risk | Gate 4/final audit |
 | `09-package-index.md` | Project/delivery status and navigation | Gate 4/final audit |
 | `10-design-and-spec-deltas.md` | Optional expanded ledger for derived artifacts; `02` remains the entry point | Gate 1 and every material prototype/SPEC review |
+| `integrations/taxonomy-mapping.md` | Optional active cross-reference between approved package IDs and Product Taxonomy codes; schema owned by `sync-refinement-package-taxonomy` | Gate 5 when Taxonomy applies and after affected reconciliation |
 | `jira/<US-ID>.md` | Copy-ready story view with inline traceability | Gate 3, refreshed Gate 4 |
 | `handoffs/dev-handoff.md` | DEV-focused approved behavior and dependencies | Gate 4 |
 | `handoffs/qa-handoff.md` | Approved QA design ready for downstream test-management generation | Gate 4 |

@@ -109,7 +109,9 @@ def main() -> int:
     print("PASS: --decision-checkpoint CLI flag works end to end")
 
     # 6) Exactly-one-When rule preserved (personal's stricter SC-* check, not staging's relaxed one)
-    stories_text = """### AC-MEM-01-01 — Something
+    stories_text = """## US-MEM-01 — Something happens
+
+### AC-MEM-01-01 — Something
 **Condición de aceptación:** algo pasa.
 #### SC-MEM-01-01 — Two events
 **Dado:** contexto

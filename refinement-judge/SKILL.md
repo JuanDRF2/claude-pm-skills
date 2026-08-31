@@ -36,6 +36,8 @@ Require:
    designs or generated SPECs are in scope.
 7. The previous Judge report when this is a rerun. Preserve it as comparison evidence
    before replacing the canonical report.
+8. Taxonomy applicability, `integrations/taxonomy-mapping.md` and its targeted remote
+   evidence when alignment is declared or the intended handoff requires it.
 
 Do not treat derived HTML, Word, Notion, or Jira presentations as canonical sources. Use them only for parity checks when they are in the declared review scope.
 
@@ -119,6 +121,7 @@ Try to find counterexamples across these dimensions:
 7. Readiness and approval ownership
 8. Cross-presentation parity
 9. Derived-artifact and product-boundary integrity
+10. Conditional Product Taxonomy alignment
 
 For each high-risk scenario marked `Ready`, require the compact execution contract defined
 by the package and independently test whether another QA reviewer could reproduce it without
@@ -135,6 +138,12 @@ When the package declares direct external dependencies, apply
 that an owner rule is still current. Verify the referenced source subset or record the
 exact unverified dependency and limit the verdict accordingly; do not silently expand into
 a full cross-refinement audit.
+
+When Product Taxonomy applies, use the Taxonomy Alignment section of
+`references/review-contract.md`. Do not require a mapping from packages with no declared
+Taxonomy scope. For a required development-destination handoff, reject a `Verified` claim
+without current targeted remote evidence; distinguish an unavailable connector from a
+product defect and apply the recorded handoff policy or explicit human exception.
 
 For Notion, obtain the native-page manifest, baseline and human-page manifest. In an initial
 publication or explicit full audit, inspect every registered page. In `Actualización

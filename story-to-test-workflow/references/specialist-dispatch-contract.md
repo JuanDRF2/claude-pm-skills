@@ -38,6 +38,7 @@ can write externally or change an approved artifact.
 | initial native Notion publication | `publish-refinement-to-notion` |
 | registered Notion synchronization | `sync-refinement-package-notion` |
 | optional Word export | `build-refinement-document` |
+| Product Taxonomy alignment or post-delivery reconciliation | `sync-refinement-package-taxonomy` |
 
 GitHub checkout, branch, commit, push and Pull Request operations follow
 `github-source-of-truth-contract.md` through the host's available Git capability. They do

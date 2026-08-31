@@ -1,0 +1,4 @@
+interface:
+  display_name: "Sync Refinement Taxonomy"
+  short_description: "Alinea refinamientos con Product Taxonomy"
+  default_prompt: "Usa $sync-refinement-package-taxonomy para alinear este paquete aprobado con Product Taxonomy o reconciliar evidencia posterior al destino de desarrollo confirmado. Empieza en solo lectura, conserva las autoridades separadas y pide autorización exacta antes de cualquier escritura de producción."

@@ -10,6 +10,8 @@ scope, agreed rules in understandable language, dependencies/enablers, questions
 acceptance criteria, canonical scenarios, inline criterion-rule-test traceability and QA
 notes. Copy every applicable approved `AC-*` and its complete `SC-*` Given/When/Then
 behavior without abbreviation. A list of IDs or a link to another file is not a substitute.
+Include active behavior only. Never copy retired or superseded `US-*`, `AC-*` or `SC-*`
+records into Jira.
 
 Use this reading order: **user story → scope → agreed behavior/rules → dependencies and questions → acceptance criteria → QA coverage**. Place status and readiness in a clearly labeled compact section. Prefer human-readable headings with IDs retained for traceability. Separate sections with whitespace; avoid long undifferentiated metadata lists, embedded CSS, or platform-specific presentation.
 
@@ -27,10 +29,12 @@ with this projection; do not maintain a separate enriched Jira version.
 ## DEV handoff
 
 Include approved stories and criteria, dependencies, enablers, observability, failure behavior, engineering confirmations, and the current Judge verdict with a relative report link. Do not paste every test step.
+Do not list retired IDs as implementation work.
 
 ## QA handoff
 
 Group by story and functional case. Show scenarios, covered checks, preconditions, data/environment needs, risk, priority, level, each scenario's automation decision and rationale, expected evidence, residual risk, and the current Judge verdict with a relative report link. Add a downstream instruction to preserve behavior and traceability while allowing assertions from the same flow to remain consolidated.
+Do not list retired IDs as coverage to execute.
 
 ## Package index
 

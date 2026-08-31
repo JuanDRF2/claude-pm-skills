@@ -68,7 +68,7 @@ Do not ask about information already clear. Preserve universal IDs such as `BR-`
 
 ## Key Concepts
 
-### One Entry Point, Nine Specialist Skills
+### One Entry Point, Ten Specialist Skills
 
 Use these local skills as the source of truth for each phase:
 
@@ -81,6 +81,7 @@ Use these local skills as the source of truth for each phase:
 7. `skills/build-refinement-document/SKILL.md`
 8. `skills/publish-refinement-to-notion/SKILL.md`
 9. `skills/sync-refinement-package-notion/SKILL.md`
+10. `skills/sync-refinement-package-taxonomy/SKILL.md`
 
 Before executing a phase, read `references/specialist-dispatch-contract.md`, invoke the required specialist through the host's skill mechanism, read it completely and follow its current instructions. Do not copy its full methodology into this orchestrator or replace it with an improvised equivalent.
 
@@ -92,7 +93,7 @@ A **decision gate** is a short pause where the user confirms information that wo
 2. Proposed releases and story split
 3. Stories and acceptance criteria
 4. Test coverage and remaining risk
-5. Optional publication and export formats
+5. Optional publication and export formats, plus conditional Taxonomy Alignment when it applies
 
 Do not ask for confirmation after every minor step. Do not skip a gate when unresolved behavior would make later output unreliable.
 
@@ -105,6 +106,10 @@ BR-01 → US-MEM-01 → AC-MEM-01-01 → CHK-MEM-001 → FTC-MEM-01 / SC-MEM-01-
 ```
 
 Never renumber silently between phases. If an item changes, record the change and update its links. Run the deterministic package validator before final handoff.
+
+When an approved `US-*`, `AC-*` or `SC-*` is retired or superseded, read
+`references/retired-identifier-contract.md`. Preserve its identity in the canonical
+historical registry, never inside active delivery behavior or by reusing the ID.
 
 ### Decision Capture Transaction
 
@@ -153,8 +158,10 @@ ordinary copy changes or future behavior Product is still defining. When design 
 domain/architecture boundaries for your own product are material, read
 `references/domain-and-design-sources.md`. If the team confirms an external dev-tracking
 destination for this project, read `references/dev-destination-handoff.md` before mapping
-canonical IDs into it. None of these references change product authority or add a
-mandatory Notion cover section.
+canonical IDs into it. After Gate 4, read `references/taxonomy-alignment.md` only when
+Product Taxonomy applies, an existing mapping may be stale, or post-handoff reconciliation
+was requested. None of these references change product authority or add a mandatory
+Notion cover section.
 
 ## Markdown Output
 
@@ -493,7 +500,7 @@ Return a concise handoff containing completed artifacts, Judge verdict, decision
 
 ### Phase 6: Choose Final Presentations
 
-After deterministic validation succeeds and the Judge returns `PASS` or `PASS WITH OBSERVATIONS` / `PASS CON OBSERVACIONES`, confirm that the canonical Markdown package is complete. Then open **Gate 5: Publication and export** and ask what additional presentation the user wants:
+After deterministic validation succeeds and the Judge returns `PASS` or `PASS WITH OBSERVATIONS` / `PASS CON OBSERVACIONES`, confirm that the canonical Markdown package is complete. If Product Taxonomy applies to this initiative, read `references/taxonomy-alignment.md` now and route the Gate 5 Taxonomy Alignment step before or alongside the development-destination handoff. Then open **Gate 5: Publication and export** and ask what additional presentation the user wants:
 
 1. Portal HTML local
 2. Documento Word
@@ -572,6 +579,7 @@ Read `references/examples-and-pitfalls.md` only when the user requests an exampl
 - `references/specialist-dispatch-contract.md` — Resolution order, preflight receipt and hard stops before invoking a specialist skill
 - `references/change-impact-contract.md` — Consumer graph, per-unit update/preserve/blocked plan and gates before regenerating or publishing
 - `references/artifact-contract.md` — Required handoff and traceability between phases
+- `references/retired-identifier-contract.md` — Active versus historical ID lifecycle
 - `references/markdown-package.md` — File structure, statuses, and update rules
 - `references/local-organization-contract.md` — Notion availability classification and local-draft normalization
 - `references/rule-governance.md` — Sources, authority, contradictions, and rule consolidation
@@ -589,6 +597,7 @@ Read `references/examples-and-pitfalls.md` only when the user requests an exampl
 - `references/codebase-verification-contract.md` — Conditional current-implementation evidence
 - `references/domain-and-design-sources.md` — Conditional design-hub and domain/architecture evidence for your own product
 - `references/dev-destination-handoff.md` — Optional adapter reference for an external dev-tracking destination
+- `references/taxonomy-alignment.md` — Conditional Gate 5 and post-handoff routing for Product Taxonomy
 - `references/examples-and-pitfalls.md` — Worked examples and common interaction failure patterns
 - `skills/refinement-judge/SKILL.md` — Independent adversarial gate before consequential actions
 - `skills/user-story-mapping/SKILL.md` — Journey, rules, variations, and release slices
