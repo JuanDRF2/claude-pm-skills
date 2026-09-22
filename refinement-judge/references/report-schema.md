@@ -51,6 +51,7 @@ Write the report in the package language. Use the translated headings shown belo
 | --- | --- | --- |
 | Source fidelity | Pass/Fail/Limited | [...] |
 | Scope and decisions | Pass/Fail/Limited | [...] |
+| Project understanding and story map | Pass/Fail/Not applicable/Limited | [...] |
 | Stories and criteria | Pass/Fail/Limited | [...] |
 | QA executability | Pass/Fail/Limited | [...] |
 | Traceability | Pass/Fail/Limited | [...] |

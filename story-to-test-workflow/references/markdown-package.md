@@ -5,6 +5,8 @@
 Ask for or propose the output location before writing. Use a lowercase kebab-case project folder such as `online-membership-purchase`. Do not create files in an unrelated product repository without confirmation.
 
 Record Artifact language, Audience, Destination, Detail level, and Sizing convention in `00-workflow-state.md`.
+For a new complete project, also record `project-context-v1`. Adopt it in an existing
+package only when Gate 1 is materially revised; use `project-context-contract.md`.
 
 ## Standard Header
 
@@ -97,6 +99,11 @@ Default behavior is to preview drafts in the conversation and save approved work
 ## Completion Check
 
 Before handoff, confirm that every expected file is either present or explicitly marked Not applicable. Report paths and statuses, not merely that “documentation was generated.”
+
+For packages declaring `project-context-v1`, confirm the semantic sections and cross-file
+consistency of `01-project-understanding.md` and `03-story-map.md`. Existence alone is not
+completion; a blank template, feature list or implementation inventory does not satisfy
+the contract.
 
 Run `python3 skills/story-to-test-workflow/scripts/validate-package.py artifacts/<project> --language <code>` and fix errors before handoff. For a registered shared contract, pass `--package-kind shared-contract`; never use that mode to bypass the complete-project contract. Explain any accepted warnings.
 

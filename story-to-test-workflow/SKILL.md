@@ -276,6 +276,10 @@ publication gate. Do not combine local moves and remote writes in one approval.
 
 ### Phase 1: Understand the Project
 
+For new projects or material Gate 1 revisions, apply `references/project-context-contract.md`
+so `01-project-understanding.md` explains the product boundary while `03-story-map.md`
+preserves the understandable end-to-end journey without duplicating rules.
+
 Use `user-story-mapping` to identify:
 
 - Objective and users
@@ -579,6 +583,7 @@ Read `references/examples-and-pitfalls.md` only when the user requests an exampl
 - `references/specialist-dispatch-contract.md` — Resolution order, preflight receipt and hard stops before invoking a specialist skill
 - `references/change-impact-contract.md` — Consumer graph, per-unit update/preserve/blocked plan and gates before regenerating or publishing
 - `references/artifact-contract.md` — Required handoff and traceability between phases
+- `references/project-context-contract.md` — Gate 1 understanding and journey quality
 - `references/retired-identifier-contract.md` — Active versus historical ID lifecycle
 - `references/markdown-package.md` — File structure, statuses, and update rules
 - `references/local-organization-contract.md` — Notion availability classification and local-draft normalization

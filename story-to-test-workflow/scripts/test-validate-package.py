@@ -572,6 +572,134 @@ AC-HH-01-01; SC-HH-01-01. Consulta el paquete canónico.
         assert any("without naming the question" in warning for warning in warnings), warnings
         assert any("only internal records or statuses" in warning for warning in warnings), warnings
 
+    # Context artifacts remain backward-compatible until a package opts into the versioned
+    # Gate 1 contract. Once adopted, existence alone is not enough.
+    with tempfile.TemporaryDirectory() as temporary:
+        root = Path(temporary)
+        state_path = root / "00-workflow-state.md"
+        understanding_path = root / "01-project-understanding.md"
+        story_map_path = root / "03-story-map.md"
+        state_path.write_text(
+            "## Workflow State\n- Project status: Active\n- Delivery status: Gate 1\n",
+            encoding="utf-8",
+        )
+        errors, warnings = validator.context_artifact_checks(
+            root, validator.read_files(root)
+        )
+        assert not errors and not warnings
+        assert not validator.semantic_heading_block(
+            "## Activities\n### Empty child heading\n", r"activities"
+        )
+
+        state_path.write_text(
+            "## Workflow State\n"
+            "- Context artifact contract / Contrato de artefactos de contexto: "
+            "project-context-v1\n",
+            encoding="utf-8",
+        )
+        understanding = """# Entendimiento del proyecto
+
+## Objetivo
+Permitir que una persona complete una compra entendible.
+
+## Resultado esperado
+La compra queda confirmada y la persona conoce el resultado.
+
+## Personas y actores
+La persona compra y el sistema procesa la solicitud.
+
+## Alcance incluido
+Incluye selección, confirmación y comunicación.
+
+## Fuera de alcance
+No incluye devoluciones. Razón: pertenecen a otra entrega.
+
+## Recorrido principal
+La persona selecciona, confirma y observa el resultado.
+
+## Variaciones
+Invitado y autenticado recorren el mismo resultado con datos distintos.
+
+## Caminos alternos, fallas y recuperación
+Un rechazo conserva los datos y permite corregirlos.
+
+## Riesgos materiales
+Evitar confirmaciones duplicadas.
+
+## Fuentes y documentos relacionados
+Las definiciones viven en [Reglas y preguntas](./02-rules-and-questions.md).
+"""
+        story_map = """# Story map
+
+## Segmento y contexto
+Una persona que necesita completar una compra.
+
+## Narrativa del recorrido
+Pasar de una selección válida a una confirmación visible.
+
+## Backbone
+1. Seleccionar
+2. Confirmar
+3. Recibir resultado
+
+## Actividades y pasos
+### Seleccionar
+La persona elige una opción y el sistema muestra el resumen.
+
+### Confirmar
+La persona confirma y el sistema comunica el resultado.
+
+## Variaciones del recorrido
+Invitado y autenticado aportan datos diferentes.
+
+## Caminos alternos, fallas y recuperación
+Un dato inválido se corrige antes de confirmar.
+
+## Primer resultado vertical candidato
+Completar una compra válida de principio a fin.
+
+## Gaps y responsables
+Ninguno; Producto confirmó el comportamiento.
+
+## Enlaces
+[Entendimiento](./01-project-understanding.md) y
+[reglas](./02-rules-and-questions.md).
+"""
+        understanding_path.write_text(understanding, encoding="utf-8")
+        story_map_path.write_text(story_map, encoding="utf-8")
+        errors, warnings = validator.context_artifact_checks(
+            root, validator.read_files(root)
+        )
+        assert not errors, "\n".join(errors)
+        assert not warnings, "\n".join(warnings)
+
+        understanding_path.write_text(
+            understanding.replace("## Riesgos materiales", "## Notas")
+            + "\n| BR-CTX-01 | Regla redefinida aquí |\n",
+            encoding="utf-8",
+        )
+        story_map_path.write_text(
+            story_map.replace("[Entendimiento](./01-project-understanding.md) y\n", ""),
+            encoding="utf-8",
+        )
+        errors, _warnings = validator.context_artifact_checks(
+            root, validator.read_files(root)
+        )
+        assert any("material risks" in error for error in errors), errors
+        assert any("must reference, not redefine" in error for error in errors), errors
+        assert any("must link to 01-project-understanding.md" in error for error in errors), errors
+
+        state_path.write_text(
+            "- Context artifact contract: project-context-v2\n", encoding="utf-8"
+        )
+        errors, _warnings = validator.context_artifact_checks(
+            root, validator.read_files(root)
+        )
+        assert errors == [
+            "Unknown context artifact contract: project-context-v2. "
+            "Expected project-context-v1 or Legacy."
+        ]
+
     # A shared contract has a smaller explicit contract; project mode must stay strict.
     with tempfile.TemporaryDirectory() as temporary:
         root = Path(temporary)

@@ -20,6 +20,7 @@ At each gate, maintain:
 - Shared storage mode: github-main-v1 | local-only
 - Artifact language/audiences:
 - Optional Word export:
+- Context artifact contract / Contrato de artefactos de contexto: project-context-v1 | Legacy
 - Project status and delivery statuses:
 - Derived artifacts: None | [artifact list and role]
 - Canonical base snapshot:
@@ -64,6 +65,10 @@ repository fields when the project is first changed in GitHub. Do not rewrite an
 package only to modernize metadata. A Pull Request is not the last merged canonical commit.
 Preserve legacy derived-output fields in old packages until that package is materially
 changed; do not treat them as required for new work.
+
+Use `project-context-v1` for every new complete project. Preserve `Legacy` or an absent
+field in older packages until their Gate 1 understanding or journey changes materially;
+then update `01`, `03` and this field together.
 
 After every material approval, also maintain:
 

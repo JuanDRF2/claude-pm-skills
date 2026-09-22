@@ -78,9 +78,9 @@ Never label an item Covered merely because a document exists. Coverage requires 
 | File | Primary content | Written after |
 |---|---|---|
 | `00-workflow-state.md` | Current phase, approvals, decision checkpoint, stale consumers, questions, next action and link/summary for retired IDs | Every approved gate and material decision |
-| `01-project-understanding.md` | Objective, actors, scope, known systems | Gate 1 |
+| `01-project-understanding.md` | Plain-language objective and outcome, actors, scope, boundaries, summarized journey, variations, recovery, risks and sources | Gate 1 |
 | `02-rules-and-questions.md` | Rules, sources, questions, assumptions, owners | Gate 1 |
-| `03-story-map.md` | Journey, variations, alternate and recovery paths | Gate 1 |
+| `03-story-map.md` | Ordered user journey, actor/system responsibilities, variations, alternate/failure/recovery paths, vertical candidate and owned gaps | Gate 1 |
 | `04-release-slices.md` | Selected deliveries, dependencies, deferred scope | Gate 2 |
 | `05-user-stories.md` | Active stories/criteria plus the canonical retired-ID registry outside all `## US-*` blocks | Gate 3 |
 | `06-test-coverage.md` | Risk analysis and coverage matrix | Gate 4 |

@@ -66,6 +66,7 @@ TAXONOMY_ID_PATTERNS = {
 }
 TAXONOMY_MAPPING_STATUSES = {"Draft", "Verified", "Stale", "Blocked"}
 TAXONOMY_CHANNELS = {"Point of sale", "Back office", "Online"}
+CONTEXT_ARTIFACT_CONTRACT = "project-context-v1"
 
 EN_MARKERS = re.compile(
     r"\b(Project|Status|Last updated|Approved through|User Story|Acceptance Criteria|"
@@ -276,6 +277,134 @@ def normalized_label(value: str) -> str:
         if not unicodedata.combining(character)
     )
     return re.sub(r"[^a-z0-9]+", " ", plain.lower()).strip()
+
+
+def semantic_heading_block(text: str, pattern: str) -> str:
+    """Return the first non-empty semantic Markdown section matching a heading."""
+    headings = list(
+        re.finditer(r"^(?P<marks>#{1,6})\s+(?P<title>.+?)\s*$", text, re.MULTILINE)
+    )
+    for index, heading in enumerate(headings):
+        title = re.sub(r"^\s*\d+(?:\.\d+)*[.)]?\s*", "", heading.group("title"))
+        title = re.sub(r"[`*_~]", "", title).strip()
+        if not re.search(pattern, title, re.IGNORECASE):
+            continue
+        level = len(heading.group("marks"))
+        end = len(text)
+        for following in headings[index + 1:]:
+            if len(following.group("marks")) <= level:
+                end = following.start()
+                break
+        body = text[heading.end():end]
+        body_without_headings = re.sub(r"(?m)^#{1,6}\s+.*$", "", body)
+        if re.search(r"[\wÁÉÍÓÚÜÑáéíóúüñ]", body_without_headings):
+            return body.strip()
+    return ""
+
+
+def context_artifact_contract_value(state: str) -> str:
+    match = re.search(
+        r"(?im)^-\s*(?:Context artifact contract\s*/\s*"
+        r"Contrato de artefactos de contexto|Context artifact contract|"
+        r"Contrato de artefactos de contexto)\s*:\s*`?([^`\s]+)`?\s*$",
+        state,
+    )
+    return match.group(1).strip() if match else ""
+
+
+def context_artifact_checks(
+    root: Path, files: dict[Path, str]
+) -> tuple[list[str], list[str]]:
+    """Validate opted-in Gate 1 context artifacts without breaking legacy packages."""
+    errors: list[str] = []
+    warnings: list[str] = []
+    state = files.get(root / "00-workflow-state.md", "")
+    contract = context_artifact_contract_value(state)
+    if not contract or normalized_label(contract) == "legacy":
+        return errors, warnings
+    if contract != CONTEXT_ARTIFACT_CONTRACT:
+        errors.append(
+            "Unknown context artifact contract: "
+            f"{contract}. Expected {CONTEXT_ARTIFACT_CONTRACT} or Legacy."
+        )
+        return errors, warnings
+
+    understanding_path = root / "01-project-understanding.md"
+    story_map_path = root / "03-story-map.md"
+    understanding = files.get(understanding_path, "")
+    story_map = files.get(story_map_path, "")
+    if not understanding or not story_map:
+        return errors, warnings  # The package contract reports missing files.
+
+    understanding_sections = {
+        "plain-language objective or summary": r"\b(?:objetivo|resumen|problema|objective|summary|problem|overview)\b",
+        "expected outcome": r"\b(?:resultado|beneficio|outcome|expected result|desired result)\b",
+        "people and actors": r"\b(?:personas?|actores?|usuarios? y sistemas?|actors?|participants?|people)\b",
+        "included scope": r"^(?!.*(?:fuera|excluid|out of scope|excluded)).*(?:alcance|scope|incluid[oa]s?|included|in scope)",
+        "excluded scope": r"\b(?:fuera de alcance|excluid[oa]s?|out of scope|excluded)\b",
+        "main journey": r"\b(?:recorrido principal|camino principal|flujo principal|backbone|main journey|main path|main flow|how it works)\b",
+        "material variations": r"\b(?:variaciones?|diferencias.*flujos?|variants?|variations?|flow differences)\b",
+        "alternate, failure or recovery paths": r"\b(?:alternos?|alternativos?|fallas?|errores?|recuperaci[oó]n|alternate|failure|errors?|recovery)\b",
+        "material risks": r"\b(?:riesgos?|risks?)\b",
+        "sources and related documents": r"\b(?:fuentes?|evidencia|documentos relacionados|sources?|evidence|related documents)\b",
+    }
+    story_map_sections = {
+        "persona, segment or context": r"\b(?:personas?|segmento|contexto|actors?|persona|segment|context)\b",
+        "journey narrative": r"\b(?:narrativa|objetivo del recorrido|journey narrative|narrative|journey goal)\b",
+        "ordered backbone": r"\b(?:backbone|actividades principales|recorrido principal|main activities|main journey)\b",
+        "activities and steps": r"\b(?:actividades?|pasos|tareas|recorrido por actividad|activities|steps|tasks|activity journey)\b",
+        "journey variations": r"\b(?:variaciones?|matriz de variaciones|variants?|variations?|variation matrix)\b",
+        "alternate, failure or recovery paths": r"\b(?:alternos?|alternativos?|fallas?|errores?|recuperaci[oó]n|alternate|failure|errors?|recovery)\b",
+        "first vertical outcome candidate": r"\b(?:resultado vertical|primera entrega|primer resultado|candidato.*entrega|vertical outcome|first delivery|delivery candidate)\b",
+        "gaps and owners": r"\b(?:gaps?|brechas|decisiones pendientes|preguntas|dependencias|owners?|responsables?)\b",
+    }
+    for label, pattern in understanding_sections.items():
+        if not semantic_heading_block(understanding, pattern):
+            errors.append(
+                f"01-project-understanding.md is missing a non-empty semantic section: {label}."
+            )
+    for label, pattern in story_map_sections.items():
+        if not semantic_heading_block(story_map, pattern):
+            errors.append(
+                f"03-story-map.md is missing a non-empty semantic section: {label}."
+            )
+
+    required_links = {
+        "01-project-understanding.md": (
+            (understanding, "02-rules-and-questions.md"),
+        ),
+        "03-story-map.md": (
+            (story_map, "01-project-understanding.md"),
+            (story_map, "02-rules-and-questions.md"),
+        ),
+    }
+    for owner, links in required_links.items():
+        for text, target in links:
+            if not re.search(
+                rf"\[[^]]+\]\((?:\./)?{re.escape(target)}(?:#[^)]+)?\)", text
+            ):
+                errors.append(f"{owner} must link to {target}.")
+
+    for path, text in (
+        (understanding_path, understanding),
+        (story_map_path, story_map),
+    ):
+        redefined: set[str] = set()
+        for prefix in ("BR", "US", "AC", "SC"):
+            redefined.update(definitions_in_text(text, prefix))
+        question_pattern = r"\bQ-(?:[A-Z0-9]+-)?\d{2,}\b"
+        redefined.update(
+            re.findall(r"^#{1,6}\s+.*?(" + question_pattern + r")", text, re.MULTILINE)
+        )
+        redefined.update(
+            re.findall(r"^\|\s*(" + question_pattern + r")\s*\|", text, re.MULTILINE)
+        )
+        if redefined:
+            errors.append(
+                f"{path.name} must reference, not redefine, canonical behavior IDs: "
+                + ", ".join(sorted(redefined))
+            )
+    return errors, warnings
 
 
 def clean_table_cell(value: str) -> str:
@@ -1133,6 +1262,9 @@ def decision_checkpoint_checks(
 def strict_checks(root: Path, files: dict[Path, str]) -> tuple[list[str], list[str]]:
     errors: list[str] = []
     warnings: list[str] = []
+    context_errors, context_warnings = context_artifact_checks(root, files)
+    errors.extend(context_errors)
+    warnings.extend(context_warnings)
     retired_errors, _retired_records = retired_identifier_checks(root, files)
     errors.extend(retired_errors)
     taxonomy_errors, taxonomy_warnings = taxonomy_alignment_checks(root, files)

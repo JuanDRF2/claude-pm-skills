@@ -63,7 +63,31 @@ Check that:
 - One delivery being complete does not mark the whole project complete.
 - Technical proposals are not presented as product decisions.
 
-### 3. Story quality
+### 3. Project comprehension and journey continuity
+
+For complete project packages, review `01-project-understanding.md` and
+`03-story-map.md` together. Check that:
+
+- a new reader can explain the problem, expected outcome, actors, included and excluded
+  scope, main journey and material risks without opening the stories first;
+- the understanding document summarizes product and system boundaries in plain language
+  instead of becoming a code inventory or a duplicate rule book;
+- the story map reads from entry to observable result and separates person actions, system
+  responses, alternate paths, failures and recovery;
+- actors, terms, scope, variations and open decisions retain the same meaning across both
+  documents and the approved source model;
+- excluded behavior does not reappear as an active activity or vertical outcome;
+- `BR-*`, `Q-*`, `US-*`, `AC-*` and `SC-*` are linked to their canonical owners rather
+  than redefined in these context artifacts;
+- the vertical candidate in the map remains a proposal until `04-release-slices.md` owns
+  the approved delivery decision;
+- a declared `project-context-v1` passes its deterministic structure and link checks.
+
+Do not require these artifacts from a `shared-contract` without an independent journey.
+For an unversioned legacy package, report material comprehension or contradiction defects,
+but do not fail it merely because its heading names differ from the new template.
+
+### 4. Story quality
 
 Check that:
 
@@ -73,7 +97,7 @@ Check that:
 - The split does not create horizontal component-only work disguised as customer value.
 - Readiness does not depend on unresolved blocking behavior.
 
-### 4. Acceptance behavior
+### 5. Acceptance behavior
 
 Check that:
 
@@ -83,7 +107,7 @@ Check that:
 - Product language is understandable without architecture knowledge.
 - Technical evidence is separated from business behavior.
 
-### 5. QA executability
+### 6. QA executability
 
 Check that:
 
@@ -120,7 +144,7 @@ rationale. Do not accept `Not applicable` merely to avoid downstream or cross-sy
 verification. Missing required composition blocks QA approval even when each individual
 scenario is syntactically valid.
 
-### 6. Traceability
+### 7. Traceability
 
 Trace both directions:
 
@@ -138,7 +162,7 @@ readiness counts exclude them; historical traceability remains separately labele
 is simultaneously active and retired or reused for different behavior. Matching numeric
 suffixes across different prefixes are not the same identity.
 
-### 7. Risk and readiness
+### 8. Risk and readiness
 
 Check high-impact areas proportionally:
 
@@ -151,7 +175,7 @@ Check high-impact areas proportionally:
 
 Readiness requires the appropriate Product, Engineering and QA ownership. Product approval alone must not be reported as globally sprint-ready.
 
-### 8. Presentation parity
+### 9. Presentation parity
 
 When derived outputs exist, compare them with canonical Markdown:
 
@@ -209,7 +233,7 @@ and supporting material. Native child pages may remain grouped in the final coll
 container `Subpáginas internas del proyecto`; do not confuse this human hierarchy with a
 canonical Markdown mirror.
 
-### 9. Derived artifacts and product boundaries
+### 10. Derived artifacts and product boundaries
 
 When HTML, prototypes, designs or generated SPECs are in scope, check that:
 

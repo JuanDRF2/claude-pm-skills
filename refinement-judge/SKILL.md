@@ -114,14 +114,21 @@ Try to find counterexamples across these dimensions:
 
 1. Source fidelity
 2. Scope and decision integrity
-3. Story size and vertical value
-4. Acceptance-criterion observability
-5. Test executability and risk coverage
-6. Traceability and ID parity
-7. Readiness and approval ownership
-8. Cross-presentation parity
-9. Derived-artifact and product-boundary integrity
-10. Conditional Product Taxonomy alignment
+3. Project comprehension and journey continuity
+4. Story size and vertical value
+5. Acceptance-criterion observability
+6. Test executability and risk coverage
+7. Traceability and ID parity
+8. Readiness and approval ownership
+9. Cross-presentation parity
+10. Derived-artifact and product-boundary integrity
+11. Conditional Product Taxonomy alignment
+
+For complete projects, reject Gate 1 readiness when `01-project-understanding.md` and
+`03-story-map.md` exist but do not let a new reader explain the outcome, scope, connected
+journey and recovery without reconstructing them from stories or technical implementation.
+Apply `project-context-v1` deterministically when the package declares it; audit semantic
+clarity and cross-file consistency for legacy packages proportionally to the intended action.
 
 For each high-risk scenario marked `Ready`, require the compact execution contract defined
 by the package and independently test whether another QA reviewer could reproduce it without
