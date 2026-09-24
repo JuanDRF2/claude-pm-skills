@@ -8,6 +8,54 @@ Record Artifact language, Audience, Destination, Detail level, and Sizing conven
 For a new complete project, also record `project-context-v1`. Adopt it in an existing
 package only when Gate 1 is materially revised; use `project-context-contract.md`.
 
+## Package Structure
+
+A recommended structure is:
+
+```text
+artifacts/<project-name>/
+├── 00-workflow-state.md
+├── 01-project-understanding.md
+├── 02-rules-and-questions.md
+├── 03-story-map.md
+├── 04-release-slices.md
+├── 05-user-stories.md
+├── 06-test-coverage.md
+├── 07-functional-test-cases.md
+├── 08-traceability-and-risks.md
+├── 09-package-index.md
+├── 11-refinement-judge-report.md
+├── jira/US-[ID].md
+└── handoffs/{dev-handoff,qa-handoff}.md
+```
+
+## Writing Rules
+
+1. Show a concise preview at the decision gate.
+2. Write or update the corresponding Markdown files only after the user confirms the phase, unless the user explicitly asks to save a draft.
+3. Label saved drafts visibly as `Status: Draft — Not approved`.
+4. Preserve user edits. Read the current file before updating and change only the relevant sections.
+5. Keep links relative so the package can move or be versioned in Git.
+6. Never publish to Notion, Jira, or another external system unless the user separately requests and authorizes it.
+7. Keep `00-workflow-state.md` current after every approved gate and every material decision checkpoint so the workflow can resume without rereading the full conversation.
+8. Keep project status separate from delivery status; one completed delivery does not complete the project.
+9. Generate Jira and role-specific views from approved source artifacts, never as competing sources of truth.
+10. Keep atomic checks in `06-test-coverage.md` and QA-reviewable functional scenarios in `07-functional-test-cases.md`.
+11. Do not generate `.testcase.yml`, `.testplan.yml`, `.testrun.yml`, TestManager keys, UUIDs, or execution results; prepare a handoff for the repository that owns them.
+
+## Local Routing
+
+When creating or migrating local work, route it before writing:
+
+- canonical project package → `artifacts/<project-slug>/`;
+- authoritative cross-project contract → `artifacts/_shared/<shared-package-slug>/`;
+- audit, review or historical delta → `artifacts/_reviews/<review-group>/`;
+- executable generator or publication helper → `artifacts/_local/tooling/<tool-group>/`.
+
+Do not create new loose files directly under `artifacts/`. Read
+`references/local-organization-contract.md` before reorganizing files. Local normalization
+must not modify Notion.
+
 ## Standard Header
 
 Start every generated file with:

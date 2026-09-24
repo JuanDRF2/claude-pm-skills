@@ -167,62 +167,14 @@ Notion cover section.
 
 Use local Markdown files as the default durable output. The conversation remains the place for questions and short previews; the files become the reviewable project package.
 
-At the start, determine a short project name suitable for a folder, for example `online-membership-purchase`. If no workspace path is specified, propose rather than silently assume the location. A recommended structure is:
+At the start, determine a short project name suitable for a folder, for example `online-membership-purchase`. If no workspace path is specified, propose rather than silently assume the location.
 
-```text
-artifacts/<project-name>/
-├── 00-workflow-state.md
-├── 01-project-understanding.md
-├── 02-rules-and-questions.md
-├── 03-story-map.md
-├── 04-release-slices.md
-├── 05-user-stories.md
-├── 06-test-coverage.md
-├── 07-functional-test-cases.md
-├── 08-traceability-and-risks.md
-├── 09-package-index.md
-├── 11-refinement-judge-report.md
-├── jira/US-[ID].md
-└── handoffs/{dev-handoff,qa-handoff}.md
-```
-
-Writing rules:
-
-1. Show a concise preview at the decision gate.
-2. Write or update the corresponding Markdown files only after the user confirms the phase, unless the user explicitly asks to save a draft.
-3. Label saved drafts visibly as `Status: Draft — Not approved`.
-4. Preserve user edits. Read the current file before updating and change only the relevant sections.
-5. Keep links relative so the package can move or be versioned in Git.
-6. Never publish to Notion, Jira, or another external system unless the user separately requests and authorizes it.
-7. Keep `00-workflow-state.md` current after every approved gate and every material decision checkpoint so the workflow can resume without rereading the full conversation.
-8. Keep project status separate from delivery status; one completed delivery does not complete the project.
-9. Generate Jira and role-specific views from approved source artifacts, never as competing sources of truth.
-10. Keep atomic checks in `06-test-coverage.md` and QA-reviewable functional scenarios in `07-functional-test-cases.md`.
-11. Do not generate `.testcase.yml`, `.testplan.yml`, `.testrun.yml`, TestManager keys, UUIDs, or execution results; prepare a handoff for the repository that owns them.
-
-Read `references/markdown-package.md` before creating or updating the package.
+Read `references/markdown-package.md` before creating or updating the package — it holds the full folder structure, the writing rules (draft labeling, relative links, when to write vs. preview, `00-workflow-state.md` freshness, never publishing to Notion/Jira without authorization), local-work routing (canonical project vs. `_shared` vs. `_reviews` vs. `_local/tooling`), and `_shared` ownership rules. Read `references/local-organization-contract.md` before reorganizing existing files — local normalization must not modify Notion.
 
 When the user asks for shared team context, has no local files, wants to resume a registered
 Notion project, or workflow state records Notion synchronization, read and invoke
 `sync-refinement-package-notion`. Use `start` before editing and do not require a teammate
 to reconstruct prior chats.
-
-When creating or migrating local work, route it before writing:
-
-- canonical project package → `artifacts/<project-slug>/`;
-- authoritative cross-project contract → `artifacts/_shared/<shared-package-slug>/`;
-- audit, review or historical delta → `artifacts/_reviews/<review-group>/`;
-- executable generator or publication helper → `artifacts/_local/tooling/<tool-group>/`.
-
-Do not create new loose files directly under `artifacts/`. Read
-`references/local-organization-contract.md` before reorganizing files. Local normalization
-must not modify Notion.
-
-For every `_shared` package, resolve ownership before publication. If one feature creates
-and governs the contract, publish its visible shared page inside that feature's canonical
-Notion project while keeping the Markdown under `_shared/` and registering a separate
-manifest. Use a shared-standards hub only when no feature owns the behavior. Consumer
-projects link to the shared page and must not copy it as independent truth.
 
 ## Interaction Rules
 
