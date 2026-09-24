@@ -6,6 +6,16 @@ Not sure which one to use? Start with [`idea-to-ship`](./idea-to-ship/) — it d
 
 See [`ACTION-TIERS.md`](./ACTION-TIERS.md) for the shared `allow`/`ask`/`block` classification that any skill touching a live system (Jira, Notion, a hosted portal) follows instead of inventing its own confirmation rule.
 
+## Install
+
+This repo is a [Claude Code Plugin](https://code.claude.com/docs/en/plugins). Install every skill in one shot:
+
+```
+/plugin install claude-pm-skills@github:JuanDRF2/claude-pm-skills
+```
+
+Or clone the repo and copy whichever individual skill folders you want into `~/.claude/skills/` (personal) or `.claude/skills/` (project) — no plugin required either way.
+
 ---
 
 ## Want the whole rhythm, not just individual skills?
