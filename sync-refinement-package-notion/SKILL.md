@@ -22,10 +22,13 @@ Leer completamente:
 
 - [references/native-pages-fast-contract.md](references/native-pages-fast-contract.md) para
   cualquier operación normal;
+- [references/sync-contract.md](references/sync-contract.md) para la autoridad, serialización
+  y estado local de la sincronización;
 - [references/page-manifest-contract.md](references/page-manifest-contract.md) al registrar
   identidades;
-- [references/publication-authorization-contract.md](references/publication-authorization-contract.md)
-  y [references/publication-execution-contract.md](references/publication-execution-contract.md)
+- [references/publication-authorization-contract.md](references/publication-authorization-contract.md),
+  [references/publication-execution-contract.md](references/publication-execution-contract.md) y
+  [references/evidence-integrity-contract.md](references/evidence-integrity-contract.md)
   antes de una escritura;
 - [references/notion-presentation-validation-contract.md](references/notion-presentation-validation-contract.md)
   cuando cambien portada, historias o materiales editoriales.
