@@ -1,32 +1,10 @@
 # Workflow state and resumption
 
-At each gate, maintain:
+The main `## Workflow State` block lives inline in `SKILL.md`'s "State and Resumption"
+section (including the Gate approval log) — maintain it there at each gate. This file holds
+the optional supplementary blocks below.
 
-```markdown
-## Workflow State
-- Route:
-- Current phase:
-- Approved through:
-- Confirmed rules:
-- Open blocking questions:
-- Selected scope:
-- Next action:
-- Markdown package path:
-- Shared repository URL:
-- Canonical branch and observed commit:
-- Working branch and base commit:
-- Pull Request URL/status:
-- Last merged canonical commit:
-- Shared storage mode: github-main-v1 | local-only
-- Artifact language/audiences:
-- Optional Word export:
-- Context artifact contract / Contrato de artefactos de contexto: project-context-v1 | Legacy
-- Project status and delivery statuses:
-- Derived artifacts: None | [artifact list and role]
-- Canonical base snapshot:
-```
-
-Add this block only when Notion or another external derived view was explicitly requested,
+Add the Derived Output State block only when Notion or another external derived view was explicitly requested,
 already registered and material to the current work, or known to contain a remote edit:
 
 ```markdown
@@ -59,16 +37,8 @@ scope, or post-delivery reconciliation was requested:
 
 Do not describe `Unavailable` as a product defect. It is an execution limitation whose
 handoff consequence follows the recorded team policy. Never store a token or secret.
-
-For packages created before `github-main-v1`, preserve their existing fields and add the
-repository fields when the project is first changed in GitHub. Do not rewrite an unchanged
-package only to modernize metadata. A Pull Request is not the last merged canonical commit.
 Preserve legacy derived-output fields in old packages until that package is materially
 changed; do not treat them as required for new work.
-
-Use `project-context-v1` for every new complete project. Preserve `Legacy` or an absent
-field in older packages until their Gate 1 understanding or journey changes materially;
-then update `01`, `03` and this field together.
 
 After every material approval, also maintain:
 

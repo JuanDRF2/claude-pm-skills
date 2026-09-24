@@ -516,12 +516,23 @@ At each gate, maintain a compact state summary. The instant a gate is approved, 
 - Selected scope:
 - Next action:
 - Markdown package path:
+- Shared repository URL:
+- Canonical branch and observed commit:
+- Working branch and base commit:
+- Pull Request URL/status:
+- Last merged canonical commit:
+- Shared storage mode: github-main-v1 | local-only
 - Artifact language/audiences:
 - Optional presentations selected:
 - Presentation paths or URLs:
 - Notion publication mode and page manifest:
+- Context artifact contract / Contrato de artefactos de contexto: project-context-v1 | Legacy
 - Project status and delivery statuses:
+- Derived artifacts: None | [artifact list and role]
+- Canonical base snapshot:
 ```
+
+For packages created before `github-main-v1`, preserve their existing fields and add the repository fields when the project is first changed in GitHub; do not rewrite an unchanged package only to modernize metadata, and remember a Pull Request is not the last merged canonical commit. Preserve legacy derived-output fields in old packages until that package is materially changed. Read `references/workflow-state.md` for the optional Derived Output State, Taxonomy Alignment State, and Decision Checkpoint blocks and when to add each.
 
 When the user returns later, continue from this state instead of restarting. If source material changed, identify what downstream artifacts may now be stale.
 
