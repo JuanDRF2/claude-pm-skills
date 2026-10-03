@@ -335,3 +335,7 @@ The Head of Product can trigger it by saying:
 
 There is no automated scheduling built into the skill — it is triggered on demand.
 The data is always live from Jira at the moment of execution.
+
+## Do not invent
+
+If a figure, quote, source, name, date or fact is not in the material you were given, write it as unknown and ask for it. Never fill a gap with a plausible-sounding value, and mark every assumption as an assumption.

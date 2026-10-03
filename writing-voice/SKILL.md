@@ -79,3 +79,7 @@ is a complete substitute for their actual calibration.
 If a line could open a post from any marketer, rewrite it until it sounds like
 the user, not like a generic AI draft. Before returning a draft, reread the opening
 sentence — if it's generic, replace it.
+
+## Do not invent
+
+If a figure, quote, source, name, date or fact is not in the material you were given, write it as unknown and ask for it. Never fill a gap with a plausible-sounding value, and mark every assumption as an assumption.

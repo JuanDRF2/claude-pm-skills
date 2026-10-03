@@ -130,3 +130,7 @@ Reportar operación, proyecto, alcance verificado, páginas escritas, `verificat
 preservadas y bloqueadas, modo de equivalencia, respaldos, Judge, auditoría y siguiente
 paso. Incluir el commit GitHub fuente e indicar claramente si la evidencia es localizada o
 global.
+
+## No inventar
+
+Si un dato, cita, fuente, nombre o fecha no está en el material recibido, escríbelo como desconocido y pídelo. Nunca rellenes un vacío con un valor verosímil, y marca cada suposición como suposición.

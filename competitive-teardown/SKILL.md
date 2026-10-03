@@ -310,3 +310,7 @@ Before delivering any competitive output:
 5. Is there a date stamp so the team knows when to refresh?
 
 If the answer to any of these is "no," fix it before delivering.
+
+## Do not invent
+
+If a figure, quote, source, name, date or fact is not in the material you were given, write it as unknown and ask for it. Never fill a gap with a plausible-sounding value, and mark every assumption as an assumption.

@@ -62,3 +62,39 @@ artifact was reconciled and verified.
 When resuming, read this state before the conversation history. If a source changed,
 identify affected downstream artifacts and resume from the first stale phase. Never infer
 remote identity, approval or synchronization state from an earlier project.
+
+## Base Workflow State block
+
+The full template referenced from `SKILL.md` ("State and Resumption"). Copy it, fill what is known, and keep every field.
+
+```markdown
+## Workflow State
+- Route:
+- Current phase:
+- Approved through:
+- Gate approval log:
+  - Gate 1 (Understanding): [approved by <name>, <date>] or [pending]
+  - Gate 2 (Scope): [approved by <name>, <date>] or [pending]
+  - Gate 3 (Behavior): [approved by <name>, <date>] or [pending]
+  - Gate 4 (Coverage): [approved by <name>, <date>] or [pending]
+  - Gate 5 (Publication): [approved by <name>, <date>] or [pending] or [not requested]
+- Confirmed rules:
+- Open blocking questions:
+- Selected scope:
+- Next action:
+- Markdown package path:
+- Shared repository URL:
+- Canonical branch and observed commit:
+- Working branch and base commit:
+- Pull Request URL/status:
+- Last merged canonical commit:
+- Shared storage mode: github-main-v1 | local-only
+- Artifact language/audiences:
+- Optional presentations selected:
+- Presentation paths or URLs:
+- Notion publication mode and page manifest:
+- Context artifact contract / Contrato de artefactos de contexto: project-context-v1 | Legacy
+- Project status and delivery statuses:
+- Derived artifacts: None | [artifact list and role]
+- Canonical base snapshot:
+```
