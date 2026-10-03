@@ -7,6 +7,8 @@ not additional routing logic. Extracted 2026-09-29 to bring SKILL.md's body unde
 
 ## References
 
+- `references/embedded-mode.md` — When another orchestrator dispatched you: qualify gates, one question, no publishing, run the Judge once and report up
+
 - `references/interaction-protocol.md` — How to ask, adapt, pause, and resume
 - `references/specialist-dispatch-contract.md` — Resolution order, preflight receipt and hard stops before invoking a specialist skill
 - `references/change-impact-contract.md` — Consumer graph, per-unit update/preserve/blocked plan and gates before regenerating or publishing

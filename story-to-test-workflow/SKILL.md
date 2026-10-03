@@ -11,6 +11,8 @@ Do not rush from an incomplete idea to a large backlog. Build shared understandi
 
 ## Entry-Point Rule
 
+If another orchestrator dispatched you for its refinement phase (for example `signal-to-ship`), read `references/embedded-mode.md` first: it changes how you present yourself and what you hand back.
+
 Use this orchestrator before any refinement specialist skill when the request spans more than one refinement stage or begins from a PRD, spec, idea, or existing artifact package. Do not require the user to know the specialist skill names.
 
 At the start of every new workflow:
