@@ -6,6 +6,12 @@ const dash = (v) => (v === null || v === undefined || v === '' ? '-' : String(v)
 const cell = (v) => dash(v).replace(/\|/g, '\\|').replace(/\r?\n/g, ' ')
 const byText = (a, b) => (a < b ? -1 : a > b ? 1 : 0)
 
+/** Days between the hypothesis and the first real evidence, or null when either date is missing. */
+function learningDays(l) {
+  if (!l || !isIsoDate(l.hypothesis_formed) || !isIsoDate(l.first_evidence)) return null
+  return Math.round((Date.parse(`${l.first_evidence}T00:00:00Z`) - Date.parse(`${l.hypothesis_formed}T00:00:00Z`)) / 86400000)
+}
+
 /** One portfolio row from a parsed state object. */
 export function toRow(s, file = '') {
   const m = s.measurement || {}
@@ -26,6 +32,7 @@ export function toRow(s, file = '') {
     adoptionD30: typeof m.adoption_d30 === 'number' ? m.adoption_d30 : null,
     day30Due: isIsoDate(m.checkpoint_2) ? m.checkpoint_2 : null,
     verdict: m.verdict ?? null,
+    learningDays: learningDays(s.learning),
   }
 }
 
@@ -51,11 +58,11 @@ export function buildPortfolio(entries, today) {
 
   const lines = ['# Portfolio', '', `As of ${today}. ${rows.length} initiative${rows.length === 1 ? '' : 's'}.`, '']
   if (rows.length) {
-    lines.push('| Feature | Type / depth | Phase | Status | Delivered | Outcome (baseline -> target) | Day-30 adoption | Verdict |')
-    lines.push('|---|---|---|---|---|---|---|---|')
+    lines.push('| Feature | Type / depth | Phase | Status | Delivered | Outcome (baseline -> target) | Day-30 adoption | Days to first evidence | Verdict |')
+    lines.push('|---|---|---|---|---|---|---|---|---|')
     for (const r of rows) {
       const adopt = r.adoptionD30 !== null ? `${r.adoptionD30}%` : r.day30Due && r.day30Due <= today ? 'MISSING' : '-'
-      lines.push(`| ${cell(r.feature)} | ${cell(r.type)} / ${cell(r.depth)} | ${cell(r.phase)} | ${cell(r.status)} | ${cell(r.delivered)} | ${cell(r.outcome)} | ${adopt} | ${cell(r.verdict)} |`)
+      lines.push(`| ${cell(r.feature)} | ${cell(r.type)} / ${cell(r.depth)} | ${cell(r.phase)} | ${cell(r.status)} | ${cell(r.delivered)} | ${cell(r.outcome)} | ${adopt} | ${r.learningDays === null ? '-' : r.learningDays} | ${cell(r.verdict)} |`)
     }
     lines.push('')
   }

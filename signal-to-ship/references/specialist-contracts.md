@@ -49,7 +49,7 @@ the specialist is available, and dispatches. If unavailable, it stops and inform
 
 ### priority-scorer
 
-**Slot:** Built-in (orchestrator handles directly)
+**Slot:** Built-in (orchestrator handles directly); the `prioritization-scorer` library skill can fill it
 **Reference:** `references/priority-calculator.md`
 
 | Field | Value |
@@ -198,7 +198,7 @@ the specialist is available, and dispatches. If unavailable, it stops and inform
 
 ### metric-designer
 
-**Slot:** Built-in (orchestrator handles directly)
+**Slot:** Built-in (orchestrator handles directly); the `success-metrics-designer` library skill can fill it
 **Reference:** `references/phases-late.md` (Phase 7)
 
 | Field | Value |
@@ -211,7 +211,7 @@ the specialist is available, and dispatches. If unavailable, it stops and inform
 
 ### eval-designer (features with a model)
 
-**Slot:** Built-in (orchestrator handles directly)
+**Slot:** Built-in (orchestrator handles directly); the `ai-feature-eval-planner` library skill can fill it
 **Reference:** `references/ai-features.md`
 
 | Field | Value |

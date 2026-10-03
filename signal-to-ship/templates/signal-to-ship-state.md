@@ -64,6 +64,16 @@ eval_plan:
 delivery:
   rollout: not_set
   delivery_date:
+beta:
+  minimum_usage:
+  feedback_sessions:
+  exit_criteria:
+readiness:
+  roast: not_run
+  roast_note:
+learning:
+  hypothesis_formed:
+  first_evidence:
 measurement:
   checkpoint_1:
   checkpoint_2:
@@ -104,6 +114,9 @@ measurement:
 | `outcome.*` | The result this work should move: `metric`, `baseline` (today) and `target`. Required to pass Gate 1 at standard and full. |
 | `request.origin` | `internal`, `stakeholder` or `customer`. When `stakeholder`, Gate 1 also needs `underlying_need`, `minimal_slice`, `tradeoff`, `approver` and `decided_on` (see `templates/stakeholder-request.md`). |
 | `measurement.adoption_d30` | Optional number 0-100: share of the target group that adopted at the Day-30 checkpoint. Feeds `npm run portfolio`. |
+| `beta.*` | When `delivery.rollout: beta`, Gate 6 needs `minimum_usage` (what usage makes the beta meaningful) and `feedback_sessions` (a whole number >= 1); `exit_criteria` says what moves it to general availability. |
+| `readiness.roast` | `not_run`, `done` or `skipped` (see `templates/feature-roast.md`). Full depth cannot close Gate 6 with `not_run`; `skipped` needs `roast_note`. |
+| `learning.*` | `hypothesis_formed` (date, set at Gate 1) and `first_evidence` (date the first real evidence arrived: a test result, a prototype session, beta usage, an adoption figure). The portfolio shows the gap in days. |
 | `measurement.verdict` | `keep`, `iterate` or `retire`, with `verdict_reason`. Required on schema 2 once checkpoint 3 appears in `measurement.checked` (Gate 7 itself closes when measurement is configured, before any result exists). |
 
 ## Data collected

@@ -93,6 +93,10 @@ not generation. Runs after UAT, before Gate 6 opens. Light depth runs only the f
 - [ ] Walkthrough video or demo recorded.
 - [ ] Sales material updated (if applicable).
 
+**Feature roast** (Full; worth it at Standard for anything customer-facing): a 45-minute session to break the
+feature before customers do, using `templates/feature-roast.md`. Record `readiness.roast: done`, or `skipped` with a
+reason in `readiness.roast_note`. Full depth cannot close Gate 6 without one of the two.
+
 **Go/no-go:** the PM confirms every applicable item. Blockers are documented with a PM
 decision (launch with documented blockers, or wait). Only after a go decision does Gate 6 open.
 
@@ -148,6 +152,10 @@ Before declaring delivery complete, the orchestrator guides a rollout plan:
 
 2. If beta (option b): document the beta plan:
    - Which client(s) and why
+   - **Usage contract** (state `beta.*`): the minimum usage that makes the beta meaningful (for example "at least 3
+     clients use it weekly for 4 weeks" in `minimum_usage`), the number of feedback sessions you will hold
+     (`feedback_sessions`, at least 1), and what moves it to general availability (`exit_criteria`). Gate 6 does not
+     close for a beta without the first two
    - Success criteria for moving from beta to GA
    - Timeline (beta start, evaluation, GA target)
    - Rollback plan if beta fails
@@ -244,7 +252,9 @@ When measurement data is available, the orchestrator:
    windows to the feature's natural usage cycle** (a weekly workflow can use 14/30/60, an
    annual one needs longer windows or a leading indicator) and record the reason.
 
-   - **Checkpoint 1 (default Day-14):** is the adoption threshold being met? New friction?
+   - **Checkpoint 1 (default Day-14):** is the adoption threshold being met? New friction? Also report the **speed to
+     learning**: days between `learning.hypothesis_formed` and `learning.first_evidence`; if no evidence has arrived
+     yet, say that and name what would count.
      Check adoption rate, error rate and support-ticket count. Adoption under 30% points to
      onboarding friction: recommend investigation.
    - **Checkpoint 2 (default Day-30):** time-to-value confirmed? Segment splits visible?

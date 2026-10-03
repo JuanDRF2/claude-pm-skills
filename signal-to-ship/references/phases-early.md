@@ -85,7 +85,9 @@ One finding at a time.
 ### Step 6 — Hypothesis and outcome (S, F)
 
 After all signals are confirmed, ask: "We believe **[change]** will cause **[outcome]**,
-measured by **[metric]**." Record in the state file. This links Phase 1 to Phase 7.
+measured by **[metric]**." Record in the state file. This links Phase 1 to Phase 7. Also record today's date in
+`learning.hypothesis_formed`; when the first real evidence arrives (a test result, a prototype session, beta usage, an
+adoption figure) record its date in `learning.first_evidence`. The gap is your **speed to learning**.
 
 Then fix the **outcome** the work should move, as three fields: `outcome.metric`,
 `outcome.baseline` (the value today, measured, not guessed) and `outcome.target`.
