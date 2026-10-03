@@ -250,7 +250,7 @@ Stop after the Markdown QA handoff. Do not generate `.testcase.yml`, `.testplan.
 ### Membership Example
 
 Create small checks, preserve different events as separate scenarios and group them under
-one functional case. See `skills/user-story/references/golden-example.md` for the complete
+one functional case. See `user-story/references/golden-example.md` for the complete
 current example.
 
 ```markdown
@@ -341,5 +341,5 @@ submission and rejected payment remain separate because their triggers and outco
 - `references/output-schema.md` — Required output and test-case templates
 - `references/executability-gate.md` — Readiness criteria for a QA-reviewable downstream handoff
 - `references/journey-integrity-contract.md` — Risk-based composition of atomic scenarios into a complete journey
-- `skills/user-story/SKILL.md` and `skills/user-story/references/golden-example.md` — Source format and complete canonical example
-- `skills/user-story-mapping/SKILL.md` — Source variations, states, and rules
+- `user-story` and `user-story/references/golden-example.md` — Source format and complete canonical example
+- `user-story-mapping` — Source variations, states, and rules

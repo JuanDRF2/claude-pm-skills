@@ -1,6 +1,6 @@
 ---
 name: okr-tracker
-description: "Defines, reviews, scores, and updates OKRs (Objectives and Key Results) for a product team or initiative. Use this skill whenever the user wants to write OKRs, review OKR progress, score key results, connect a feature or PRD to existing OKRs, prepare for a quarterly planning session, or do an OKR retrospective. Trigger on phrases like \"write OKRs for\", \"score our OKRs\", \"how does this feature map to our OKRs\", \"what are our key results this quarter\", \"quarterly planning\", \"OKR check-in\", \"help me define success for this quarter\", \"are we on track\", or any time OKRs, goals, or quarterly targets are mentioned. Always use this skill — do not write or score OKRs freehand."
+description: "Defines, reviews, scores, and updates OKRs (Objectives and Key Results) for a product team or initiative. Use this skill whenever the user wants to write OKRs, review OKR progress, score key results, connect a feature or PRD to existing OKRs, prepare for a quarterly planning session, or do an OKR retrospective. Trigger on phrases like \"write OKRs for\", \"score our OKRs\", \"how does this feature map to our OKRs\", \"what are our key results this quarter\", \"quarterly planning\", \"OKR check-in\", \"help me define success for this quarter\", \"are we on track\", or any time OKRs, goals, or quarterly targets are mentioned. Prefer this skill over writing or scoring OKRs freehand."
 ---
 
 # OKR Tracker

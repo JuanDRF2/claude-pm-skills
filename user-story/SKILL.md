@@ -90,7 +90,7 @@ A user story combines:
 
 ### When NOT to Use This
 - For pure technical debt or refactoring (use engineering tasks instead)
-- When stories are too large (split first—see `skills/user-story-splitting/SKILL.md`)
+- When stories are too large (split first—see `user-story-splitting`)
 - Before understanding the user problem (write a problem statement first)
 
 ---
@@ -198,7 +198,7 @@ submission or external event, cannot be meaningfully performed alone, and lead t
 primary outcome verified with the same evidence. Otherwise create another scenario.
 
 **Red flags:**
-- **Multiple unrelated When/Then pairs:** Sign of scope creep—evaluate splitting (reference `skills/user-story-splitting/SKILL.md`)
+- **Multiple unrelated When/Then pairs:** Sign of scope creep—evaluate splitting (reference `user-story-splitting`)
 - **Vague Thens:** "Then I see improved performance" (unmeasurable—make it specific)
 - **Fragmentary context:** “Given Check selected” does not identify who is acting, which
   journey is in progress, or which relevant preparation is complete.
@@ -269,7 +269,7 @@ Write a short, memorable summary that captures the story's value:
 
 - **Read aloud to the team:** Does everyone understand who, what, why?
 - **Test acceptance criteria:** Can QA write test cases from this?
-- **Check for splitting:** If the story feels too big, use `skills/user-story-splitting/SKILL.md`
+- **Check for splitting:** If the story feels too big, use `user-story-splitting`
 - **Ensure testability:** Can you prove "Then" happened?
 - **Check plain language:** Can a non-technical reviewer explain the actor, event and result after hiding IDs and technical notes?
 - **Check async behavior:** Is there an approved completion signal/window, or is the scenario visibly `Needs refinement`?
@@ -299,10 +299,10 @@ illustrations and failure patterns; they never override the template or golden e
 ## References
 
 ### Related Skills
-- `skills/user-story-splitting/SKILL.md` — How to break large stories into smaller ones
+- `user-story-splitting` — How to break large stories into smaller ones
 
 ### Optional Helpers
-- `skills/user-story/scripts/user-story-template.py` — Deterministic Markdown stub generator (no network access)
+- `scripts/user-story-template.py` — Deterministic Markdown stub generator (no network access)
 
 ### External Frameworks
 - Mike Cohn, *User Stories Applied* (2004) — Origin of the "As a / I want / so that" format

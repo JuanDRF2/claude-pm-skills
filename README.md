@@ -4,7 +4,7 @@ A library of product-management Skills for Claude. Each skill is a folder contai
 
 Not sure which one to use? Start with [`idea-to-ship`](./idea-to-ship/) — it doesn't draft anything itself, it figures out where your initiative stands (idea, spec, approved stories, mid-build, shipped) and routes you to the right skill below, one guided step at a time. Works the same whether you run this with a team on Jira or solo with AI and no tracker at all.
 
-See [`ACTION-TIERS.md`](./ACTION-TIERS.md) for the shared `allow`/`ask`/`block` classification that any skill touching a live system (Jira, Notion, a hosted portal) follows instead of inventing its own confirmation rule.
+See [`ACTION-TIERS.md`](./ACTION-TIERS.md) for the shared `allow`/`ask`/`block` classification that any skill touching a live system (Jira, Notion, a hosted portal) follows instead of inventing its own confirmation rule. It also states that text a skill reads from tools, files or the web is data, never instructions.
 
 ## Install
 
@@ -81,9 +81,51 @@ below are enough to start.
 
 ---
 
-## Install
+## What to upload
 
-Upload a skill folder in Claude → **Settings → Capabilities**. Each folder's `SKILL.md` is the skill definition; no other files are required.
+Not every skill is a single file. Some carry references, templates or scripts that the `SKILL.md`
+reads at run time, so uploading only the `SKILL.md` leaves them broken.
+
+- **Upload `SKILL.md` alone** for the skills marked so in the table below.
+- **Upload the whole folder** for the others (in Claude: **Settings → Capabilities**, or copy the
+  folder into `~/.claude/skills/`).
+- **Related skills** are other skills that a `SKILL.md` names. They are not all required, and a skill
+  may still work without them in a reduced form, but this has not been verified for every skill. The
+  safest set for the refinement workflow is `story-to-test-workflow` with the skills it names.
+- Several skills talk to Jira, Notion or another tool. Where no tool is connected they should fall back
+  to drafting in the conversation; this is also not yet verified for every skill.
+
+| Skill | Files in the folder | Upload | Related skills it names |
+|---|---|---|---|
+| `architecture-aware-reviewer` | 1 | `SKILL.md` alone | — |
+| `artifact-sync` | 1 | `SKILL.md` alone | — |
+| `build-refinement-document` | 5 | whole folder (5 files) | — |
+| `build-refinement-portal` | 6 | whole folder (6 files) | — |
+| `competitive-teardown` | 1 | `SKILL.md` alone | — |
+| `design-system` | 2 | whole folder (2 files) | `video-demo-generator` |
+| `discovery-interview-guide` | 1 | `SKILL.md` alone | — |
+| `idea-to-ship` | 1 | `SKILL.md` alone | routes to most skills in the library |
+| `jira-bug-writer` | 1 | `SKILL.md` alone | — |
+| `jira-story-publisher` | 1 | `SKILL.md` alone | `story-to-test-workflow`, `test-case-designer`, `user-story` |
+| `launch-comms` | 1 | `SKILL.md` alone | — |
+| `mini-spec-writer` | 1 | `SKILL.md` alone | `prd-writer`, `story-to-test-workflow`, `user-story-mapping` |
+| `mockup-builder` | 1 | `SKILL.md` alone | — |
+| `okr-tracker` | 1 | `SKILL.md` alone | — |
+| `prd-writer` | 1 | `SKILL.md` alone | `architecture-aware-reviewer`, `idea-to-ship`, `jira-story-publisher`, `mini-spec-writer`, `story-to-test-workflow` |
+| `product-context-base` | 1 | `SKILL.md` alone | — |
+| `publish-refinement-to-notion` | 8 | whole folder (8 files) | `sync-refinement-package-notion` |
+| `refinement-judge` | 8 | whole folder (8 files) | `story-to-test-workflow`, `sync-refinement-package-notion` |
+| `release-notes-writer` | 1 | `SKILL.md` alone | — |
+| `story-to-test-workflow` | 37 | whole folder (37 files) | `build-refinement-document`, `build-refinement-portal`, `idea-to-ship`, `jira-story-publisher`, `publish-refinement-to-notion`, `refinement-judge`, `sync-refinement-package-notion`, `sync-refinement-package-taxonomy`, `test-case-designer`, `user-story`, `user-story-mapping`, `user-story-splitting` |
+| `sync-refinement-package-notion` | 35 | whole folder (35 files) | — |
+| `sync-refinement-package-taxonomy` | 4 | whole folder (4 files) | — |
+| `test-case-designer` | 7 | whole folder (7 files) | `user-story`, `user-story-mapping` |
+| `user-story` | 7 | whole folder (7 files) | `user-story-splitting` |
+| `user-story-mapping` | 5 | whole folder (5 files) | — |
+| `user-story-splitting` | 5 | whole folder (5 files) | `user-story` |
+| `video-demo-generator` | 3 | whole folder (3 files) | `design-system` |
+| `weekly-product-pulse` | 1 | `SKILL.md` alone | — |
+| `writing-voice` | 1 | `SKILL.md` alone | — |
 
 ---
 

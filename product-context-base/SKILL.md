@@ -8,8 +8,8 @@ description: >
   "refresh your memory about our product", "initialize context for my team", or
   any time a user wants Claude to understand the history of product decisions before
   doing strategic work, writing stories, prioritizing roadmap, or doing analysis.
-  Always trigger this skill before any deep product work if context has not been
-  loaded yet in the conversation.
+  Use this skill when deep product work needs context that has not been loaded yet in the
+  conversation, and only when the user asks for it or confirms it first (it reads Jira and Notion).
 compatibility:
   tools:
     - Atlassian (Jira + Confluence MCP)

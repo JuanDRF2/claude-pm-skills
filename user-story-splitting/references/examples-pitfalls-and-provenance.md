@@ -108,7 +108,7 @@ As a team admin, I want to manage team members so that I can control access.
 ## References
 
 ### Related Skills
-- `skills/user-story/SKILL.md` — Format for writing the split stories
+- `user-story` — Format for writing the split stories
 
 ### External Frameworks
 - Richard Lawrence & Peter Green, *The Humanizing Work Guide to Splitting User Stories* — Origin of the 8 splitting patterns
@@ -126,5 +126,5 @@ As a team admin, I want to manage team members so that I can control access.
 **Skill type:** Component
 **Suggested filename:** `user-story-splitting.md`
 **Suggested placement:** `/skills/components/`
-**Dependencies:** References `skills/user-story/SKILL.md`
+**Dependencies:** References `user-story`
 **Applies to:** User stories, epics, and any work that's too large to complete in a single sprint
