@@ -28,7 +28,8 @@ customers or the team itself use `origin: customer` / `internal` and skip this s
 
 ### Step 0 — Problem framing (L: one line / S, F: full)
 
-Before any query, the PM articulates the problem in plain language:
+Before any query, the PM articulates the problem in plain language. Ask these three **one per message,
+in this order**, each as a single question (an example in the same sentence is fine; a second question is not):
 
 - **Who has this problem?** A named persona ("front-desk staff member", "operations manager"), not "users".
 - **How do they solve it today?** The current workaround, however ugly.
@@ -89,12 +90,16 @@ measured by **[metric]**." Record in the state file. This links Phase 1 to Phase
 Then fix the **outcome** the work should move, as three fields: `outcome.metric`,
 `outcome.baseline` (the value today, measured, not guessed) and `outcome.target`.
 Example: "checkout completion, 48%, 70%". A roadmap item without a baseline and a target is
-an output, not an outcome. If the baseline is unknown, the first task is to measure it.
+an output, not an outcome. If the baseline is unknown, the first task is to measure it. Until it is, write
+`outcome.baseline` as "unmeasured (estimate X)" naming who measures it and by when, and close Gate 1 as
+`provisional` with that reason in `gate_reasons.signals`. Update the baseline text when the gate status changes.
 
 ### Step 7 — Risk assessment (S, F)
 
 The PM scores risks 1 (low) to 5 (high). The orchestrator presents each with evidence
-from the signals already collected:
+from the signals already collected, one risk per message. Write the evidence and the gaps as **statements**; the
+only question in the message is the score. (A list of things you would like to know is not a list of questions to
+ask the PM: note it as an open question in the state file.)
 
 | Risk | Question | Evidence the orchestrator cites |
 |------|----------|---------------------------------|
