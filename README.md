@@ -212,3 +212,7 @@ Run `python3 scripts/validate-skills.py` before opening a pull request; CI runs 
 - [`pos-support-agent`](https://github.com/JuanDRF2/pos-support-agent) — a separate public project by the same
   author: a local retrieval-augmented support assistant with a deterministic eval suite, built with the same
   discipline (write down the limits, measure instead of claiming).
+
+## License
+
+MIT. See [LICENSE](LICENSE).
