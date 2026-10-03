@@ -246,6 +246,12 @@ When measurement data is available, the orchestrator:
      complaint volume on it fallen? Record the measured value and adoption status. If status is
      still `not_checked` after this checkpoint, flag it to the PM.
 
+   **Record what the PM reports as soon as they report it**, even when other numbers are still missing:
+   write `measurement.adoption_d30` (and the other figures) to the state file in that same turn. Mark the
+   checkpoint `checked` once the PM has given at least its main figure (adoption at checkpoint 2), and list
+   what is still missing as an open action with an owner and a date. Never hold a reported number back
+   until a second one arrives: an unrecorded figure is a lost figure.
+
    Dates are saved in state. The orchestrator is pull-based, so it also supports **scheduled
    checkpoints** (a recurring agent that opens the case and surfaces due checkpoints; see
    `references/architecture.md`). When the PM returns to `/signal-to-ship <feature>`, any passed

@@ -9,7 +9,7 @@ hooks cannot travel inside a skill**: Claude Code reads them from settings files
 |-------|--------------|
 | `permissions` (in `settings.snippet.json`) | Reads are free; **writes** to shared systems (tracker, docs, chat, feedback tool, taxonomy) ask you first every time; sending chat messages directly is denied (drafts only). |
 | `hooks/gate-check.mjs` (PreToolUse on Write or Edit) | **Warns, never blocks**, when a delivery document is written before the case's gates allow it. Reads the validated state file. |
-| `hooks/state-reminder.mjs` (Stop) | Reminds the assistant to save the state file when it announced a gate outcome but the file was not updated in the last two minutes. |
+| `hooks/state-reminder.mjs` (Stop) | Reminds the assistant to save the state file when it announced a gate outcome but the file was not updated in the last two minutes. It stays silent in a session that has not written a case state file yet, so a report that merely mentions gates does not trigger it. |
 
 Both hooks need Node 18 or newer and use only the files in this skill.
 

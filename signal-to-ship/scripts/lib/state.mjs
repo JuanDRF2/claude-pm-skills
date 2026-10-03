@@ -118,6 +118,7 @@ function rebuild(block) {
 
 // ---- validator ------------------------------------------------------------
 
+const isNa = (v) => typeof v === 'string' && /^(n\/?a|none|-|—)$/i.test(v.trim())
 const empty = (v) => v === null || v === undefined || v === '' || (Array.isArray(v) && v.length === 0)
 const err = (code, message) => ({ severity: 'error', code, message })
 const warn = (code, message) => ({ severity: 'warn', code, message })
@@ -196,10 +197,15 @@ export function validateState(s) {
   for (const k of [...RISK_KEYS, 'ai']) {
     const v = risks[k]
     if (empty(v)) continue
+    // a model often writes "n/a" for the AI risk of a feature without a model: accept it, with a nudge
+    if (k === 'ai' && s.ai_feature !== true && isNa(v)) {
+      f.push(warn('W_RISK_NA', 'risks.ai is "n/a": leave it empty when ai_feature is false'))
+      continue
+    }
     if (!Number.isInteger(v) || v < 1 || v > 5) f.push(err('E_RISK', `risks.${k} must be an integer 1-5`))
     else scored.push([k, v])
   }
-  if (!empty(risks.ai) && s.ai_feature !== true) f.push(err('E_RISK_AI', 'risks.ai is set but ai_feature is not true'))
+  if (!empty(risks.ai) && s.ai_feature !== true && !isNa(risks.ai)) f.push(err('E_RISK_AI', 'risks.ai is set but ai_feature is not true'))
   if (s.ai_feature === true && s.depth !== 'full') f.push(err('E_AI_DEPTH', 'features with a model (ai_feature: true) require depth: full'))
   const maxRisk = Math.max(0, ...scored.map(([, v]) => v))
   if (maxRisk >= 4 && s.depth !== 'full') f.push(err('E_DEPTH_UPGRADE', 'a risk >= 4 requires depth: full'))

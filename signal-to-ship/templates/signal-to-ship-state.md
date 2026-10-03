@@ -47,7 +47,7 @@ risks:
   usability:
   feasibility:
   viability:
-  ai:
+  ai:                # leave empty unless ai_feature: true (do not write n/a)
   highest:
   mitigation_plan:
 scope:
