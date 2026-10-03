@@ -1,0 +1,4 @@
+interface:
+  display_name: "Build Refinement Document"
+  short_description: "Genera un documento Word de refinamiento claro"
+  default_prompt: "Usa $build-refinement-document para convertir este paquete Markdown de refinamiento aprobado en un documento Word legible y validado."

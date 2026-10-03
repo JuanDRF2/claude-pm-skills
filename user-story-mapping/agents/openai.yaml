@@ -1,0 +1,4 @@
+interface:
+  display_name: "User Story Mapping"
+  short_description: "Map journeys, gaps, and release slices"
+  default_prompt: "Use $user-story-mapping to organize this product workflow into a user journey, variations, open questions, tasks, and useful release slices."
