@@ -210,3 +210,7 @@ When building new features:
 ---
 
 **Related Skills:** `video-demo-generator`
+
+## Do not invent
+
+If a figure, quote, source, name, date or fact is not in the material you were given, write it as unknown and ask for it. Never fill a gap with a plausible-sounding value, and mark every assumption as an assumption.

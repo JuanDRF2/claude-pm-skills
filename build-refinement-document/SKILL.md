@@ -48,3 +48,7 @@ Crear una vista documental derivada. Mantener los Markdown como fuente de verdad
 - Render e inspección visual satisfactorios, o una advertencia explícita si el ambiente no permite renderizar.
 
 No adjuntar los PNG de validación ni convertir el DOCX en fuente canónica.
+
+## No inventar
+
+Si un dato, cita, fuente, nombre o fecha no está en el material recibido, escríbelo como desconocido y pídelo. Nunca rellenes un vacío con un valor verosímil, y marca cada suposición como suposición.

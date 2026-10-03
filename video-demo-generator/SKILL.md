@@ -280,3 +280,7 @@ You'll see this skill suggested when you:
 
 - **design-system** — Defines all design tokens, colors, typography, components
 - **mockup-builder** — Creates static mockups; use this skill for videos instead
+
+## Do not invent
+
+If a figure, quote, source, name, date or fact is not in the material you were given, write it as unknown and ask for it. Never fill a gap with a plausible-sounding value, and mark every assumption as an assumption.

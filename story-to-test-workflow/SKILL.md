@@ -482,37 +482,7 @@ canonical branch, and never claim the shared canon changed before observing the 
 
 At each gate, maintain a compact state summary. The instant a gate is approved, append one line to the Gate approval log below — who approved it (the user, by name if known, otherwise "the user") and today's date — before moving on. Don't infer or backfill a missing log line later; if a gate isn't logged, treat it as not actually approved yet.
 
-```markdown
-## Workflow State
-- Route:
-- Current phase:
-- Approved through:
-- Gate approval log:
-  - Gate 1 (Understanding): [approved by <name>, <date>] or [pending]
-  - Gate 2 (Scope): [approved by <name>, <date>] or [pending]
-  - Gate 3 (Behavior): [approved by <name>, <date>] or [pending]
-  - Gate 4 (Coverage): [approved by <name>, <date>] or [pending]
-  - Gate 5 (Publication): [approved by <name>, <date>] or [pending] or [not requested]
-- Confirmed rules:
-- Open blocking questions:
-- Selected scope:
-- Next action:
-- Markdown package path:
-- Shared repository URL:
-- Canonical branch and observed commit:
-- Working branch and base commit:
-- Pull Request URL/status:
-- Last merged canonical commit:
-- Shared storage mode: github-main-v1 | local-only
-- Artifact language/audiences:
-- Optional presentations selected:
-- Presentation paths or URLs:
-- Notion publication mode and page manifest:
-- Context artifact contract / Contrato de artefactos de contexto: project-context-v1 | Legacy
-- Project status and delivery statuses:
-- Derived artifacts: None | [artifact list and role]
-- Canonical base snapshot:
-```
+Keep these fields in the state summary: route, current phase, approved-through gate, the gate approval log (Gates 1 to 5, each `approved by <name>, <date>`, `pending` or `not requested`), confirmed rules, open blocking questions, selected scope, next action, package path, repository and branch fields, shared storage mode, artifact language, selected presentations, context artifact contract, derived artifacts and the canonical base snapshot. The full template, in order, is the "Base Workflow State block" in `references/workflow-state.md`.
 
 For packages created before `github-main-v1`, preserve their existing fields and add the repository fields when the project is first changed in GitHub; do not rewrite an unchanged package only to modernize metadata, and remember a Pull Request is not the last merged canonical commit. Preserve legacy derived-output fields in old packages until that package is materially changed. Read `references/workflow-state.md` for the optional Derived Output State, Taxonomy Alignment State, and Decision Checkpoint blocks and when to add each.
 

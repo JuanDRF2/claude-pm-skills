@@ -94,14 +94,37 @@ check formats and validators, not that the skill works against your tools).
 - **Tested:** `signal-to-ship` (its source repository has unit tests and eleven evals run against a clean install),
   `story-to-test-workflow`, `refinement-judge`, `build-refinement-document`, `sync-refinement-package-notion`.
 - **Experimental** (depends on a tool or an environment that was not verified here, or still carries assumptions
-  from one workflow): `publish-refinement-to-notion`, `sync-refinement-package-notion`, `build-refinement-document`,
-  `video-demo-generator`, `mockup-builder`, `weekly-product-pulse`, `product-context-base`, `artifact-sync`.
+  from one workflow): `publish-refinement-to-notion`, `video-demo-generator`, `mockup-builder`,
+  `weekly-product-pulse`, `product-context-base`, `artifact-sync`. (`sync-refinement-package-notion` and
+  `build-refinement-document` are listed under Tested because their scripts have tests; the Notion and Word sides
+  themselves were not verified here.)
 - **Prompt-only:** every other skill. They are plain instructions with no scripts to test; judge them by reading them
   and trying them on a small case.
 
 Several skills say what they do when their tool is not connected (a "Without Jira" or "Without Notion" section):
 they stop at a draft, hand over paste-ready text and never claim anything was created. [`STATES.md`](./STATES.md)
 maps the approval, release and verdict words of different skills onto one lifecycle and explains how to name gates.
+
+---
+
+## Try it
+
+With the skills installed, in Claude Code, type something like:
+
+> I want members to be able to pay their membership in two installments. Where do I start?
+
+`idea-to-ship` asks a few short numbered questions (is the problem clear? is there a spec? are there approved
+stories? is anything built?), tells you which stage you are in (Define, Build, Verify or Ship) and hands off to the
+right skill: for example `mini-spec-writer` for a raw idea or `user-story` for an approved spec. It does not draft the
+spec itself.
+
+## Limits
+
+- These are instructions for a model, not programs. The output depends on the model you use and on what you give it.
+- "Tested" only means that a skill's own scripts have tests (see Maturity). Nobody has verified every skill against
+  every tool it can talk to; where a tool is not connected, the skills are meant to stop at a draft.
+- A few skills are written in Spanish (the refinement document, portal and Notion skills); the rest are in English.
+- The skills ask for facts instead of inventing them, but check any figure, quote or source before you use it.
 
 ---
 
@@ -142,9 +165,9 @@ reads at run time, so uploading only the `SKILL.md` leaves them broken.
 | `publish-refinement-to-notion` | 8 | whole folder (8 files) | `sync-refinement-package-notion` |
 | `refinement-judge` | 8 | whole folder (8 files) | `story-to-test-workflow`, `sync-refinement-package-notion` |
 | `release-notes-writer` | 1 | `SKILL.md` alone | — |
-| `signal-to-ship` | 36 | whole folder (36 files) | `competitive-teardown`, `design-system`, `jira-bug-writer`, `jira-story-publisher`, `launch-comms`, `mini-spec-writer`, `prd-writer`, `refinement-judge`, `release-notes-writer`, `story-to-test-workflow`, `sync-refinement-package-taxonomy` (named in `references/specialist-contracts.md`; it falls back to guiding you directly when one is missing) |
+| `signal-to-ship` | 37 | whole folder (37 files) | `competitive-teardown`, `design-system`, `jira-bug-writer`, `jira-story-publisher`, `launch-comms`, `mini-spec-writer`, `prd-writer`, `refinement-judge`, `release-notes-writer`, `story-to-test-workflow`, `sync-refinement-package-taxonomy` (named in `references/specialist-contracts.md`; it falls back to guiding you directly when one is missing) |
 | `stakeholder-request-triage` | 1 | `SKILL.md` alone | — |
-| `story-to-test-workflow` | 37 | whole folder (37 files) | `build-refinement-document`, `build-refinement-portal`, `idea-to-ship`, `jira-story-publisher`, `publish-refinement-to-notion`, `refinement-judge`, `sync-refinement-package-notion`, `sync-refinement-package-taxonomy`, `test-case-designer`, `user-story`, `user-story-mapping`, `user-story-splitting` |
+| `story-to-test-workflow` | 38 | whole folder (38 files) | `build-refinement-document`, `build-refinement-portal`, `idea-to-ship`, `jira-story-publisher`, `publish-refinement-to-notion`, `refinement-judge`, `sync-refinement-package-notion`, `sync-refinement-package-taxonomy`, `test-case-designer`, `user-story`, `user-story-mapping`, `user-story-splitting` |
 | `success-metrics-designer` | 1 | `SKILL.md` alone | — |
 | `sync-refinement-package-notion` | 35 | whole folder (35 files) | — |
 | `sync-refinement-package-taxonomy` | 4 | whole folder (4 files) | — |
@@ -175,16 +198,17 @@ Some skills reference workspace-specific values that are not published in this r
 
 Each skill lives in its own folder. The `SKILL.md` must start with YAML frontmatter containing at minimum `name` and `description`. The `name` must match the folder name exactly.
 
-\`\`\`yaml
+```yaml
 ---
 name: skill-folder-name
 description: One-line description of what the skill does and when to trigger it.
 ---
-\`\`\`
+```
+
+Run `python3 scripts/validate-skills.py` before opening a pull request; CI runs it too.
 
 ## Related
 
-- [`ai-first-workspace`](https://github.com/JuanDRF2/ai-first-workspace) — the personal workspace
-  these skills are used from day to day; this repo is the public, sanitized, always-in-sync copy.
-- [`genesis`](https://github.com/JuanDRF2/genesis) — a companion tool for scaffolding a
-  brand-new project from scratch with guardrails already installed, usable alongside these skills.
+- [`pos-support-agent`](https://github.com/JuanDRF2/pos-support-agent) — a separate public project by the same
+  author: a local retrieval-augmented support assistant with a deterministic eval suite, built with the same
+  discipline (write down the limits, measure instead of claiming).

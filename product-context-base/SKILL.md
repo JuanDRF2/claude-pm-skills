@@ -258,3 +258,7 @@ story about where the team's quality debt lies.
 
 **This context should make Claude feel like a colleague who's been on the team
 for 6 months — not a consultant reading a brief for the first time.**
+
+## Do not invent
+
+If a figure, quote, source, name, date or fact is not in the material you were given, write it as unknown and ask for it. Never fill a gap with a plausible-sounding value, and mark every assumption as an assumption.

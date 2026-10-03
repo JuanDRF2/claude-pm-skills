@@ -114,6 +114,13 @@ Exit condition includes release communication being sent. Route:
 | Quarterly goals need defining or scoring | `okr-tracker` |
 | Any external-facing text is being drafted | `writing-voice` — applies automatically, not stage-bound |
 
+## Skills reached through other skills
+
+Some skills are never the first answer; another skill hands off to them. If the user asks for one directly, run it. Otherwise let the owning skill decide:
+
+- `story-to-test-workflow` owns the refinement chain: `user-story-mapping`, `user-story-splitting`, `user-story`, `test-case-designer`, `refinement-judge`, `sync-refinement-package-taxonomy` and the optional presentations `build-refinement-document`, `build-refinement-portal`, `publish-refinement-to-notion` and `sync-refinement-package-notion`.
+- `signal-to-ship` is a full seven-phase workflow of its own and calls several of the skills above as optional specialists.
+
 ## Gate discipline
 
 Before pointing to the next stage, check whether the current stage's exit condition is actually met — don't infer it from "we did some of the work." Ask it as a plain yes/no, never open-ended, and match the question to the tracking mode: tracking mode 1 → "Does a real Jira ticket already exist for this story? **1.** Yes. **2.** Not yet." Tracking mode 2 → "Is the story already marked as approved (not a draft)? **1.** Yes. **2.** Not yet." If the answer is no, say in one sentence what's missing and stay in the current stage — don't advance on a promise.
