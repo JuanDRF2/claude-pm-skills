@@ -48,6 +48,7 @@ below are enough to start.
 
 | Skill | Description |
 |---|---|
+| [`ai-feature-eval-planner`](./ai-feature-eval-planner/) | Plans how to prove that a feature built on a language model works before it ships: autonomy level per capability, AI risk review, an eval plan with numeric thresholds and a golden dataset, tool ergonomics for agents, and a staged rollout. |
 | [`architecture-aware-reviewer`](./architecture-aware-reviewer/) | Reviews a product spec or user story set against established architecture principles and ADRs, surfacing conflicts and risks before engineering picks up the work. |
 | [`artifact-sync`](./artifact-sync/) | Propagates a single product decision across every linked artifact so nothing drifts: Jira (epic/story body and comments), the Notion spec (with a version bump), design references, and HTML/JSX mockups. |
 | [`build-refinement-document`](./build-refinement-document/) | Generates or updates a navigable Word (`.docx`) document from an approved product/QA refinement Markdown package. |
@@ -63,12 +64,15 @@ below are enough to start.
 | [`mockup-builder`](./mockup-builder/) | Builds on-brand, handoff-ready HTML or JSX mockups pinned to the platform's design system and domain-correct data references. |
 | [`okr-tracker`](./okr-tracker/) | Defines, reviews, scores, and updates OKRs (Objectives and Key Results) for a product team or initiative. |
 | [`prd-writer`](./prd-writer/) | Writes a full Product Requirements Document (PRD) for a feature, initiative, or product area. |
+| [`prioritization-scorer`](./prioritization-scorer/) | Scores and ranks product work with a transparent framework (RICE, ICE, WSJF, MoSCoW or custom), labelling every input as measured, estimated or guessed and showing how fragile the ranking is. |
 | [`product-context-base`](./product-context-base/) | Builds and stores a rich product context snapshot for a specific team by pulling the last 6 months of Jira issues and relevant Notion product pages. |
 | [`publish-refinement-to-notion`](./publish-refinement-to-notion/) | Publishes or updates an approved product/QA refinement Markdown package as native, readable Notion pages. |
 | [`refinement-judge`](./refinement-judge/) | Independent adversarial quality gate that audits a complete product-refinement package before external publication, Jira creation, or another consequential action — comparing it against original sources rather than trusting the generating skill's own conclusions. |
 | [`release-notes-writer`](./release-notes-writer/) | Writes structured, audience-aware release notes and publishes them to Notion. |
 | [`signal-to-ship`](./signal-to-ship/) | Orchestrates a product initiative from customer signal to measured outcome in seven gated phases (signals, prioritization, specification, prototyping, refinement, delivery, measurement), right-sized to light, standard or full depth, with a recorded stop and a keep / iterate / retire verdict. Dispatches the specialist skills in this library. Start with its [`GETTING-STARTED.md`](./signal-to-ship/GETTING-STARTED.md). |
+| [`stakeholder-request-triage`](./stakeholder-request-triage/) | Turns a request from someone with authority into a defensible decision: the need behind the ask, the smallest slice, the trade-off in dates, a decision owner (DACI) and a written record. |
 | [`story-to-test-workflow`](./story-to-test-workflow/) | Orchestrates product refinement end to end — journey mapping, story splitting, user stories with acceptance criteria, and risk-based QA test design — through explicit decision gates, from a rough idea or an approved spec. |
+| [`success-metrics-designer`](./success-metrics-designer/) | Designs how a change will be judged: outcome metric with a measured baseline and target, adoption definition, metrics in five categories, checkpoints, and the keep / iterate / retire rule. |
 | [`sync-refinement-package-notion`](./sync-refinement-package-notion/) | Ongoing sync after an initial Notion publication: status/diff, start a local checkout, publish approved changes, reconcile concurrent edits, recover a partial write, or accept editorial drift. |
 | [`test-case-designer`](./test-case-designer/) | Designs risk-based, traceable QA coverage from approved stories and criteria: atomic checks and QA-reviewable functional test cases, with automation guidance and a downstream test-management handoff. |
 | [`user-story`](./user-story/) | Writes a user story (Mike Cohn format) and its acceptance criteria (Gherkin, stable `AC-*`/`SC-*` IDs, plain-language contract, per-role readiness state). |
@@ -78,7 +82,7 @@ below are enough to start.
 | [`weekly-product-pulse`](./weekly-product-pulse/) | Generates a structured weekly status report for the Head of Product by pulling the active sprint from all product team Jira projects, grouping results by team, and surfacing delivery health, blockers, and risks. |
 | [`writing-voice`](./writing-voice/) | Applies your own calibrated writing voice — direct, human, no AI-tells — to external-facing content (LinkedIn, cover letters, bios, launch announcements) in English or Spanish. |
 
-30 skills in total.
+34 skills in total.
 
 ---
 
@@ -117,6 +121,7 @@ reads at run time, so uploading only the `SKILL.md` leaves them broken.
 
 | Skill | Files in the folder | Upload | Related skills it names |
 |---|---|---|---|
+| `ai-feature-eval-planner` | 1 | `SKILL.md` alone | — |
 | `architecture-aware-reviewer` | 1 | `SKILL.md` alone | — |
 | `artifact-sync` | 1 | `SKILL.md` alone | — |
 | `build-refinement-document` | 5 | whole folder (5 files) | — |
@@ -132,12 +137,15 @@ reads at run time, so uploading only the `SKILL.md` leaves them broken.
 | `mockup-builder` | 1 | `SKILL.md` alone | — |
 | `okr-tracker` | 1 | `SKILL.md` alone | — |
 | `prd-writer` | 1 | `SKILL.md` alone | `architecture-aware-reviewer`, `idea-to-ship`, `jira-story-publisher`, `mini-spec-writer`, `story-to-test-workflow` |
+| `prioritization-scorer` | 1 | `SKILL.md` alone | — |
 | `product-context-base` | 1 | `SKILL.md` alone | — |
 | `publish-refinement-to-notion` | 8 | whole folder (8 files) | `sync-refinement-package-notion` |
 | `refinement-judge` | 8 | whole folder (8 files) | `story-to-test-workflow`, `sync-refinement-package-notion` |
 | `release-notes-writer` | 1 | `SKILL.md` alone | — |
 | `signal-to-ship` | 36 | whole folder (36 files) | `competitive-teardown`, `design-system`, `jira-bug-writer`, `jira-story-publisher`, `launch-comms`, `mini-spec-writer`, `prd-writer`, `refinement-judge`, `release-notes-writer`, `story-to-test-workflow`, `sync-refinement-package-taxonomy` (named in `references/specialist-contracts.md`; it falls back to guiding you directly when one is missing) |
+| `stakeholder-request-triage` | 1 | `SKILL.md` alone | — |
 | `story-to-test-workflow` | 37 | whole folder (37 files) | `build-refinement-document`, `build-refinement-portal`, `idea-to-ship`, `jira-story-publisher`, `publish-refinement-to-notion`, `refinement-judge`, `sync-refinement-package-notion`, `sync-refinement-package-taxonomy`, `test-case-designer`, `user-story`, `user-story-mapping`, `user-story-splitting` |
+| `success-metrics-designer` | 1 | `SKILL.md` alone | — |
 | `sync-refinement-package-notion` | 35 | whole folder (35 files) | — |
 | `sync-refinement-package-taxonomy` | 4 | whole folder (4 files) | — |
 | `test-case-designer` | 7 | whole folder (7 files) | `user-story`, `user-story-mapping` |

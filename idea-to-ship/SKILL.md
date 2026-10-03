@@ -106,6 +106,10 @@ Exit condition includes release communication being sent. Route:
 |---|---|
 | An approved decision changed after being written down | `artifact-sync` — propagates the change across Jira/Notion/design/mockups; never silently re-derives |
 | The initiative needs customer signals, prioritization, gates and post-launch measurement, not only a spec | `signal-to-ship` — the full gated cycle; hand off to it and let it own the state |
+| A stakeholder asked for something, often with a deal or a deadline | `stakeholder-request-triage` |
+| Several options need ranking, or a roadmap order needs a sanity check | `prioritization-scorer` |
+| It is about to ship (or shipped) and the user asks how to know it worked | `success-metrics-designer` |
+| The feature includes a language model or lets an agent act | `ai-feature-eval-planner` |
 | Weekly status across teams | `weekly-product-pulse` |
 | Quarterly goals need defining or scoring | `okr-tracker` |
 | Any external-facing text is being drafted | `writing-voice` — applies automatically, not stage-bound |
