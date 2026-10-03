@@ -216,6 +216,12 @@ Before publishing, confirm all of the following are resolved:
 
 ---
 
+## Without Notion
+
+If no Notion connection is available, stop after the draft in chat: the draft is the deliverable. Offer to save it as
+a local Markdown file, with the metadata fields (quarter, product, status, release date, PM, team) at the top for the
+user to copy into their documentation tool. Do not say that anything was published.
+
 ## Standing Rules — Always Apply
 
 1. **Draft first, Notion second.** Never push without explicit "push to Notion" or "publish" from the user.

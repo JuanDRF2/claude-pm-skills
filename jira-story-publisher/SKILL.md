@@ -125,6 +125,12 @@ Then, if this story came from a `story-to-test-workflow` package, note that its 
 
 ---
 
+## Without Jira
+
+If no Jira connection is available, do Phase 1 in full (read the approved story, estimate, assemble the ticket) and
+hand over the ticket as paste-ready Markdown. Record in the story file that publication is pending and by whom,
+without inventing an issue key. Say plainly that nothing was created.
+
 ## Quality checklist
 
 Before creating any issue, verify:

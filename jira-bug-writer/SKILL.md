@@ -107,6 +107,12 @@ Return a summary:
 
 ---
 
+## Without Jira
+
+If no Jira connection is available, stop after Phase 1 and give the finished bug as Markdown (title, description,
+steps, expected and actual result, environment, severity) for the user to paste into any tracker. Say plainly
+that nothing was created; never claim a ticket exists. The same fields fit GitHub Issues, Linear or any other tracker.
+
 ## Writing quality rules
 
 ### Description
