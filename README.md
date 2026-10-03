@@ -82,6 +82,25 @@ below are enough to start.
 
 ---
 
+## Maturity
+
+An honest label, so you know what to trust. "Tested" means automated tests of the skill's own scripts exist (they
+check formats and validators, not that the skill works against your tools).
+
+- **Tested:** `signal-to-ship` (its source repository has unit tests and eleven evals run against a clean install),
+  `story-to-test-workflow`, `refinement-judge`, `build-refinement-document`, `sync-refinement-package-notion`.
+- **Experimental** (depends on a tool or an environment that was not verified here, or still carries assumptions
+  from one workflow): `publish-refinement-to-notion`, `sync-refinement-package-notion`, `build-refinement-document`,
+  `video-demo-generator`, `mockup-builder`, `weekly-product-pulse`, `product-context-base`, `artifact-sync`.
+- **Prompt-only:** every other skill. They are plain instructions with no scripts to test; judge them by reading them
+  and trying them on a small case.
+
+Several skills say what they do when their tool is not connected (a "Without Jira" or "Without Notion" section):
+they stop at a draft, hand over paste-ready text and never claim anything was created. [`STATES.md`](./STATES.md)
+maps the approval, release and verdict words of different skills onto one lifecycle and explains how to name gates.
+
+---
+
 ## What to upload
 
 Not every skill is a single file. Some carry references, templates or scripts that the `SKILL.md`
