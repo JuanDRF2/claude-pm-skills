@@ -22,6 +22,7 @@ const RISK_KEYS = ['value', 'usability', 'feasibility', 'viability']
 const ORIGINS = ['internal', 'stakeholder', 'customer']
 const VERDICTS = ['keep', 'iterate', 'retire']
 const STATUSES = ['active', 'stopped']
+const ROAST = ['not_run', 'done', 'skipped']
 const DATE = /^\d{4}-\d{2}-\d{2}$/
 
 /** True only for real calendar dates in YYYY-MM-DD form. */
@@ -99,7 +100,7 @@ function rebuild(block) {
       if (ind < indent) break
       if (ind > indent) throw new Error(`Unexpected indentation: "${line}"`)
       const kv = line.trim().match(/^([A-Za-z0-9_]+):(?:\s+(.*)|\s*)$/)
-      if (!kv) throw new Error(`Unsupported frontmatter line: "${line}"`)
+      if (!kv) throw new Error(`Unsupported frontmatter line: "${line}" (use "key: value" lines; write lists inline as [a, b])`)
       const [, key, rest] = kv
       if (key in obj) throw new Error(`Duplicate key "${key}"`)
       const hasValue = rest !== undefined && rest.trim() !== '' && !rest.trim().startsWith('#')
@@ -283,6 +284,30 @@ export function validateState(s) {
   if (passed('delivery')) {
     if (!ROLLOUTS.includes(del.rollout) || del.rollout === 'not_set') f.push(err('E_G6_ROLLOUT', 'Gate 6 passed but delivery.rollout is not set'))
     if (!isIsoDate(del.delivery_date)) f.push(err('E_G6_DATE', 'Gate 6 passed but delivery.delivery_date is missing or not an ISO date'))
+  }
+  // v0.10: a beta needs a usage contract; a full-depth launch needs a feature roast (or a written reason)
+  if (passed('delivery') && v2) {
+    if (del.rollout === 'beta') {
+      const b = s.beta || {}
+      if (empty(b.minimum_usage) || !Number.isInteger(b.feedback_sessions) || b.feedback_sessions < 1) {
+        f.push(err('E_G6_BETA', 'rollout beta: Gate 6 needs beta.minimum_usage (what usage makes the beta meaningful) and beta.feedback_sessions (an integer >= 1)'))
+      }
+    }
+    if (s.depth === 'full') {
+      const r = s.readiness?.roast
+      if (!ROAST.includes(r) || r === 'not_run') f.push(err('E_G6_ROAST', 'full depth: Gate 6 needs readiness.roast set to done, or skipped with readiness.roast_note'))
+      else if (r === 'skipped' && empty(s.readiness?.roast_note)) f.push(err('E_G6_ROAST_REASON', 'readiness.roast is skipped: record why in readiness.roast_note'))
+    }
+  }
+  if (s.beta && !empty(s.beta.feedback_sessions) && (!Number.isInteger(s.beta.feedback_sessions) || s.beta.feedback_sessions < 0)) {
+    f.push(err('E_BETA', 'beta.feedback_sessions must be a whole number >= 0'))
+  }
+  if (s.readiness && !empty(s.readiness.roast) && !ROAST.includes(s.readiness.roast)) f.push(err('E_ROAST', `readiness.roast must be one of ${ROAST.join(', ')}`))
+  // speed to learning: when the hypothesis was formed and when the first real evidence arrived
+  const lr = s.learning || {}
+  for (const k of ['hypothesis_formed', 'first_evidence']) if (!empty(lr[k]) && !isIsoDate(lr[k])) f.push(err('E_LEARNING_DATE', `learning.${k} must be an ISO date`))
+  if (isIsoDate(lr.hypothesis_formed) && isIsoDate(lr.first_evidence) && lr.first_evidence < lr.hypothesis_formed) {
+    f.push(err('E_LEARNING_ORDER', 'learning.first_evidence cannot be earlier than learning.hypothesis_formed'))
   }
   if (closed('delivery') && s.ai_feature === true && s.eval_plan?.status !== 'executed') {
     f.push(err('E_G6_EVAL', 'ai_feature: Gate 6 needs eval_plan.status executed (it cannot be provisional or skipped)'))
