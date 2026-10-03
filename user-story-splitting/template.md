@@ -18,7 +18,7 @@ Adapted from `prompts/user-story-splitting-prompt-template.md` in the `https://g
 ## Output Template
 ```markdown
 ### Original Story
-[Story written using `skills/user-story/template.md`]
+[Story written using `user-story/template.md`]
 
 ### Suggested Splits
 | Candidate | Reason for this split | User outcome | Rules retained | Deferred scope | Dependencies | Risk reduced | Work type |

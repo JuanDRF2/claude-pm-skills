@@ -1,6 +1,6 @@
 ---
 name: jira-bug-writer
-description: "Formats and creates bug issues in Jira from a plain-language description. Use this skill whenever the user wants to: report a bug, write a bug ticket, create a bug issue in Jira, document a defect, or turn a bug description into a structured Jira issue. Trigger on phrases like 'write a bug', 'create a bug ticket', 'log this bug', 'report a defect', 'turn this into a bug issue', 'I found a bug', or any time the user shares a bug description and wants it formatted or pushed to Jira. Always use this skill — do not attempt to write bug tickets freehand."
+description: "Formats and creates bug issues in Jira from a plain-language description. Use this skill whenever the user wants to: report a bug, write a bug ticket, create a bug issue in Jira, document a defect, or turn a bug description into a structured Jira issue. Trigger on phrases like 'write a bug', 'create a bug ticket', 'log this bug', 'report a defect', 'turn this into a bug issue', 'I found a bug', or any time the user shares a bug description and wants it formatted or pushed to Jira. Prefer this skill over writing bug tickets freehand."
 ---
 
 # Jira Bug Writer

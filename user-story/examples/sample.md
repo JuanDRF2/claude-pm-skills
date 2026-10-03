@@ -122,7 +122,7 @@ functional grouping, use `../references/golden-example.md`.
 - Different outcomes aren't related (adding items ≠ applying coupons)
 
 **How to split it:**
-Use `skills/user-story-splitting/SKILL.md` to break this into:
+Use `user-story-splitting` to break this into:
 1. "Add items to cart"
 2. "Remove items from cart"
 3. "Update item quantities"

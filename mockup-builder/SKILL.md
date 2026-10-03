@@ -1,6 +1,6 @@
 ---
 name: mockup-builder
-description: "Builds on-brand, handoff-ready HTML or JSX mockups pinned to the platform's design system and domain-correct data references. Use this skill whenever the user wants a mockup, prototype, UI draft, screen, component, or visual of a platform feature — e.g. \"mock up the account record\", \"build a UI for the checkout flow\", \"show me what this screen looks like\", \"make a JSX component for X\", \"draft the settings UI\", or any request that produces an on-brand interface for review or frontend handoff. Always use this skill so tokens, components, and data references stay consistent — do not build platform UI freehand from memory."
+description: "Builds on-brand, handoff-ready HTML or JSX mockups pinned to the platform's design system and domain-correct data references. Use this skill whenever the user wants a mockup, prototype, UI draft, screen, component, or visual of a platform feature — e.g. \"mock up the account record\", \"build a UI for the checkout flow\", \"show me what this screen looks like\", \"make a JSX component for X\", \"draft the settings UI\", or any request that produces an on-brand interface for review or frontend handoff. Use this skill so tokens, components and data references stay consistent, rather than building platform UI freehand from memory."
 compatibility:
   related_skills:
     - frontend-design (public) — read its SKILL.md first for environment/styling constraints

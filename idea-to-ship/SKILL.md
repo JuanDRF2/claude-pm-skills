@@ -173,11 +173,11 @@ During Define, this note only points at `story-to-test-workflow`'s own `00-workf
 
 ## References
 
-- `skills/discovery-interview-guide/SKILL.md`, `skills/competitive-teardown/SKILL.md`, `skills/product-context-base/SKILL.md` — Optional discovery
-- `skills/prd-writer/SKILL.md`, `skills/mini-spec-writer/SKILL.md` — Define, step 1
-- `skills/architecture-aware-reviewer/SKILL.md` — Define, step 2
-- `skills/story-to-test-workflow/SKILL.md` — Define, step 3 (its own sub-orchestrator for mapping → splitting → user-story → test-case-designer)
-- `skills/jira-story-publisher/SKILL.md` — Define → Build exit condition, tracking mode 1 only (solo + AI without a tracker skips straight to Build once the story is approved)
-- `skills/design-system/SKILL.md`, `skills/mockup-builder/SKILL.md`, `skills/video-demo-generator/SKILL.md`, `skills/jira-bug-writer/SKILL.md` — Build support
-- `skills/release-notes-writer/SKILL.md`, `skills/launch-comms/SKILL.md` — Ship
-- `skills/artifact-sync/SKILL.md`, `skills/weekly-product-pulse/SKILL.md`, `skills/okr-tracker/SKILL.md`, `skills/writing-voice/SKILL.md` — Continuous
+- `discovery-interview-guide`, `competitive-teardown`, `product-context-base` — Optional discovery
+- `prd-writer`, `mini-spec-writer` — Define, step 1
+- `architecture-aware-reviewer` — Define, step 2
+- `story-to-test-workflow` — Define, step 3 (its own sub-orchestrator for mapping → splitting → user-story → test-case-designer)
+- `jira-story-publisher` — Define → Build exit condition, tracking mode 1 only (solo + AI without a tracker skips straight to Build once the story is approved)
+- `design-system`, `mockup-builder`, `video-demo-generator`, `jira-bug-writer` — Build support
+- `release-notes-writer`, `launch-comms` — Ship
+- `artifact-sync`, `weekly-product-pulse`, `okr-tracker`, `writing-voice` — Continuous

@@ -177,4 +177,4 @@ End with this boundary instruction:
 
 Do not generate `.testcase.yml`, `.testplan.yml`, `.testrun.yml`, UUIDs, native keys, counters, execution results, evidence, or defects in this skill.
 
-See `skills/user-story/references/golden-example.md` for the complete canonical story-to-QA example.
+See `user-story/references/golden-example.md` for the complete canonical story-to-QA example.

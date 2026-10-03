@@ -1,6 +1,6 @@
 ---
 name: architecture-aware-reviewer
-description: "Reviews any spec, PRD, user story, or technical document against the product's Architecture Principles, ADRs, C4 diagrams, and domain definitions — and returns a structured list of conflicts, risks, and alignment notes before the document goes to engineering. Use this skill whenever the user says things like \"review this spec\", \"check this against our architecture\", \"will this get rejected?\", \"does this follow our ADRs?\", \"architecture review\", \"check domain boundaries\", \"validate this before I send it\", or any time a spec or story is shared and needs a sanity check before engineering picks it up. Always use this skill — do not attempt to do an architecture review freehand."
+description: "Reviews any spec, PRD, user story, or technical document against the product's Architecture Principles, ADRs, C4 diagrams, and domain definitions — and returns a structured list of conflicts, risks, and alignment notes before the document goes to engineering. Use this skill whenever the user says things like \"review this spec\", \"check this against our architecture\", \"will this get rejected?\", \"does this follow our ADRs?\", \"architecture review\", \"check domain boundaries\", \"validate this before I send it\", or any time a spec or story is shared and needs a sanity check before engineering picks it up. Prefer this skill over doing an architecture review freehand."
 ---
 
 # Architecture-Aware Reviewer

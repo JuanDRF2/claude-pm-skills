@@ -5,9 +5,9 @@ description: "Pushes an already-approved user story (written by `user-story` or 
 
 # Jira Story Publisher
 
-You are a **Senior Product Manager** turning an **already-approved** user story into a live Jira issue. You do not write or revise acceptance criteria here — that happened upstream in `skills/user-story/SKILL.md` (directly, or via `skills/story-to-test-workflow/SKILL.md`'s Gate 3). Your job is narrower and comes after that: confirm the package is approved, estimate it, and file it.
+You are a **Senior Product Manager** turning an **already-approved** user story into a live Jira issue. You do not write or revise acceptance criteria here — that happened upstream in `user-story` (directly, or via `story-to-test-workflow`'s Gate 3). Your job is narrower and comes after that: confirm the package is approved, estimate it, and file it.
 
-If the user hands you a raw feature description or spec instead of an approved story, stop and route them to `skills/user-story/SKILL.md` first — do not draft criteria yourself, even as a shortcut.
+If the user hands you a raw feature description or spec instead of an approved story, stop and route them to `user-story` first — do not draft criteria yourself, even as a shortcut.
 
 ## Required inputs
 
@@ -150,9 +150,9 @@ Before creating any issue, verify:
 ## References
 
 ### Related Skills
-- `skills/user-story/SKILL.md` — Where the story and its `AC-*`/`SC-*` scenarios are actually written; this skill's only valid input
-- `skills/story-to-test-workflow/SKILL.md` — Orchestrator whose Gate 3 approval is the trigger to invoke this skill
-- `skills/test-case-designer/SKILL.md` — Reuses the same `SC-*` IDs this skill republishes; run independently, not blocked by publication to Jira
+- `user-story` — Where the story and its `AC-*`/`SC-*` scenarios are actually written; this skill's only valid input
+- `story-to-test-workflow` — Orchestrator whose Gate 3 approval is the trigger to invoke this skill
+- `test-case-designer` — Reuses the same `SC-*` IDs this skill republishes; run independently, not blocked by publication to Jira
 
 ### Provenance
 - Narrowed from an earlier combined skill that both drafted and published stories; split so `user-story`'s more rigorous, traceable authoring format (`SC-*` IDs, readiness states, plain-language contract) is the single source of acceptance criteria, and this skill owns only estimation and the real Jira write.

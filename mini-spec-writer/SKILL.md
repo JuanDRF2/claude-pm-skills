@@ -1,6 +1,6 @@
 ---
 name: mini-spec-writer
-description: "Writes structured, production-ready Mini Specs for software features. Use this skill whenever the user wants to write a spec, mini spec, technical specification, feature spec, product spec, or wants to document a feature for engineering. Also trigger when the user says things like \"help me spec this out\", \"write a spec for\", \"I need to document this feature\", \"turn this idea into a spec\", or \"write requirements for\". Always use this skill before attempting to write any spec freehand — it contains the exact structure, business rules, and quality bar required."
+description: "Writes structured, production-ready Mini Specs for software features. Use this skill whenever the user wants to write a spec, mini spec, technical specification, feature spec, product spec, or wants to document a feature for engineering. Also trigger when the user says things like \"help me spec this out\", \"write a spec for\", \"I need to document this feature\", \"turn this idea into a spec\", or \"write requirements for\". Use this skill before writing a spec freehand; it holds the structure, business rules and quality bar. For a large, cross-team spec use `prd-writer` instead."
 ---
 
 # Mini Spec Writer
@@ -262,4 +262,4 @@ If the answer to any of these is "no," fix it before delivering.
 
 ## Related Skills
 
-Once this Mini Spec is approved and needs to become sprint-ready stories with QA coverage, hand it to `skills/story-to-test-workflow/SKILL.md` — do not draft stories or acceptance criteria inside this skill. Its Business Rules and Standard Scenarios sections are exactly the input that orchestrator's Phase 1 (`user-story-mapping`) expects.
+Once this Mini Spec is approved and needs to become sprint-ready stories with QA coverage, hand it to `story-to-test-workflow` — do not draft stories or acceptance criteria inside this skill. Its Business Rules and Standard Scenarios sections are exactly the input that orchestrator's Phase 1 (`user-story-mapping`) expects.

@@ -90,7 +90,7 @@ Based on Richard Lawrence and Peter Green's "Humanizing Work Guide to Splitting 
 ## Application
 
 ### Step 1: Identify the Original Story
-Start with the story, epic, or feature that needs splitting. Express its actor, desired outcome, value, scope, rules, and unresolved dependencies; use `skills/user-story/SKILL.md` when a formal story is needed.
+Start with the story, epic, or feature that needs splitting. Express its actor, desired outcome, value, scope, rules, and unresolved dependencies; use `user-story` when a formal story is needed.
 
 ```markdown
 ### Original Story:
@@ -217,7 +217,7 @@ Evaluate all 8 splitting patterns. Recommend the split or combination that best 
 
 ### Step 3: Write the Split Stories
 
-For each split, write a complete user story using the format from `skills/user-story/SKILL.md`:
+For each split, write a complete user story using the format from `user-story`:
 
 ```markdown
 ### Split 1 using [Pattern Name]:

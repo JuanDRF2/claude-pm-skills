@@ -119,7 +119,7 @@ Mini example excerpt:
 
 **Consequence:** Story is too big. Likely multiple features bundled together.
 
-**Fix:** Split the story using `skills/user-story-splitting/SKILL.md`. Each When/Then pair should be its own story (or at least evaluated for splitting).
+**Fix:** Split the story using `user-story-splitting`. Each When/Then pair should be its own story (or at least evaluated for splitting).
 
 ---
 

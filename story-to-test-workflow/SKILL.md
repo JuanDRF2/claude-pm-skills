@@ -1,6 +1,6 @@
 ---
 name: story-to-test-workflow
-description: "Orchestrates product refinement through an always-guided conversation from a rough idea or spec to reviewed stories, acceptance criteria, QA coverage and handoffs. Use as the single entry point to create a refinement, review existing work, continue an approved phase, reconcile a prototype or generated SPEC, or extend an approved canonical package. Infers and confirms the appropriate internal route, asks one to three related questions per round, waits for answers and uses explicit decision gates; produces a fast provisional draft only when the user explicitly requests one."
+description: "Orchestrates product refinement through an always-guided conversation from a rough idea or spec to reviewed stories, acceptance criteria, QA coverage and handoffs. Use as the entry point for refinement work (not for the whole product cycle: use `idea-to-ship` when unsure where to start) to create a refinement, review existing work, continue an approved phase, reconcile a prototype or generated SPEC, or extend an approved canonical package. Infers and confirms the appropriate internal route, asks one to three related questions per round, waits for answers and uses explicit decision gates; produces a fast provisional draft only when the user explicitly requests one."
 ---
 
 ## Purpose
@@ -11,7 +11,7 @@ Do not rush from an incomplete idea to a large backlog. Build shared understandi
 
 ## Entry-Point Rule
 
-Use this orchestrator before any specialist skill when the request spans more than one refinement stage or begins from a PRD, spec, idea, or existing artifact package. Do not require the user to know the specialist skill names.
+Use this orchestrator before any refinement specialist skill when the request spans more than one refinement stage or begins from a PRD, spec, idea, or existing artifact package. Do not require the user to know the specialist skill names.
 
 At the start of every new workflow:
 
@@ -72,16 +72,16 @@ Do not ask about information already clear. Preserve universal IDs such as `BR-`
 
 Use these local skills as the source of truth for each phase:
 
-1. `skills/user-story-mapping/SKILL.md`
-2. `skills/user-story-splitting/SKILL.md`
-3. `skills/user-story/SKILL.md`
-4. `skills/test-case-designer/SKILL.md`
-5. `skills/refinement-judge/SKILL.md`
-6. `skills/build-refinement-portal/SKILL.md`
-7. `skills/build-refinement-document/SKILL.md`
-8. `skills/publish-refinement-to-notion/SKILL.md`
-9. `skills/sync-refinement-package-notion/SKILL.md`
-10. `skills/sync-refinement-package-taxonomy/SKILL.md`
+1. `user-story-mapping`
+2. `user-story-splitting`
+3. `user-story`
+4. `test-case-designer`
+5. `refinement-judge`
+6. `build-refinement-portal`
+7. `build-refinement-document`
+8. `publish-refinement-to-notion`
+9. `sync-refinement-package-notion`
+10. `sync-refinement-package-taxonomy`
 
 Before executing a phase, read `references/specialist-dispatch-contract.md`, invoke the required specialist through the host's skill mechanism, read it completely and follow its current instructions. Do not copy its full methodology into this orchestrator or replace it with an improvised equivalent.
 
@@ -349,7 +349,7 @@ After approval, write or update `05-user-stories.md` and `00-workflow-state.md`.
 
 Also generate one Jira-ready file per approved story. Include title, user outcome, concise context, included/excluded scope, criteria, dependencies, questions, and an `AC → BR → CHK → FTC/SC` table. Before Gate 4, test links may be pending.
 
-This file is a preview, not a live Jira issue — it does not create anything in Jira. Once a story clears Gate 4 (or Gate 3, if the team files tickets before test design finishes), use `skills/jira-story-publisher/SKILL.md` to estimate it and create the real issue.
+This file is a preview, not a live Jira issue — it does not create anything in Jira. Once a story clears Gate 4 (or Gate 3, if the team files tickets before test design finishes), use `jira-story-publisher` to estimate it and create the real issue.
 
 Read `references/story-and-scenario-writing-conventions.md` before writing or reformatting any story/criterion content — it covers Jira-view formatting, Markdown structure, `SC-*` heading conventions, journey integrity, context sufficiency, and product-language-first ordering. Keep the phase steps and gate logic above authoritative; that file only covers writing/formatting mechanics.
 

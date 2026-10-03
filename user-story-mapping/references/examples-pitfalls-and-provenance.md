@@ -97,7 +97,7 @@ See `examples/sample.md` for a full story map example.
 ## References
 
 ### Related Skills
-- `skills/user-story/SKILL.md` — Tasks from the map become user stories
+- `user-story` — Tasks from the map become user stories
 
 ### External Frameworks
 - Jeff Patton, *User Story Mapping* (2014) — Origin of the story mapping technique
@@ -114,4 +114,4 @@ See `examples/sample.md` for a full story map example.
 **Skill type:** Component
 **Suggested filename:** `user-story-mapping.md`
 **Suggested placement:** `/skills/components/`
-**Dependencies:** References `skills/user-story/SKILL.md`; persona, problem, and desired progress may be supplied directly
+**Dependencies:** References `user-story`; persona, problem, and desired progress may be supplied directly
