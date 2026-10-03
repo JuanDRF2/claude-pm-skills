@@ -1,0 +1,164 @@
+version: "0.6.0"
+
+organization:
+  name: "Acme SaaS"
+  industry: "B2B SaaS"
+  product: "Acme Platform"
+
+framework:
+  active: rice
+  weights:
+    reach: 1.0
+    impact: 1.0
+    confidence: 1.0
+    effort: 1.0
+
+slots:
+  signal_collector:
+    enabled: true
+    adapter: productboard
+    mcp_tools:
+      - "mcp__productboard__list_features"
+      - "mcp__productboard__get_insights"
+    config:
+      workspace: "acme-workspace"
+    fallback: "PM provides feedback data manually."
+
+  competitive_researcher:
+    enabled: true
+    adapter: built_in
+    mcp_tools:
+      - WebSearch
+    fallback: "PM provides competitive context manually."
+
+  legacy_analyzer:
+    enabled: false
+    adapter: none
+    fallback: "No legacy system. Greenfield product."
+
+  priority_scorer:
+    enabled: true
+    adapter: built_in
+    fallback: "N/A (built-in)"
+
+  spec_writer:
+    enabled: false
+    adapter: none
+    fallback: "PM writes specs in Notion. Orchestrator reviews."
+
+  competitive_teardown:
+    enabled: false
+    adapter: none
+    fallback: "Competitive research handled in signal phase only."
+
+  issue_tracker:
+    enabled: true
+    adapter: jira                    # jira | taxonomy_known_issues | github_issues | linear
+    mcp_tools:
+      - mcp__claude_ai_Atlassian_Rovo__searchJiraIssuesUsingJql
+    config:
+      support_case_field: "customfield_XXXXX"
+    # When the taxonomy stores known issues, switch the adapter and disable Jira:
+    #   adapter: taxonomy_known_issues
+    #   mcp_tools: [list_known_issues, get_known_issue]
+    fallback: "PM pastes the relevant bug list."
+
+  customer_calls:
+    enabled: false                   # optional voice-of-customer source
+    adapter: none                    # e.g. a call-recording tool's MCP connector
+    fallback: "Orchestrator asks the PM for call insights (signal-collection.md, Step 5b)."
+
+  eval_designer:
+    enabled: true                    # only used when a feature has ai_feature: true
+    adapter: built_in
+    fallback: "N/A (built-in). Gate 3 cannot close for AI features without an approved eval plan."
+
+  prototype_builder:
+    enabled: true
+    adapter: vercel_v0
+    config:
+      tool: "v0.dev"
+    fallback: "Figma prototypes."
+
+  refinement_orchestrator:
+    enabled: true
+    adapter: built_in
+    fallback: "PM writes stories directly."
+
+  refinement_judge:
+    enabled: false
+    adapter: none
+    fallback: "PM peer review replaces judge."
+
+  ticket_writer:
+    enabled: true
+    adapter: linear
+    mcp_tools:
+      - "mcp__linear__create_issue"
+      - "mcp__linear__update_issue"
+    config:
+      team_id: "ENG"
+      default_project: "Platform"
+    fallback: "PM creates Linear issues manually."
+
+  taxonomy_sync:
+    enabled: false
+    adapter: none
+    fallback: "No taxonomy system. Tags used instead."
+
+  template_filler:
+    enabled: true
+    adapter: built_in
+    fallback: "N/A (built-in)"
+
+  release_notes_writer:
+    enabled: true
+    adapter: built_in
+    fallback: "N/A (built-in)"
+
+  metric_designer:
+    enabled: true
+    adapter: built_in
+    mcp_tools:
+      - WebSearch
+    config:
+      analytics: amplitude
+      survey: hotjar
+    fallback: "PM defines metrics manually."
+
+competitive:
+  competitors:
+    - name: "RivalCo"
+      url: "https://rivalco.com"
+      category: direct
+  research_depth: surface
+
+delivery:
+  templates:
+    - name: "release-notes"
+      path: "templates/release-notes.md"
+  audiences:
+    - engineering
+    - product
+    - sales
+  publication_channels:
+    - type: notion
+      enabled: false
+    - type: slack
+      channel: "#product"
+      enabled: true
+
+# ----------------------------------------------------------------------------
+# Process policy (right-sizing, checkpoints, autonomy)
+# ----------------------------------------------------------------------------
+process:
+  default_depth: standard            # light | standard | full
+  force_full_when:
+    any_risk_at_least: 4
+    ai_feature: true
+  measurement:
+    checkpoint_days: [14, 30, 60]    # adjust per feature usage cycle; record the reason in state
+  autonomy:
+    reads: autonomous
+    writes_to_shared_systems: propose_then_approve
+    never_autonomous: [money, authentication, personal_data_changes, irreversible_actions]
