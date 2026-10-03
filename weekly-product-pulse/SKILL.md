@@ -304,6 +304,13 @@ The Head of Product is busy. Respect their time.
 
 ---
 
+## Without Jira
+
+If no Jira connection is available, ask the user to paste what they have for each team: a board or sprint export,
+a list of tickets with status, or a short summary. Build the same report from it, label the data source "provided
+by the user", and do not claim completeness: say which teams or fields are missing and how that limits the health
+scores. Never estimate counts you were not given.
+
 ## Edge cases
 
 | Situation | How to handle |

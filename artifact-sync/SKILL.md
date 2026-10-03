@@ -118,6 +118,12 @@ Close with a compact report:
 
 ---
 
+## Without a connected tool
+
+Build the sync report and the diff table as usual. Apply changes only to artifacts you can reach (local Markdown,
+mockups). For each remote artifact you cannot reach (a tracker issue, a documentation page), list the exact edit
+as a manual step for the user, and say that those artifacts are not yet in sync.
+
 ## Hard rules
 
 - **Propose before write. Always.** Phase 3 is non-negotiable.

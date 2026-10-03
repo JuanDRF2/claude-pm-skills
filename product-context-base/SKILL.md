@@ -224,6 +224,14 @@ try {
 
 ---
 
+## Without Jira, Notion or persistent storage
+
+- **No Jira or Notion:** ask the user to paste what stands in for them (recent ticket titles and statuses, roadmap
+  or spec excerpts) and build the snapshot from that, naming each source. A snapshot with a missing source is
+  valid; say what it lacks.
+- **No `window.storage`** (it exists only in some artifact environments): write the snapshot to a local Markdown
+  file named `product-context-<team>.md` and read it back from there next time.
+
 ## Edge cases and handling
 
 | Situation | How to handle |
