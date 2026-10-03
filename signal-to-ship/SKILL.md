@@ -122,7 +122,7 @@ reasoning and let the PM confirm or override:
 
 | Depth | Use when | What changes |
 |-------|----------|--------------|
-| **Light** | Bug fix, copy/config tweak, small enhancement, no new customer-facing behavior | One-line problem framing; no risk scoring, onboarding, adoption threshold or hypothesis. Gate 3 (on paths that run it) needs scope in/out only. |
+| **Light** | Bug fix, copy/config tweak, small enhancement, no new customer-facing behavior | One-line problem framing; no risk scoring, onboarding, adoption threshold or hypothesis. Gate 3 (on paths that run it) needs scope in/out only. Refinement is written inline (a short story and 2 to 4 acceptance criteria); no specialist package. |
 | **Standard** (default) | New feature, enhancement, migration | Every step in `references/phases-early.md` tagged `S`. |
 | **Full** | Any risk scored >= 4, contractual deadline, cross-team or pricing/compliance impact, features with a model or agent write-access | Everything in Standard + riskiest-assumption test, advisory check, eval plan (AI), beta with usage contract. |
 
