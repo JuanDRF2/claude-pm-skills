@@ -1,0 +1,28 @@
+name: validate
+# Deterministic checks only. The sanitization scan needs a denylist kept outside the repository; it runs
+# locally before every commit.
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: pip install pyyaml
+      - name: Every SKILL.md has valid frontmatter
+        run: python3 scripts/validate-skills.py
+      - name: story-to-test-workflow validator regression tests
+        working-directory: story-to-test-workflow/scripts
+        run: |
+          python3 test-validate-package.py
+          python3 test-merge-specific.py
+      - name: signal-to-ship validator runs on its own template (Node)
+        run: node signal-to-ship/scripts/validate-state.mjs signal-to-ship/templates/signal-to-ship-state.md
