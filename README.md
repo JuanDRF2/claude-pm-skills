@@ -67,6 +67,7 @@ below are enough to start.
 | [`publish-refinement-to-notion`](./publish-refinement-to-notion/) | Publishes or updates an approved product/QA refinement Markdown package as native, readable Notion pages. |
 | [`refinement-judge`](./refinement-judge/) | Independent adversarial quality gate that audits a complete product-refinement package before external publication, Jira creation, or another consequential action — comparing it against original sources rather than trusting the generating skill's own conclusions. |
 | [`release-notes-writer`](./release-notes-writer/) | Writes structured, audience-aware release notes and publishes them to Notion. |
+| [`signal-to-ship`](./signal-to-ship/) | Orchestrates a product initiative from customer signal to measured outcome in seven gated phases (signals, prioritization, specification, prototyping, refinement, delivery, measurement), right-sized to light, standard or full depth, with a recorded stop and a keep / iterate / retire verdict. Dispatches the specialist skills in this library. |
 | [`story-to-test-workflow`](./story-to-test-workflow/) | Orchestrates product refinement end to end — journey mapping, story splitting, user stories with acceptance criteria, and risk-based QA test design — through explicit decision gates, from a rough idea or an approved spec. |
 | [`sync-refinement-package-notion`](./sync-refinement-package-notion/) | Ongoing sync after an initial Notion publication: status/diff, start a local checkout, publish approved changes, reconcile concurrent edits, recover a partial write, or accept editorial drift. |
 | [`test-case-designer`](./test-case-designer/) | Designs risk-based, traceable QA coverage from approved stories and criteria: atomic checks and QA-reviewable functional test cases, with automation guidance and a downstream test-management handoff. |
@@ -77,7 +78,7 @@ below are enough to start.
 | [`weekly-product-pulse`](./weekly-product-pulse/) | Generates a structured weekly status report for the Head of Product by pulling the active sprint from all product team Jira projects, grouping results by team, and surfacing delivery health, blockers, and risks. |
 | [`writing-voice`](./writing-voice/) | Applies your own calibrated writing voice — direct, human, no AI-tells — to external-facing content (LinkedIn, cover letters, bios, launch announcements) in English or Spanish. |
 
-29 skills in total.
+30 skills in total.
 
 ---
 
@@ -116,6 +117,7 @@ reads at run time, so uploading only the `SKILL.md` leaves them broken.
 | `publish-refinement-to-notion` | 8 | whole folder (8 files) | `sync-refinement-package-notion` |
 | `refinement-judge` | 8 | whole folder (8 files) | `story-to-test-workflow`, `sync-refinement-package-notion` |
 | `release-notes-writer` | 1 | `SKILL.md` alone | — |
+| `signal-to-ship` | 34 | whole folder (34 files) | `competitive-teardown`, `design-system`, `jira-bug-writer`, `jira-story-publisher`, `launch-comms`, `mini-spec-writer`, `prd-writer`, `refinement-judge`, `release-notes-writer`, `story-to-test-workflow`, `sync-refinement-package-taxonomy` (named in `references/specialist-contracts.md`; it falls back to guiding you directly when one is missing) |
 | `story-to-test-workflow` | 37 | whole folder (37 files) | `build-refinement-document`, `build-refinement-portal`, `idea-to-ship`, `jira-story-publisher`, `publish-refinement-to-notion`, `refinement-judge`, `sync-refinement-package-notion`, `sync-refinement-package-taxonomy`, `test-case-designer`, `user-story`, `user-story-mapping`, `user-story-splitting` |
 | `sync-refinement-package-notion` | 35 | whole folder (35 files) | — |
 | `sync-refinement-package-taxonomy` | 4 | whole folder (4 files) | — |

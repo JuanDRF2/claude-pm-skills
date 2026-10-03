@@ -1,0 +1,46 @@
+{
+  "permissions": {
+    "allow": ["Read", "Glob", "Grep"],
+    "ask": [
+      "mcp__<your-tracker>__create_issue",
+      "mcp__<your-tracker>__update_issue",
+      "mcp__<your-docs>__create_page",
+      "mcp__<your-docs>__update_page",
+      "mcp__<your-feedback-tool>__create_idea",
+      "mcp__<your-feedback-tool>__update_idea",
+      "mcp__<your-taxonomy>__update_initiative"
+    ],
+    "deny": [
+      "mcp__<your-chat>__send_message",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/*credentials*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/skills/signal-to-ship/hardening/hooks/gate-check.mjs\"",
+            "timeout": 5,
+            "statusMessage": "Checking gate order..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/skills/signal-to-ship/hardening/hooks/state-reminder.mjs\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
