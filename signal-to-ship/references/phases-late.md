@@ -44,7 +44,16 @@ Step 5 — Post-validation (Acme-specific):
 
 **Goal:** Produce stories, acceptance criteria, QA coverage, and pass the Judge.
 
-**Orchestrator actions:**
+**Size it by depth, before dispatching anything.**
+
+- **Light (and Path 3, a bug fix):** do **not** dispatch `story-to-test-workflow`, `test-case-designer` or any
+  multi-file refinement package. Write the refinement **inline**, in one message: a one-sentence story, 2 to 4
+  acceptance criteria in plain Given / When / Then, what to regression-check, and the out-of-scope line. Show
+  it to the PM, record it in the state file's narrative, and close Gate 5 on the PM's review (the judge slot's
+  fallback applies when it is disabled). A one-line fix does not need a story map, a split, or a QA package.
+- **Standard and Full:** use the specialist below.
+
+**Orchestrator actions (Standard and Full):**
 - Invoke story-to-test-workflow as the specialist orchestrator for this phase
 - Pass all registered gaps from Specification phase as input
 - story-to-test-workflow handles its own internal gates (Gates 1-5)
