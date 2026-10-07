@@ -67,10 +67,46 @@ its outcome, Day-30 adoption and verdict, and warns when recently delivered feat
 Permissions and hooks cannot ship inside a skill, so they live in `hardening/`. Read `hardening/README.md` to make
 writes to shared systems ask you first every time.
 
+## Quick reference
+
+**Run it:** `/signal-to-ship <what you want to work on>`. Optional words in the same line: a mode (`roadmap`,
+`parity-scan`, `resume`, `portfolio`) and a depth (`light`, `standard`, `full`; otherwise it proposes one).
+
+**Which front door?**
+
+| You want to... | Use |
+|---|---|
+| Take one initiative from signal to a keep / iterate / retire verdict, with a saved state and gates | `signal-to-ship` |
+| Know which skill to run next and let it route you, one step at a time, without tracking a whole initiative | `idea-to-ship` |
+| Do one task (a spec, a story, release notes) | that skill directly |
+
+**What it saves and checks:** progress goes to `00-signal-to-ship-state.md` in your working directory after every
+gate. `node scripts/validate-state.mjs <file>` checks it; `node scripts/portfolio.mjs <folder-with-your-cases>`
+shows every initiative with its outcome, adoption and verdict.
+
+**What you decide, and when.** It asks the question and closes the gate only on your answer; a reported approval
+or "close it" does not count. Every message to a team or channel is shown to you first (recipients and text) and
+sent only on approve.
+
+| Gate | You choose |
+|---|---|
+| 2, prioritization | build now / backlog / archive |
+| 3, specification | approve / revise / defer |
+| 4, prototype | validated / iterate / pivot (and whether real users tried it, or the risk you accept) |
+| 5, refinement | PASS or FAIL, then send the handoff or hold it |
+| 6, delivery | go / hold; then, once live, the real deploy date and the announcement |
+| 7, measurement | keep / iterate / retire, after the checkpoints |
+
+**No spec yet?** It runs a guided interview (`references/spec-interview.md`), or uses the library skill
+`product-spec-interview` if you have it installed.
+
+**You need:** nothing beyond the skill. Node 18 or newer is only for the optional scripts; connectors (feedback
+tool, tracker, docs) are optional slots, and where one is missing it asks you for the data instead.
+
 ## What to expect, honestly
 
-- It has been tested only in a headless harness with a simulated PM: eleven cases, one of them a full bug-fix cycle,
-  almost all on one model (three on a second). The cases pass, and the runs also found real defects that were
+- It has been tested only in a headless harness with a simulated PM: 23 eval cases, one of them a full bug-fix
+  cycle, mostly run once or a few times on one model family. The cases pass, and the runs also found real defects that were
   fixed. It has not been used by anyone but its author.
 - It asks a lot of questions at the start. That is the point, and light depth keeps it short for small work.
 - It does not edit your product code, and it cannot reach a tool you have not connected: it will say so and give

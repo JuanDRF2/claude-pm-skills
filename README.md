@@ -119,6 +119,24 @@ stories? is anything built?), tells you which stage you are in (Define, Build, V
 right skill: for example `mini-spec-writer` for a raw idea or `user-story` for an approved spec. It does not draft the
 spec itself.
 
+### Which front door: `idea-to-ship` or `signal-to-ship`?
+
+Both orchestrate other skills, for different jobs.
+
+| You want to... | Use |
+|---|---|
+| Know which skill to run next and be routed one numbered question at a time, without tracking a whole initiative | `idea-to-ship` |
+| Take one initiative from customer signal to a keep / iterate / retire verdict, with a saved state file and a decision of yours at each gate | `signal-to-ship` |
+| Do one task (a spec, a story, release notes) | that skill directly |
+
+To start `signal-to-ship`, type `/signal-to-ship <what you want to work on>`; add `light`, `standard` or `full` for the
+depth, or `resume`, `roadmap` or `portfolio` for a mode. It asks you one question at a time, closes a gate only on your
+answer, and shows you any message to a team or channel before it is sent. If you have no spec, it interviews you
+(`product-spec-interview` does the same on its own). The commands, what you decide at each gate and what it needs are in
+[`signal-to-ship/GETTING-STARTED.md`](./signal-to-ship/GETTING-STARTED.md).
+
+---
+
 ## Limits
 
 - These are instructions for a model, not programs. The output depends on the model you use and on what you give it.
