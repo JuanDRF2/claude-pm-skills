@@ -185,7 +185,7 @@ reads at run time, so uploading only the `SKILL.md` leaves them broken.
 | `publish-refinement-to-notion` | 8 | whole folder (8 files) | `sync-refinement-package-notion` |
 | `refinement-judge` | 8 | whole folder (8 files) | `story-to-test-workflow`, `sync-refinement-package-notion` |
 | `release-notes-writer` | 1 | `SKILL.md` alone | — |
-| `signal-to-ship` | 39 | whole folder (39 files) | `competitive-teardown`, `design-system`, `jira-bug-writer`, `jira-story-publisher`, `launch-comms`, `mini-spec-writer`, `prd-writer`, `product-spec-interview`, `refinement-judge`, `release-notes-writer`, `story-to-test-workflow`, `sync-refinement-package-taxonomy` (named in `references/specialist-contracts.md`; it falls back to guiding you directly when one is missing) |
+| `signal-to-ship` | 40 | whole folder (40 files) | `competitive-teardown`, `design-system`, `jira-bug-writer`, `jira-story-publisher`, `launch-comms`, `mini-spec-writer`, `prd-writer`, `product-spec-interview`, `refinement-judge`, `release-notes-writer`, `story-to-test-workflow`, `sync-refinement-package-taxonomy` (named in `references/specialist-contracts.md`; it falls back to guiding you directly when one is missing) |
 | `stakeholder-request-triage` | 1 | `SKILL.md` alone | — |
 | `story-to-test-workflow` | 38 | whole folder (38 files) | `build-refinement-document`, `build-refinement-portal`, `idea-to-ship`, `jira-story-publisher`, `publish-refinement-to-notion`, `refinement-judge`, `sync-refinement-package-notion`, `sync-refinement-package-taxonomy`, `test-case-designer`, `user-story`, `user-story-mapping`, `user-story-splitting` |
 | `success-metrics-designer` | 1 | `SKILL.md` alone | — |
