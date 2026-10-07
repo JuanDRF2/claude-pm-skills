@@ -3,7 +3,7 @@
 // Usage: node scripts/validate-state.mjs <state-file> [--today YYYY-MM-DD]
 // Exit codes: 0 valid (warnings allowed), 1 validation errors, 2 usage / parse error.
 import { readFileSync } from 'node:fs'
-import { parseFrontmatter, validateState, dueCheckpoints } from './lib/state.mjs'
+import { parseFrontmatter, validateState, dueCheckpoints, deployUnconfirmed } from './lib/state.mjs'
 
 const args = process.argv.slice(2)
 const file = args.find((a) => !a.startsWith('--'))
@@ -17,6 +17,8 @@ try { state = parseFrontmatter(readFileSync(file, 'utf8')) } catch (e) { console
 const findings = validateState(state)
 for (const f of findings) console.log(`${f.severity === 'error' ? 'ERROR' : 'warn '} ${f.code}: ${f.message}`)
 for (const d of dueCheckpoints(state, today)) console.log(`DUE   checkpoint ${d.n} passed on ${d.due} — surface it to the PM before anything else`)
+const planned = deployUnconfirmed(state, today)
+if (planned) console.log(`ASK   delivery was planned for ${planned} and delivery.deployed_on is empty — ask the PM whether it shipped, and when`)
 const errors = findings.filter((f) => f.severity === 'error').length
 console.log(errors ? `validate-state: FAIL (${errors} error${errors > 1 ? 's' : ''})` : 'validate-state: OK')
 process.exit(errors ? 1 : 0)

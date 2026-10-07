@@ -87,7 +87,7 @@ Two hooks run in Claude Code (configured in `.claude/settings.json`, scripts in 
 
 The orchestrator is pull-based: it only notices a due checkpoint when the PM returns. To make measurement proactive, schedule a recurring agent (for example with the `/schedule` skill) that runs weekly, opens each case folder, runs `validate-state.mjs --today <date>`, and posts any `DUE` lines to the PM. Optionally add a second weekly routine that re-runs signal collection for features in Gates 1-3. Both routines only **read** and **report**; they never write to shared systems.
 
-**Resume protocol:** When starting a new session, the orchestrator checks for an existing state file. If found, it states what was completed and asks the PM whether to resume or restart. Passed gates are skipped; the last gate summary is re-confirmed before advancing.
+**Resume protocol:** When starting a new session, the orchestrator checks for an existing state file. If found, it states what was completed and asks the PM whether to resume or restart. Passed gates are skipped; the last gate summary is re-confirmed before advancing. Two things come first: an `ASK` line (the planned delivery date passed and `delivery.deployed_on` is empty, so ask whether and when it shipped, then run the post-deploy step) and any `DUE` checkpoint. Checkpoints are anchored on `delivery.deployed_on`, falling back to the planned `delivery.delivery_date` until the deploy is confirmed.
 
 ## Anthropic patterns applied
 

@@ -61,9 +61,15 @@ spec:
   riskiest_assumption: not_required
 eval_plan:
   status: not_required
+validation:
+  end_user_test: not_asked
+  end_user_note:
 delivery:
   rollout: not_set
   delivery_date:
+  deployed_on:
+  announcement: not_sent
+  announcement_note:
 beta:
   minimum_usage:
   feedback_sessions:
@@ -107,7 +113,11 @@ measurement:
 | `spec.riskiest_assumption` | `not_required`, `pending` (a test is owed), `tested`, `accepted_untested`. Gate 3 cannot close with `pending` or `not_required` at full depth, or when value or usability is >= 4. |
 | `eval_plan.status` | `not_required`, `draft`, `approved`, `executed` |
 | `delivery.rollout` | `not_set`, `all_at_once`, `beta`, `phased`, `internal_only` |
-| `measurement.checkpoint_*` | ISO dates, calculated from `delivery.delivery_date` |
+| `validation.end_user_test` | `not_asked`, `done`, `accepted_risk` or `not_applicable`. Gate 4 cannot pass (schema 2) while it is `not_asked`: stakeholders and an advisory group approve a prototype, they do not prove it is usable by the persona. `accepted_risk` needs `validation.end_user_note`. |
+| `delivery.delivery_date` | The **planned** launch date, set when Gate 6 closes. |
+| `delivery.deployed_on` | ISO date the change **really** reached production, set at the post-deploy step (after Gate 6). When set, it replaces the plan as the anchor of the measurement checkpoints. The portfolio asks for it once the planned date has passed. |
+| `delivery.announcement` | `not_sent`, `sent` or `skipped`. The post-deploy announcement goes to the audiences that received the Gate 6 artifacts; `skipped` needs `delivery.announcement_note` (for example an internal-only rollout). |
+| `measurement.checkpoint_*` | ISO dates, calculated from `delivery.deployed_on` (else `delivery.delivery_date`). If the deploy slipped after they were set, re-anchor them or record `measurement.window_reason`. |
 | `schema` | `2` (current). `1` still validates with a warning; the fields below are enforced only on `2`. |
 | `status` | `active` or `stopped`. Stopping is a legitimate outcome: set `stop_reason` and `stopped_on`; remaining gates can stay `pending`. |
 | `problem_statement.cost_of_inaction` | One line: "if we do not build this, what happens?" Required to pass Gate 1 at every depth. If the honest answer is "nothing significant", recommend stopping. |

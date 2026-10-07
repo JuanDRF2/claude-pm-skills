@@ -8,8 +8,11 @@ the cycle reaches Phase 4 or later.
 **Goal:** Build a clickable prototype, validate it with stakeholders, iterate until approved.
 
 **Orchestrator behavior:**
-- Suggest this phase when: feature has visual component, new screen, user-facing workflow
-- Skip when: backend-only, bug fix, tech debt, PM declines
+- Always run it when: a new feature with a visual component (Path 1), or `risks.usability` >= 4
+- Suggest it when: an enhancement that changes the experience, or a migration with a significant interface change.
+  Ask: "This changes what people see. Do you want a prototype to validate it?" If the PM declines, skip with a
+  recorded reason in `gate_reasons.prototyping`
+- Skip when: backend-only, bug fix, contractual, a migration with no visible change, or the PM declines
 
 **If executed:**
 
@@ -23,6 +26,15 @@ Step 2 — Validation planning:
   - External (clients, prospects)
   - Both
 - Generate shareable link + validation checklist tailored to each audience
+- Ask explicitly: "Will you test this with end users who match the persona in the problem statement?
+  Stakeholders and an advisory group are valuable, but their approval does not prove usability."
+  - **Yes:** plan a light test: 3 to 5 people who match the persona, specific tasks, completion measured. Record
+    `validation.end_user_test: done` and the result in the narrative.
+  - **No:** record `accepted_risk` with the reason in `validation.end_user_note` ("no matching users reachable
+    before the contract date"), or `not_applicable` when there is no end user (an internal tool for the team
+    that already reviewed it).
+- If a beta is likely after launch, seed the plan now (which clients, what success looks like, rough timeline).
+  Phase 6 formalizes it; the decision starts here.
 
 Step 3 — Collect feedback:
 - PM brings feedback from each stakeholder
@@ -38,7 +50,25 @@ Step 5 — Post-validation (Acme-specific):
 - Generate component spec drafts
 - Create issue tickets in issue tracker (slot)
 
-**Gate 4:** Prototype validated with stakeholders OR phase explicitly skipped.
+**Gate 4, decision point.** When feedback is in, ask the PM to choose. Stakeholder approvals the PM reports,
+and even "close Gate 4", are inputs, not the choice: ask the three-way question explicitly and close the gate
+only after the answer.
+
+1. **Validated:** approved, with or without minor changes. Proceed.
+2. **Iterate:** significant changes needed. Go back to Step 4.
+3. **Pivot:** fundamental problems. Return to Phase 3, or defer.
+
+On *validated*, in the same message, propose the feedback request or validation message (audiences and timing in
+`references/audience-views.md`): who receives it, the prototype link, the specific question ("click through and
+tell us what is missing for your work"). Show it with the recipient list. The PM answers **approve / edit /
+skip**; nothing is sent without that answer. Use a direct message rather than a public channel when you want
+honest feedback.
+
+The feedback request does not hold the gate. If it cannot go out yet (a missing prototype link, say), give the PM
+the ready-to-paste text, note in the narrative that it is pending and who sends it, and close the gate.
+
+**Gate 4:** Prototype validated with stakeholders and `validation.end_user_test` answered; the feedback request
+proposed (sent, skipped with a reason, or pending an input from the PM); OR phase explicitly skipped.
 
 ## Phase 5: Refinement
 
@@ -64,7 +94,17 @@ Step 5 — Post-validation (Acme-specific):
 - Resolves gaps registered in Specification phase
 - Generates proposals or applies changes (with PM authorization)
 
-**Gate 5:** refinement-judge PASS.
+**Gate 5, decision point.** After the judge runs, present the result:
+
+1. **PASS:** stories and QA coverage are complete. Proceed.
+2. **FAIL:** show the findings. The PM fixes and resubmits; nothing is handed off until PASS.
+
+On PASS, propose the **handoff to Dev and QA**: the stories, acceptance criteria and scenario counts, the test
+plan, dependencies, blockers and environment needs, delivered through the tracker slot and the refinement
+package. Show the counts and the blocker list, then ask **approve / hold**. The handoff is a write to a shared
+system, so the PM's approval of its content is what triggers it (invariant 14).
+
+**Gate 5:** refinement-judge PASS; handoff to Dev and QA sent, or held with a reason.
 
 ## Pre-Release Readiness (between Gate 5 and Gate 6)
 
@@ -97,8 +137,9 @@ not generation. Runs after UAT, before Gate 6 opens. Light depth runs only the f
 feature before customers do, using `templates/feature-roast.md`. Record `readiness.roast: done`, or `skipped` with a
 reason in `readiness.roast_note`. Full depth cannot close Gate 6 without one of the two.
 
-**Go/no-go:** the PM confirms every applicable item. Blockers are documented with a PM
-decision (launch with documented blockers, or wait). Only after a go decision does Gate 6 open.
+**Go/no-go (decision point):** the PM confirms every applicable item and chooses **go** or **hold**.
+Blockers are documented with a PM decision (launch with documented blockers, or wait). Only after a *go*
+does Gate 6 open.
 
 ## Phase 6: Delivery
 
@@ -188,10 +229,32 @@ with documented blockers as long as the PM acknowledges them.
 datetime it was published. At gate close, verify every applicable artifact is published and
 flag any stuck at `draft` or `reviewed`. The orchestrator **proposes** each publication
 ("CSM briefing is ready. Publish to the CS channel? yes / no / later") and only the PM's
-approval triggers it.
+approval triggers it. Each one gets its own answer, **approve / edit / skip**; record what was published (and
+where and when), what was skipped and why, and what is still pending. One approval never covers the next artifact.
 
 **Gate 6:** All applicable audience artifacts generated AND published. Beta/rollout plan
 defined. Launch readiness confirmed (or blockers documented). Publication tracked for every artifact.
+
+## Post-deploy (after Gate 6, before measurement starts)
+
+A separate step, not part of Gate 6: the artifacts say what is coming; this confirms that it arrived.
+
+1. **Confirm it is live.** Ask: "Is it live in production? On what date?" Record `delivery.deployed_on`. If the
+   date differs from `delivery.delivery_date` (the plan), keep both: the plan stays as it was, the real date
+   drives everything after.
+2. **Verify the artifacts.** Count what Gate 6 published and what is still pending, and say so: "4 published,
+   1 still draft. Announce now or wait?"
+3. **Propose the announcement** to the audiences that received the Gate 6 artifacts: what shipped, who it
+   affects, how to explain the value, where to find the help article. Show the recipients and the text; the PM
+   answers **approve / edit / skip**. Do this right after the deploy date is recorded, even when the launch
+   was weeks ago (say how long ago it was), and before configuring measurement. Record `delivery.announcement` as `sent`, or `skipped` with the
+   reason in `delivery.announcement_note` (an internal-only rollout has no external announcement).
+4. **Re-anchor the checkpoints** if they were already set from the planned date (Phase 7 below).
+
+**Rollback protocol.** If the PM reports a problem after deploy, offer the rollback notice at once, using
+`templates/rollback-notice.md`: the same audiences and channels as the original, the same day. Contents: what
+happened, current status, when the next update comes, and what to do in the meantime. The PM approves it like any
+other communication. Mark the affected delivery rows `rollback_sent`, and route the cause to Phase 1 as a new signal.
 
 ## Phase 7: Measurement
 
@@ -199,6 +262,9 @@ defined. Launch readiness confirmed (or blockers documented). Publication tracke
 
 **Orchestrator actions:**
 
+0. **Start from what Phase 3 already decided.** The adoption threshold, the outcome metric (`outcome.*`) and the
+   hypothesis are the source of truth. This phase does not invent new success metrics: it checks that they can
+   be measured and sets up the collection. If Phase 3 was skipped (a bug fix, say), propose metrics from scratch.
 1. Research industry best practices and competitor metrics for the feature domain
 2. Propose metrics organized in five categories:
    - **Product & Engagement** (Pendo/TestIds): adoption rate, completion rate, time to
@@ -247,8 +313,10 @@ When measurement data is available, the orchestrator:
    Gate 1) and verify the metrics will actually test it. If the hypothesis says "cut time from
    3 min to 30 sec" and no metric measures time, flag the gap.
 
-7. **Measurement schedule.** Register three checkpoints from the delivery date and the
-   adoption threshold from Phase 3. The defaults are Day-14 / Day-30 / Day-60; **adjust the
+7. **Measurement schedule.** Register three checkpoints from the **real deploy date** (`delivery.deployed_on`;
+   the planned `delivery.delivery_date` only until the deploy is confirmed) and the adoption threshold from
+   Phase 3. If the deploy slips after the checkpoints were set, re-anchor them on the real date, or record in
+   `measurement.window_reason` why the original ones stay. The defaults are Day-14 / Day-30 / Day-60; **adjust the
    windows to the feature's natural usage cycle** (a weekly workflow can use 14/30/60, an
    annual one needs longer windows or a leading indicator) and record the reason.
 
@@ -273,8 +341,10 @@ When measurement data is available, the orchestrator:
 
    Dates are saved in state. The orchestrator is pull-based, so it also supports **scheduled
    checkpoints** (a recurring agent that opens the case and surfaces due checkpoints; see
-   `references/architecture.md`). When the PM returns to `/signal-to-ship <feature>`, any passed
-   checkpoint is surfaced first: "Checkpoint 1 passed on [date]. Have you checked adoption?"
+   `references/architecture.md`). When the PM returns to `/signal-to-ship <feature>`, three things come first, in
+   this order: a planned delivery date that has passed with no `delivery.deployed_on` ("did it ship, and when?");
+   any passed checkpoint ("Checkpoint 1 passed on [date]. Have you checked adoption?"); and the next checkpoint
+   if it falls within the next 7 days.
 
 8. **Verdict (after the last checkpoint).** When checkpoint 3 is checked, the PM records
    `measurement.verdict` and `verdict_reason`. This is the decision most teams skip:
