@@ -190,8 +190,10 @@ For any feature that includes a model or gives agents write access, also read
 
 ## Phases 4-7
 
-**Early notification:** when Phase 4 starts (or Gate 3 passes on a path with no prototype),
-send the GTM heads-up: problem, target persona, prototype link if any, expected timeline.
+**Early notification:** when Gate 3 is approved, propose the GTM heads-up: problem, target persona, expected
+timeline. It asks nothing of its readers. It is **not** the Gate 4 message: at Gate 4, in the same message that closes
+the gate, propose the prototype **feedback request** (the link and the question "what is missing for your work?").
+If the heads-up has not gone out yet, propose it as a separate item; never in place of the feedback request.
 See `references/audience-views.md`, Release Communication Protocol.
 
 Read `references/phases-late.md` for complete instructions on:
