@@ -24,7 +24,7 @@ Signal to Ship is not a traditional software project. It's an AI-first workflow 
 │          │                  │                   │          │
 │  ┌───────┴──────────────────┴───────────────────┴───────┐ │
 │  │           specialist-contracts.md                     │ │
-│  │     14 slot definitions across 7 phases               │ │
+│  │     15 slot definitions across 7 phases               │ │
 │  └──────────────────────────────────────────────────────┘ │
 │                                                            │
 │  Gate 0 ──> Gate 1 ──> Gate 2 ──> ... ──> Gate 7          │
@@ -50,7 +50,7 @@ The orchestrator loads references on demand, not all at once:
 | `signal-collection.md` | Query plan for Canny, Jira, taxonomy, competitive research | Phase 1 (Signals) |
 | `priority-calculator.md` | 5 scoring frameworks (BRICE+, RICE, MoSCoW, WSJF, ICE) | Phase 2 (Prioritization) |
 | `audience-views.md` | 10 audience definitions, applicability matrix, publication destinations | Phase 6 (Delivery) |
-| `specialist-contracts.md` | 14 slot contracts with inputs, outputs, required MCP, fallbacks | Any specialist dispatch |
+| `specialist-contracts.md` | 15 slot contracts with inputs, outputs, required MCP, fallbacks | Any specialist dispatch |
 
 ## Paths and Gate 0
 
