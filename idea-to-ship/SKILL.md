@@ -71,6 +71,7 @@ Exit condition: the write-up is approved, an architecture pre-check found no unr
 Route in this order:
 
 1. **Pick the write-up size.** Ask: "How would you describe this? **1.** It's large, crosses several teams, or needs leadership sign-off. **2.** It's small and already well understood." → 1 runs `prd-writer`, 2 runs `mini-spec-writer`. This mirrors `prd-writer`'s own routing table — don't re-derive the criteria, just present them as a menu.
+   If the problem, the success measure or the scope is still fuzzy, run `product-spec-interview` first and hand its answers to the chosen writer.
 2. **Architecture pre-check** — `architecture-aware-reviewer` against the draft. Blockers get fixed before moving on; risks can carry forward as open questions.
 3. **Stories, acceptance criteria, test strategy** — `story-to-test-workflow`. Don't duplicate any of its mapping/splitting/story/test-design logic here, just hand off and wait for it to clear its own five gates.
 4. **Cross into Build** — once `story-to-test-workflow` reaches its Gate 3/4 approval, what happens next depends on the tracking mode set at the start:
@@ -187,6 +188,7 @@ During Define, this note only points at `story-to-test-workflow`'s own `00-workf
 
 - `discovery-interview-guide`, `competitive-teardown`, `product-context-base` — Optional discovery
 - `prd-writer`, `mini-spec-writer` — Define, step 1
+- `product-spec-interview` — Define, step 1, when the problem, the success measure or the scope is still fuzzy (run it first; it hands its answers to either writer)
 - `architecture-aware-reviewer` — Define, step 2
 - `story-to-test-workflow` — Define, step 3 (its own sub-orchestrator for mapping → splitting → user-story → test-case-designer)
 - `jira-story-publisher` — Define → Build exit condition, tracking mode 1 only (solo + AI without a tracker skips straight to Build once the story is approved)
