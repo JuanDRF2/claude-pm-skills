@@ -199,3 +199,11 @@ structure beyond what's in the scorecard template. To adapt:
 2. Add a `cases/<your-project>/` directory with scorecards
 3. Run `/signal-to-ship roadmap <your-project>`
 4. Customize risk derivation rules if your risk model differs
+
+## The roadmap artifact (a shared page, not this view)
+
+This view is a read mode for the PM. The page that leadership and the go-to-market leads see is the roadmap
+artifact in `templates/roadmap-review.md` (Part 2), produced at Gate 2 after a roadmap review. It carries the
+ranked initiatives, their scores, the decision (build now, backlog, archive) and the reason, worded as outcomes
+rather than feature promises and without delivery dates. Generate it from the same scorecards this view reads;
+share it only after the PM approves.

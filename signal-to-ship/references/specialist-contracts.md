@@ -64,8 +64,8 @@ the specialist is available, and dispatches. If unavailable, it stops and inform
 
 ### spec-writer
 
-**Slot:** `mini-spec-writer` (default), `prd-writer` (large or cross-team scope). An organization-specific spec skill can fill the slot if it meets this contract.
-**Status:** Generic skill available (`mini-spec-writer`, or `prd-writer` for cross-team scope). If neither is installed, the orchestrator guides the PM directly.
+**Slot:** `mini-spec-writer` (default), `prd-writer` (large or cross-team scope), `product-spec-interview` (library skill; questioning-first, for when the problem, the success measure or the scope is still fuzzy). An organization-specific spec skill can fill the slot if it meets this contract.
+**Status:** Generic skills available (`mini-spec-writer`, `prd-writer` for cross-team scope, `product-spec-interview` to think it through first). If none is installed, the orchestrator runs the guided interview in `references/spec-interview.md`.
 
 | Field | Value |
 |-------|-------|
@@ -74,7 +74,7 @@ the specialist is available, and dispatches. If unavailable, it stops and inform
 | Phase 3 addendum | A library spec skill does not cover everything Gate 3 needs. The orchestrator collects the rest itself (`references/phases-early.md`, Phase 3): alternatives considered, implementation class, onboarding, adoption threshold, riskiest assumption. |
 | Required MCP | taxonomy-system (for alignment) |
 | Quality gate | Spec must be reviewable by PM. Taxonomy-aligned. No unresolved contradictions. |
-| Fallback if unavailable | Orchestrator guides PM through spec creation using the Signals data as input. Or PM provides an existing spec for review. |
+| Fallback if unavailable | The orchestrator runs the guided interview in `references/spec-interview.md` (rounds with checkpoints, outcome coverage matrix, acceptance-criteria axes), using the Signals data as input. Or the PM provides an existing spec for review. |
 
 ### competitive-teardown
 

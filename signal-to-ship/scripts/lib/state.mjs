@@ -23,6 +23,8 @@ const ORIGINS = ['internal', 'stakeholder', 'customer']
 const VERDICTS = ['keep', 'iterate', 'retire']
 const STATUSES = ['active', 'stopped']
 const ROAST = ['not_run', 'done', 'skipped']
+const ANNOUNCEMENT = ['not_sent', 'sent', 'skipped']
+const END_USER = ['not_asked', 'done', 'accepted_risk', 'not_applicable']
 const DATE = /^\d{4}-\d{2}-\d{2}$/
 
 /** True only for real calendar dates in YYYY-MM-DD form. */
@@ -313,19 +315,43 @@ export function validateState(s) {
     f.push(err('E_G6_EVAL', 'ai_feature: Gate 6 needs eval_plan.status executed (it cannot be provisional or skipped)'))
   }
 
+  // v0.11 Gate 4: stakeholders are not end users; the question must be answered (schema 2, when the block exists)
+  const val = s.validation
+  if (val && !empty(val.end_user_test) && !END_USER.includes(val.end_user_test)) {
+    f.push(err('E_END_USER', `validation.end_user_test must be one of ${END_USER.join(', ')}`))
+  }
+  if (passed('prototyping') && v2) {
+    if (!val) {
+      f.push(warn('W_G4_VALIDATION', 'Gate 4 passed with no validation block: record whether the prototype was tested with end users who match the persona (validation.end_user_test)'))
+    } else if (empty(val.end_user_test) || val.end_user_test === 'not_asked') {
+      f.push(err('E_G4_END_USER', 'Gate 4 passed but validation.end_user_test is not answered (done, accepted_risk or not_applicable)'))
+    } else if (val.end_user_test === 'accepted_risk' && empty(val.end_user_note)) {
+      f.push(err('E_G4_END_USER_NOTE', 'validation.end_user_test is accepted_risk: record why in validation.end_user_note'))
+    }
+  }
+
+  // v0.11 post-deploy: the real production date and the announcement
+  if (!empty(del.deployed_on) && !isIsoDate(del.deployed_on)) f.push(err('E_DEPLOYED_DATE', 'delivery.deployed_on must be an ISO date (YYYY-MM-DD)'))
+  if (!empty(del.deployed_on) && isIsoDate(del.deployed_on) && !passed('delivery')) {
+    f.push(err('E_DEPLOYED_EARLY', 'delivery.deployed_on is set but Gate 6 has not passed: confirm the deploy after the launch go decision'))
+  }
+  if (!empty(del.announcement) && !ANNOUNCEMENT.includes(del.announcement)) f.push(err('E_ANNOUNCEMENT', `delivery.announcement must be one of ${ANNOUNCEMENT.join(', ')}`))
+  if (del.announcement === 'skipped' && empty(del.announcement_note)) f.push(err('E_ANNOUNCEMENT_REASON', 'delivery.announcement is skipped: record why in delivery.announcement_note'))
+
   // Gate 7
   const m = s.measurement || {}
+  const anchor = isIsoDate(del.deployed_on) ? del.deployed_on : del.delivery_date // the real deploy date wins over the plan
   if (passed('measurement')) {
     const cps = [m.checkpoint_1, m.checkpoint_2, m.checkpoint_3]
-    const valid = cps.every((c) => isIsoDate(c)) && isIsoDate(del.delivery_date)
-    const ascending = valid && cps[0] < cps[1] && cps[1] < cps[2] && (!del.delivery_date || cps[0] > del.delivery_date)
+    const valid = cps.every((c) => isIsoDate(c)) && isIsoDate(anchor)
+    const ascending = valid && cps[0] < cps[1] && cps[1] < cps[2] && (!anchor || cps[0] > anchor)
     if (!valid || !ascending) {
-      f.push(err('E_G7_CHECKPOINTS', 'Gate 7 passed but measurement.checkpoint_1..3 must be ascending ISO dates after delivery.delivery_date'))
+      f.push(err('E_G7_CHECKPOINTS', 'Gate 7 passed but measurement.checkpoint_1..3 must be ascending ISO dates after the deploy date (delivery.deployed_on, else delivery.delivery_date)'))
     } else {
-      const def = [14, 30, 60].map((n) => addDays(del.delivery_date, n))
+      const def = [14, 30, 60].map((n) => addDays(anchor, n))
       const isDefault = cps.every((c, i) => c === def[i])
       if (!isDefault && empty(m.window_reason)) {
-        f.push(err('E_G7_WINDOW', 'checkpoints differ from the 14/30/60-day defaults: record measurement.window_reason'))
+        f.push(err('E_G7_WINDOW', 'checkpoints differ from the 14/30/60-day defaults: record measurement.window_reason (if the deploy slipped, re-anchor them on delivery.deployed_on)'))
       }
     }
   }
@@ -365,4 +391,16 @@ export function dueCheckpoints(s, today) {
     if (isIsoDate(due) && due <= today && !checked.map(Number).includes(n)) out.push({ n, due })
   }
   return out
+}
+
+/**
+ * The planned delivery date when Gate 6 passed, that date has arrived and nobody has recorded when the
+ * change really reached production (delivery.deployed_on); otherwise null. The checkpoints should start
+ * from the real date, so the orchestrator asks "did it ship?" before anything else.
+ */
+export function deployUnconfirmed(s, today) {
+  const del = s.delivery || {}
+  if (s.status === 'stopped' || s.gates?.delivery !== 'passed') return null
+  if (!isIsoDate(del.delivery_date) || isIsoDate(del.deployed_on)) return null
+  return del.delivery_date <= today ? del.delivery_date : null
 }

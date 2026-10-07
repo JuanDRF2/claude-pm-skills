@@ -185,8 +185,34 @@ Gate-based, not calendar-based ("3 weeks before" does not survive a slipped date
 | Gate 4 (prototype validated) | GTM leads + advisory candidates | Prototype link + validation questions: "click through and tell us what's missing" | Team channel + direct message |
 | Gate 5 (Judge PASS) | Dev + QA | Stories ready, test plan available, environment needs | Issue tracker (already handled by ticket creation) |
 | Gate 6 (delivery) | All applicable audiences | Full artifacts per audience (see applicability matrix) | Per-audience destination |
-| Post-deploy (same day) | CS, Support, Sales, Marketing, C-Level | Release announcement: what shipped, who it affects, how to explain the value | Announcements channel + release-notes page |
+| Post-deploy (same day, after `delivery.deployed_on` is confirmed) | CS, Support, Sales, Marketing, C-Level | Release announcement: what shipped, who it affects, how to explain the value | Announcements channel + release-notes page |
 | Rollback (if needed) | Same audiences that got Gate 6 artifacts | What happened, current status, next update time, interim guidance | `templates/rollback-notice.md`, same channels as the original |
+
+### Every communication is the PM's decision
+
+The orchestrator proposes each message with its recipients and text, and waits for **approve / edit / skip**.
+Nothing is sent without that answer, and an answer to one message never covers the next. If the PM says no at a
+gate, the flow stops there. Record each decision (and each skip, with its reason) in the state file.
+
+| Gate | The PM chooses |
+|------|----------------|
+| Gate 2 | build now / backlog / archive |
+| Gate 3 | approve / revise / defer to the roadmap |
+| Gate 4 | validated / iterate / pivot |
+| Gate 5 | PASS (send the handoff) / FAIL (fix and resubmit) |
+| Pre-release | go / hold |
+
+### Which communications apply to which kind of work
+
+| Moment | New feature | Enhancement | Migration | Bug fix | Contractual |
+|--------|:-----------:|:-----------:|:---------:|:-------:|:-----------:|
+| Roadmap review (before scoring) | Full | Full | no | no | no |
+| Early heads-up (Gate 3) | yes | if visible | yes | no | yes |
+| Prototype feedback request (Gate 4) | yes | if a prototype exists | rarely | no | no |
+| Handoff to Dev and QA (Gate 5) | yes | yes | yes | yes | yes |
+| Gate 6 artifacts | per matrix | per matrix | per matrix | patch notes | per matrix |
+| Post-deploy announcement | yes | yes | yes | if customer-visible | yes |
+| Rollback notice | if rolled back | if rolled back | if rolled back | if rolled back | if rolled back |
 
 ### Communication timing by rollout type
 
@@ -203,6 +229,9 @@ When Phase 4 produces a validated prototype, the orchestrator asks: "Has this be
 by the customer advisory group? (yes / no / not applicable)". If yes, record
 `advisoryValidated: true` and a short `advisoryFeedback`. If no but applicable, offer to share
 it first. If not applicable, proceed. Informational, never blocking.
+
+Report back: when the group's input changed something, say what; when it did not, say why. Share that with
+the group at the next contact. An advisory group that never hears what happened to its feedback stops giving it.
 
 ### Publication tracking
 

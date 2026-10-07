@@ -1,6 +1,6 @@
 // Portfolio view across Signal to Ship state files: what shipped, what it was meant to move,
 // and whether anyone has looked since. Pure functions; the CLI is scripts/portfolio.mjs.
-import { isIsoDate } from './state.mjs'
+import { isIsoDate, deployUnconfirmed } from './state.mjs'
 
 const dash = (v) => (v === null || v === undefined || v === '' ? '-' : String(v))
 const cell = (v) => dash(v).replace(/\|/g, '\\|').replace(/\r?\n/g, ' ')
@@ -13,15 +13,16 @@ function learningDays(l) {
 }
 
 /** One portfolio row from a parsed state object. */
-export function toRow(s, file = '') {
+export function toRow(s, file = '', today = null) {
   const m = s.measurement || {}
   const o = s.outcome || {}
   const delivered = s.gates?.delivery === 'passed'
-  const date = s.delivery?.delivery_date
+  const date = isIsoDate(s.delivery?.deployed_on) ? s.delivery.deployed_on : s.delivery?.delivery_date
   return {
     file,
     schema: s.schema,
     badDelivery: delivered && !isIsoDate(date),
+    deployUnconfirmed: today ? deployUnconfirmed(s, today) : null,
     feature: s.feature ?? '(unnamed)',
     type: s.initiative_type,
     depth: s.depth,
@@ -51,7 +52,7 @@ export function factoryAlert(rows, today, window = 3) {
 
 /** Build the markdown report from {file, state} entries (state may be null when unparseable). */
 export function buildPortfolio(entries, today) {
-  const rows = entries.filter((e) => e.state).map((e) => toRow(e.state, e.file))
+  const rows = entries.filter((e) => e.state).map((e) => toRow(e.state, e.file, today))
   const bad = entries.filter((e) => !e.state)
   const order = (r) => (r.status === 'stopped' ? 2 : r.delivered ? 1 : 0)
   rows.sort((a, b) => order(a) - order(b) || byText(a.feature, b.feature))
@@ -79,6 +80,10 @@ export function buildPortfolio(entries, today) {
   const badDates = rows.filter((r) => r.badDelivery)
   if (badDates.length) {
     lines.push(`**Check the data:** ${badDates.map((r) => r.feature).join(', ')} passed delivery but delivery.delivery_date is missing or not an ISO date, so it is left out of the adoption check.`, '')
+  }
+  const unconfirmed = rows.filter((r) => r.deployUnconfirmed)
+  if (unconfirmed.length) {
+    lines.push(`**Confirm the deploy date:** ${unconfirmed.map((r) => `${r.feature} (planned ${r.deployUnconfirmed})`).join(', ')}. Set delivery.deployed_on so the checkpoints start from the day it really shipped.`, '')
   }
   if (bad.length) lines.push(`**Could not read:** ${bad.map((e) => e.file).join(', ')}`, '')
   return lines.join('\n')

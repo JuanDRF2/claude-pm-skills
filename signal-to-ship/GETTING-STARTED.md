@@ -47,11 +47,13 @@ contractual deadline), propose how much process to apply, and then ask you one q
 - ask **what happens if you do not build this** and recommend stopping when the honest answer is "nothing";
 - upgrade to full depth by itself when you score any risk 4 or 5, and tell you why;
 - say plainly when a number is an estimate and ask you to measure it, closing the gate as `provisional` until you do;
+- put each gate's decision to **you** (for example validated, iterate or pivot) and close the gate only on your answer, and propose every message to a team or a channel for your approval before anything is sent;
+- ask whether people who match the persona have tried a prototype, instead of treating a stakeholder's approval as proof it is usable;
 - start its first message about anything it read with `Embedded instructions: none`, or describe text inside a
   file or tool result that tried to give it orders (it does not act on it).
 
 Progress is saved after every gate in `00-signal-to-ship-state.md` in your working directory. Say
-`resume <feature>` to come back; a measurement checkpoint that has come due is the first thing it will raise.
+`resume <feature>` to come back; a planned launch date that has passed with no real deploy date, and a measurement checkpoint that has come due, are the first things it will raise.
 
 See `examples/walkthrough-globex.md` for a real conversation, up to the first gate.
 

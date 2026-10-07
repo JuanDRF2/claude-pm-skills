@@ -130,17 +130,38 @@ scored, with a mitigation plan for the highest when it scores >= 4. Stakeholder 
 
 ## Phase 2: Prioritization
 
-**Skipped for Path 3, 4 and 5.** Follow `references/priority-calculator.md`. Auto-fill from
-Phase 1 data, collect manual variables one at a time, calculate, and show the calibration
-warnings listed there before the PM approves.
+**Skipped for Path 3, 4 and 5.**
 
-**Gate 2:** Score calculated and PM approves the ranking.
+### Roadmap review (F, optional; worth it whenever several candidates compete for the same cycle)
+
+Before scoring, the PM can take the candidates to the people who see the market and the business: leadership and
+the go-to-market leads. Prepare the pre-read with `templates/roadmap-review.md` (Part 1): each candidate's
+problem, signal summary, rough effort and highest risk. Showing the pre-read to anyone outside the team is a
+communication, so the PM approves it first. The review feeds the manual variables of the score; it does not
+replace the PM's scoring or turn into a vote. Record in the decision log that it happened and what changed.
+
+### Scoring
+
+Follow `references/priority-calculator.md`. Auto-fill from Phase 1 data, collect manual variables one at a time,
+calculate, and show the calibration warnings listed there before the PM approves.
+
+**Gate 2, decision point.** When the score is shown, the PM chooses one:
+
+1. **Build now:** close Gate 2 and go on to Phase 3.
+2. **Backlog:** close Gate 2 with the score recorded, log the decision, and do not start Phase 3. The
+   initiative waits for a later cycle.
+3. **Archive:** a recorded stop (`status: stopped`, with `stop_reason`). A stop is a valid outcome.
+
+**Gate 2:** Score calculated and PM approves the ranking and one of the three decisions. At Full depth with a
+roadmap review, produce the roadmap artifact (`templates/roadmap-review.md`, Part 2) and propose sharing it with
+the people who took part; the PM approves before it goes anywhere.
 When the system of record supports it, persist the score on the work item (see `references/system-of-record.md`).
 
 ## Phase 3: Specification
 
 **When a spec exists:** review it, verify alignment with Signals findings, register gaps.
-**When it does not:** invoke the spec-writer specialist, or guide the PM through creation.
+**When it does not:** invoke the spec-writer specialist. If none is installed, or the PM wants to think it
+through first, run the guided interview in `references/spec-interview.md`.
 
 ### Scope decisions (L: in/out only / S, F: full)
 
@@ -214,6 +235,13 @@ it has been validated there. Informational, never blocking.
 
 When Phase 4 starts (or when Gate 3 passes on a path with no prototype), send the GTM
 early heads-up described in `references/audience-views.md` (Release Communication Protocol).
+
+**Gate 3, decision point.** When the spec is complete for the depth, the PM chooses:
+
+1. **Approve:** close Gate 3 and send the early heads-up.
+2. **Revise:** name what changes; stay in Phase 3.
+3. **Defer to the roadmap:** the spec stands but the work does not start now; log the decision and park the
+   initiative as at Gate 2 *backlog*.
 
 **Gate 3 (by mode):**
 
