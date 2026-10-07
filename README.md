@@ -66,6 +66,7 @@ below are enough to start.
 | [`prd-writer`](./prd-writer/) | Writes a full Product Requirements Document (PRD) for a feature, initiative, or product area. |
 | [`prioritization-scorer`](./prioritization-scorer/) | Scores and ranks product work with a transparent framework (RICE, ICE, WSJF, MoSCoW or custom), labelling every input as measured, estimated or guessed and showing how fragile the ranking is. |
 | [`product-context-base`](./product-context-base/) | Builds and stores a rich product context snapshot for a specific team by pulling the last 6 months of Jira issues and relevant Notion product pages. |
+| [`product-spec-interview`](./product-spec-interview/) | Builds a product spec from zero by interviewing you: problem and people, evidence, strategy, then deliverables with an outcome coverage matrix and, for high-stakes work, acceptance criteria by axis. Pushes back on vague answers and never invents numbers. |
 | [`publish-refinement-to-notion`](./publish-refinement-to-notion/) | Publishes or updates an approved product/QA refinement Markdown package as native, readable Notion pages. |
 | [`refinement-judge`](./refinement-judge/) | Independent adversarial quality gate that audits a complete product-refinement package before external publication, Jira creation, or another consequential action — comparing it against original sources rather than trusting the generating skill's own conclusions. |
 | [`release-notes-writer`](./release-notes-writer/) | Writes structured, audience-aware release notes and publishes them to Notion. |
@@ -82,7 +83,7 @@ below are enough to start.
 | [`weekly-product-pulse`](./weekly-product-pulse/) | Generates a structured weekly status report for the Head of Product by pulling the active sprint from all product team Jira projects, grouping results by team, and surfacing delivery health, blockers, and risks. |
 | [`writing-voice`](./writing-voice/) | Applies your own calibrated writing voice — direct, human, no AI-tells — to external-facing content (LinkedIn, cover letters, bios, launch announcements) in English or Spanish. |
 
-34 skills in total.
+35 skills in total.
 
 ---
 
@@ -156,12 +157,13 @@ reads at run time, so uploading only the `SKILL.md` leaves them broken.
 | `jira-bug-writer` | 1 | `SKILL.md` alone | — |
 | `jira-story-publisher` | 1 | `SKILL.md` alone | `story-to-test-workflow`, `test-case-designer`, `user-story` |
 | `launch-comms` | 1 | `SKILL.md` alone | — |
-| `mini-spec-writer` | 1 | `SKILL.md` alone | `prd-writer`, `story-to-test-workflow`, `user-story-mapping` |
+| `mini-spec-writer` | 1 | `SKILL.md` alone | `prd-writer`, `product-spec-interview`, `story-to-test-workflow`, `user-story-mapping` |
 | `mockup-builder` | 1 | `SKILL.md` alone | — |
 | `okr-tracker` | 1 | `SKILL.md` alone | — |
 | `prd-writer` | 1 | `SKILL.md` alone | `architecture-aware-reviewer`, `idea-to-ship`, `jira-story-publisher`, `mini-spec-writer`, `story-to-test-workflow` |
 | `prioritization-scorer` | 1 | `SKILL.md` alone | — |
 | `product-context-base` | 1 | `SKILL.md` alone | — |
+| `product-spec-interview` | 1 | `SKILL.md` alone | `architecture-aware-reviewer`, `mini-spec-writer`, `prd-writer`, `prioritization-scorer`, `story-to-test-workflow`, `success-metrics-designer` |
 | `publish-refinement-to-notion` | 8 | whole folder (8 files) | `sync-refinement-package-notion` |
 | `refinement-judge` | 8 | whole folder (8 files) | `story-to-test-workflow`, `sync-refinement-package-notion` |
 | `release-notes-writer` | 1 | `SKILL.md` alone | — |
