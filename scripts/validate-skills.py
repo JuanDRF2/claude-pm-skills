@@ -26,5 +26,15 @@ for d in sorted(os.listdir(root)):
         print(f"{d}: empty description"); bad += 1
     elif len(desc) > 1024:
         print(f"{d}: description is {len(desc)} characters (limit 1024)"); bad += 1
+# A skill that carries a VERSION file must hold a plain X.Y.Z; signal-to-ship must carry one (an installed copy
+# cannot tell whether it is current without it).
+for d in sorted(os.listdir(root)):
+    f = os.path.join(root, d, "VERSION")
+    if os.path.isfile(os.path.join(root, d, "SKILL.md")):
+        if os.path.isfile(f):
+            if not re.fullmatch(r"\d+\.\d+\.\d+", open(f, encoding="utf-8").read().strip()):
+                print(f"{d}: VERSION is not X.Y.Z"); bad += 1
+        elif d == "signal-to-ship":
+            print(f"{d}: missing VERSION file"); bad += 1
 print(f"validate-skills: {count} skills, {bad} problem(s)")
 sys.exit(1 if bad else 0)

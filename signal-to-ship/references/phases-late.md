@@ -97,14 +97,16 @@ proposed (sent, skipped with a reason, or pending an input from the PM); OR phas
 **Gate 5, decision point.** After the judge runs, present the result:
 
 1. **PASS:** stories and QA coverage are complete. Proceed.
-2. **FAIL:** show the findings. The PM fixes and resubmits; nothing is handed off until PASS.
+2. **PASS WITH OBSERVATIONS:** proceed only after the PM has read the observations; record them and the risks they
+   carry in the state file's narrative and name them in the handoff.
+3. **FAIL:** show the findings. The PM fixes and resubmits; nothing is handed off until PASS or PASS WITH OBSERVATIONS.
 
 On PASS, propose the **handoff to Dev and QA**: the stories, acceptance criteria and scenario counts, the test
 plan, dependencies, blockers and environment needs, delivered through the tracker slot and the refinement
 package. Show the counts and the blocker list, then ask **approve / hold**. The handoff is a write to a shared
 system, so the PM's approval of its content is what triggers it (invariant 14).
 
-**Gate 5:** refinement-judge PASS; handoff to Dev and QA sent, or held with a reason.
+**Gate 5:** refinement-judge PASS or PASS WITH OBSERVATIONS (risks recorded); handoff to Dev and QA sent, or held with a reason.
 
 ## Pre-Release Readiness (between Gate 5 and Gate 6)
 

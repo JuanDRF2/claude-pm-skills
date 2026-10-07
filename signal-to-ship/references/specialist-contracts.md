@@ -94,7 +94,7 @@ the specialist is available, and dispatches. If unavailable, it stops and inform
 ### prototype-builder
 
 **Slot:** /prototype skill (AcmeFrontend repo-specific)
-**Status:** Active, installed at AcmeFrontend/.claude/skills/prototype/SKILL.md
+**Status:** Organization-specific prototype skill; the generic alternative is `mockup-builder` (static HTML or JSX).
 
 | Field | Value |
 |-------|-------|
@@ -110,7 +110,7 @@ the specialist is available, and dispatches. If unavailable, it stops and inform
 ### refinement-orchestrator
 
 **Slot:** story-to-test-workflow
-**Status:** Active, installed at ~/.claude/skills/story-to-test-workflow/
+**Status:** Generic skill available (`story-to-test-workflow`, from the skills library).
 
 | Field | Value |
 |-------|-------|
@@ -120,12 +120,12 @@ the specialist is available, and dispatches. If unavailable, it stops and inform
 | Quality gate | Must pass refinement-judge before advancing. |
 | Owns | Its own internal gates (Gates 1-5). Signal to Ship orchestrator waits for completion. |
 | Portability | Acme-specific conventions (ID prefixes, folder structure, CI rules). Core methodology (stories, ACs, scenarios, judge) is portable. |
-| Fallback if unavailable | Cannot be skipped for Path 1/2/4 unless the organization's slot config disables it, in which case the declared fallback applies. For Path 3 (bug) and Path 5 (contractual), a lightweight refinement is acceptable. |
+| Fallback if unavailable | Cannot be skipped for Path 1/2/4 unless the organization's slot config disables it, in which case the declared fallback applies. For Path 3 (bug) an inline refinement is acceptable (see `phases-late.md`, Phase 5). Path 5 (contractual) has no refinement phase. |
 
 ### refinement-judge
 
 **Slot:** refinement-judge
-**Status:** Active, installed at ~/.claude/skills/refinement-judge/
+**Status:** Generic skill available (`refinement-judge`, from the skills library).
 
 | Field | Value |
 |-------|-------|
@@ -141,7 +141,7 @@ the specialist is available, and dispatches. If unavailable, it stops and inform
 ### ticket-writer
 
 **Slot:** jira-story-publisher (Acme), jira-bug-writer (bugs)
-**Status:** Active, installed at ~/.claude/skills/jira-story-publisher/
+**Status:** Generic skill available (`jira-story-publisher`, from the skills library).
 
 | Field | Value |
 |-------|-------|
@@ -155,7 +155,7 @@ the specialist is available, and dispatches. If unavailable, it stops and inform
 ### taxonomy-sync
 
 **Slot:** sync-refinement-package-taxonomy
-**Status:** Active, installed at ~/.claude/skills/sync-refinement-package-taxonomy/
+**Status:** Generic skill available (`sync-refinement-package-taxonomy`, from the skills library); optional, and off unless a taxonomy system is configured.
 
 | Field | Value |
 |-------|-------|
