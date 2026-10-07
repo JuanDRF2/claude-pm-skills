@@ -105,7 +105,7 @@ tool, tracker, docs) are optional slots, and where one is missing it asks you fo
 
 ## What to expect, honestly
 
-- It has been tested only in a headless harness with a simulated PM: 23 eval cases, one of them a full bug-fix
+- It has been tested only in a headless harness with a simulated PM: 26 eval cases, one of them a full bug-fix
   cycle, mostly run once or a few times on one model family. The cases pass, and the runs also found real defects that were
   fixed. It has not been used by anyone but its author.
 - It asks a lot of questions at the start. That is the point, and light depth keeps it short for small work.
