@@ -75,6 +75,7 @@ below are enough to start.
 | [`story-to-test-workflow`](./story-to-test-workflow/) | Orchestrates product refinement end to end — journey mapping, story splitting, user stories with acceptance criteria, and risk-based QA test design — through explicit decision gates, from a rough idea or an approved spec. |
 | [`success-metrics-designer`](./success-metrics-designer/) | Designs how a change will be judged: outcome metric with a measured baseline and target, adoption definition, metrics in five categories, checkpoints, and the keep / iterate / retire rule. |
 | [`sync-refinement-package-notion`](./sync-refinement-package-notion/) | Ongoing sync after an initial Notion publication: status/diff, start a local checkout, publish approved changes, reconcile concurrent edits, recover a partial write, or accept editorial drift. |
+| [`sync-refinement-package-taxonomy`](./sync-refinement-package-taxonomy/) | Aligns an approved refinement package with an external product taxonomy system before a development handoff, or reconciles verified implementation and QA evidence afterward. Read-only preview by default; production writes need exact authorization. |
 | [`test-case-designer`](./test-case-designer/) | Designs risk-based, traceable QA coverage from approved stories and criteria: atomic checks and QA-reviewable functional test cases, with automation guidance and a downstream test-management handoff. |
 | [`user-story`](./user-story/) | Writes a user story (Mike Cohn format) and its acceptance criteria (Gherkin, stable `AC-*`/`SC-*` IDs, plain-language contract, per-role readiness state). |
 | [`user-story-mapping`](./user-story-mapping/) | Creates a user story map — activities, steps, tasks, release slices — that lays out the customer journey before any story gets written. |
@@ -92,13 +93,16 @@ below are enough to start.
 An honest label, so you know what to trust. "Tested" means automated tests of the skill's own scripts exist (they
 check formats and validators, not that the skill works against your tools).
 
-- **Tested:** `signal-to-ship` (its source repository has unit tests and 23 evals run against a clean install),
-  `story-to-test-workflow`, `refinement-judge`, `build-refinement-document`, `sync-refinement-package-notion`.
+- **Tested** (the scripts below have tests that CI runs on every pull request): `story-to-test-workflow` (package
+  validator), `refinement-judge` (snapshot and verdict validator), `build-refinement-document` (Word builder, needs
+  `python-docx`), `sync-refinement-package-notion` (offline script tests). For `signal-to-ship`, CI only runs its
+  state-file validator on the bundled template. Its fuller unit tests live in its source repository, and its evidence is
+  a set of 51 eval cases on fictitious data, of which eleven have a recorded run (E06 and E19 to E28) and forty do not
+  yet. That is early evidence, not proof.
 - **Experimental** (depends on a tool or an environment that was not verified here, or still carries assumptions
   from one workflow): `publish-refinement-to-notion`, `video-demo-generator`, `mockup-builder`,
-  `weekly-product-pulse`, `product-context-base`, `artifact-sync`. (`sync-refinement-package-notion` and
-  `build-refinement-document` are listed under Tested because their scripts have tests; the Notion and Word sides
-  themselves were not verified here.)
+  `weekly-product-pulse`, `product-context-base`, `artifact-sync`. (The Notion and Word sides of the skills listed
+  under Tested were not verified here; only their scripts are.)
 - **Prompt-only:** every other skill. They are plain instructions with no scripts to test; judge them by reading them
   and trying them on a small case.
 

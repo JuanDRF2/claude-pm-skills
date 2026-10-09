@@ -1,8 +1,8 @@
 {
   "name": "claude-pm-skills",
   "displayName": "Claude PM Skills",
-  "description": "A library of product-management Skills for Claude — specs, user stories, test design, Jira/Notion publishing, and the full Cadence delivery rhythm (Shape, Build, Verify, Ship).",
-  "version": "1.0.0",
+  "description": "A library of product-management Skills for Claude: discovery, specs, user stories, risk-based test design, a refinement-package workflow with an independent quality gate, an orchestrator from customer signal to measured outcome, and the Cadence delivery rhythm (Shape, Build, Verify, Ship).",
+  "version": "1.1.0",
   "author": {
     "name": "Juan Ramos",
     "url": "https://github.com/JuanDRF2"

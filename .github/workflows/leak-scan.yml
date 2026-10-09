@@ -1,0 +1,38 @@
+name: leak-scan
+# Scans the tree for terms on a private denylist stored in the repository secret SANITIZE_DENYLIST.
+# The denylist and the matched terms are never printed, only file:line.
+# Pull requests from forks never receive secrets, so for them the scan is skipped with a warning.
+# On a push to main of the owner's repository an empty secret is a FAILURE, not a skip: a missing secret there
+# means the gate is not protecting the repository.
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  leak-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan for denylisted terms
+        env:
+          DENYLIST_CONTENT: ${{ secrets.SANITIZE_DENYLIST }}
+          OWNER_REPO: JuanDRF2/claude-pm-skills
+          THIS_REPO: ${{ github.repository }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          set -uo pipefail
+          if [ -z "${DENYLIST_CONTENT:-}" ]; then
+            if [ "$THIS_REPO" = "$OWNER_REPO" ] && [ "$EVENT" = "push" ]; then
+              echo "::error::The SANITIZE_DENYLIST secret is empty on the owner's repository. The leak scan did not run. Set the secret."
+              exit 1
+            fi
+            echo "::warning::leak-scan SKIPPED: the SANITIZE_DENYLIST secret is not available (a fork, a pull request from a fork, or not set yet). Nothing was scanned."
+            exit 0
+          fi
+          umask 077
+          f="$(mktemp)"
+          trap 'rm -f "$f"' EXIT
+          printf '%s\n' "$DENYLIST_CONTENT" > "$f"
+          SANITIZE_DENYLIST="$f" bash scripts/leak-scan.sh
