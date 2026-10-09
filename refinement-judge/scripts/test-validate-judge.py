@@ -363,4 +363,21 @@ Revisar consumidores.
     post_publication = validate_report(report, post_publication=True)
     assert post_publication.returncode == 0, post_publication.stdout + post_publication.stderr
 
+    report.write_text(
+        report_text(verdict="PASS", findings="Sin hallazgos abiertos.")
+        + "\n## Review history / Historial de revisiones\n\n- Veredicto: FAIL\n",
+        encoding="utf-8",
+    )
+    competing_verdict = validate_report(report, publication=True)
+    assert competing_verdict.returncode != 0, competing_verdict.stdout
+    assert "single current Verdict" in competing_verdict.stdout, competing_verdict.stdout
+
+    report.write_text(
+        report_text(verdict="PASS", findings="Sin hallazgos abiertos.")
+        + "\n## Review history / Historial de revisiones\n\n- 2026-01-01: rerun, no competing verdict.\n",
+        encoding="utf-8",
+    )
+    history_ok = validate_report(report, publication=True)
+    assert history_ok.returncode == 0, history_ok.stdout + history_ok.stderr
+
     print("OK: Judge snapshots, scope, history and verdict regressions passed")
