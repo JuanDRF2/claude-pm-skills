@@ -1,11 +1,11 @@
 ---
 name: design-system
-description: "Implements the platform's design system consistently across all UI components and modules. Use this skill whenever building new features, designing components, creating member-facing interfaces, or any customer-facing features. Ensures color consistency, typography standards, spacing rules, component patterns, and accessibility across the entire platform. Always reference this when designing new modules, updating existing ones, or creating mockups."
+description: "Applies one consistent set of design tokens (colors, typography, spacing, radii, component patterns, accessibility rules) to new UI components and screens. Use when building or reviewing an interface and you want every screen to follow the same tokens. It ships a placeholder palette: replace it with your own brand tokens first, because the skill cannot know your product or brand. Not for choosing a brand identity, and not for one-off sketches where consistency does not matter."
 ---
 
 # Design System Implementation
 
-This is the authoritative guide for building consistent, professional, accessible UI components across your platform. Use this skill whenever you're designing, building, or refining any part of the interface.
+This is a guide for building consistent, accessible UI components from one set of design tokens. It needs your own tokens to be useful: the values below are placeholders, so replace them with your brand's colors, type and spacing before applying it to real work.
 
 **The palette below is a placeholder example** — a colorimetrically coherent starter palette (teal primary, slate neutrals, standard semantic colors), not any specific company's real brand. Replace `Primary` and its derived tints with your own brand color before shipping real UI, then keep everything else (typography, spacing, radii, component patterns) as-is or adapt to your own system.
 
@@ -134,7 +134,7 @@ Built from one primary hue (teal, ~175°) plus a neutral slate scale — this ke
 
 If your platform sits partly on a legacy/third-party shell (e.g. a CRM's native UI layer) and partly on your own custom surfaces, keep the two visually and structurally separate:
 
-### Legacy/Third-Party Shell (Global Chrome)
+### Legacy or third-party shell (Global Chrome)
 - Utility bar
 - App launcher
 - Navigation
@@ -161,7 +161,7 @@ If your platform sits partly on a legacy/third-party shell (e.g. a CRM's native 
 
 ## Common Patterns by Use Case
 
-### Membership/Account Management
+### Account management
 - Simple card (name, dates, status) + rich modal for actions
 - Status badges with color-coded indicators
 - Payment options with radio button groups
