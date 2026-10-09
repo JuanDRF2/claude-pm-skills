@@ -30,6 +30,7 @@ Trigger automatically when a user:
 | ADRs | ✅ Yes | Search project knowledge |
 | C4 Diagrams (L1/L2) | Strongly preferred | Search project knowledge |
 | Domain Definitions | Strongly preferred | Search project knowledge |
+| Rules files (CLAUDE.md / AGENTS.md, the constraints AI coding agents build against) | If the team uses AI coding agents | Check the repo root and nested directories |
 
 If Architecture Principles or ADRs cannot be found in project knowledge, ask the user to share them before proceeding. Do not run a review without them — a review without the source of truth is just an opinion.
 
@@ -43,6 +44,7 @@ Before reading the document, load and internalize the following from project kno
 2. **ADRs** — Read the Summary and Decision sections in full. Skim Alternatives. Note the status of each ADR (proposed / accepted / deprecated / superseded).
 3. **C4 Diagrams (L1 and L2)** — Understand which systems, containers, and domains exist and how they interact.
 4. **Domain Definitions** — Know the canonical vocabulary: what each domain owns, what it does not own, and what crosses boundaries.
+5. **Rules files, if present** (CLAUDE.md / AGENTS.md) — these hold the mandatory and forbidden patterns and tech constraints that AI agents build against. A spec that conflicts with a standing rules-file constraint is the same class of problem as conflicting with an ADR; flag it the same way.
 
 Do not begin the review until you have loaded all available sources. State which sources you loaded at the top of your review output.
 
@@ -58,6 +60,7 @@ Read the spec or document in full. As you read, tag every element against the ar
 - **Naming** — does the spec use canonical domain vocabulary, or informal/incorrect synonyms?
 - **Boundaries** — does the feature cross domain or service boundaries? If yes, how?
 - **New infrastructure or patterns** — does the spec introduce something not in the C4 model? Is there an ADR that either permits or prohibits it?
+- **Rules-file conflicts** — does anything in the spec ask for a pattern a rules file explicitly forbids, or skip a convention it mandates?
 
 ---
 
@@ -76,6 +79,7 @@ List every architecture document you reviewed before running this check. Example
 - ✅ C4 L1 System Context Diagram
 - ✅ C4 L2 Container Diagram
 - ✅ Domain Definitions (7 domains)
+- ✅ Rules files (CLAUDE.md, root plus 2 nested)
 - ⚠️ ADR-004: Not found — skipped
 
 ---
