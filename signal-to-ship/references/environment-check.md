@@ -62,7 +62,9 @@ Never say a tool is connected unless it passed this test. Never invent a command
 
 ## The message
 
-At most 120 words. Show at most 5 rows under "Not connected", then "and N more optional ones".
+At most 120 words. Name only the connected tools that serve this flow (the slot types above), at most 6, and fold
+the rest into one clause ("and {n} other connected tools I will not use unless you ask"). Show at most 3 rows under
+"Not connected", then "and N more optional ones".
 
 ```
 Before we start, here is what I can use in this session.

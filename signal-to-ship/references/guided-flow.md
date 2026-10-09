@@ -93,7 +93,8 @@ Signal to Ship
 - Who it is for: product managers working with Claude Code. Only Claude Code has been tested. It was built and
   tested by one person, so treat the prioritization and fallback behaviour as new.
 - How to use it: say what you want to work on. I ask one question at a time and you decide at every gate. Your
-  progress is saved in cases/<feature>/, so you can come back with `resume`.
+  progress is saved in cases/<feature>/ (I create the folder when you confirm the route), so you can come back with
+  `resume`.
 - What it can do:
   - five kinds of work, each with its own route: new feature, improvement of something partial, bug fix,
     migration or parity, client or contract deadline
@@ -108,6 +109,10 @@ What do you want to work on? (Say 'connect first' if you want to set up a missin
 ```
 
 About 200 to 250 words once filled in. Do not add a second question.
+
+Under "What I can use now", name only the connected tools that serve this flow (feedback tool, issue tracker, docs
+platform, source control, analytics, call recorder, taxonomy, chat), at most 6 names, and fold the rest into one
+clause: "and {n} other connected tools I will not use unless you ask". Show at most 3 rows under "Not connected".
 
 ## Template registry
 
