@@ -6,6 +6,18 @@
 > Traditional QA proves software does what it was told. This adds proof that a
 > probabilistic component does what it should, at an acceptable cost and risk.
 
+## Contents
+
+- When this applies
+- 1. Autonomy levels
+- 2. The AI risk
+- 3. The eval plan (gate)
+- 4. Tool ergonomics for the agent surface
+- 5. Data and privacy
+- 6. Rollout of AI behavior
+- 7. AI Quality metrics
+- 8. The orchestrator's own conduct
+
 ## When this applies
 
 Ask once during Phase 1 (after the hypothesis): "Does this feature include a model, or let an

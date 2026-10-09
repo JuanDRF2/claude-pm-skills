@@ -1,6 +1,6 @@
 // Portfolio view across Signal to Ship state files: what shipped, what it was meant to move,
 // and whether anyone has looked since. Pure functions; the CLI is scripts/portfolio.mjs.
-import { isIsoDate, deployUnconfirmed } from './state.mjs'
+import { isIsoDate, deployUnconfirmed, backlogNotice } from './state.mjs'
 
 const dash = (v) => (v === null || v === undefined || v === '' ? '-' : String(v))
 const cell = (v) => dash(v).replace(/\|/g, '\\|').replace(/\r?\n/g, ' ')
@@ -27,7 +27,7 @@ export function toRow(s, file = '', today = null) {
     type: s.initiative_type,
     depth: s.depth,
     phase: s.current_phase,
-    status: s.status || 'active',
+    status: s.status === 'stopped' ? 'stopped' : backlogNotice(s) ? 'backlog' : s.status || 'active',
     delivered: delivered && isIsoDate(date) ? date : null,
     outcome: o.metric ? `${o.metric}: ${dash(o.baseline)} -> ${dash(o.target)}` : null,
     adoptionD30: typeof m.adoption_d30 === 'number' ? m.adoption_d30 : null,
@@ -76,6 +76,10 @@ export function buildPortfolio(entries, today) {
   const noOutcome = rows.filter((r) => r.schema === 2 && r.status !== 'stopped' && !r.outcome && r.depth !== 'light')
   if (noOutcome.length) {
     lines.push(`**No outcome defined:** ${noOutcome.map((r) => r.feature).join(', ')}. A roadmap item without a baseline and a target is an output.`, '')
+  }
+  const parked = rows.filter((r) => r.status === 'backlog')
+  if (parked.length) {
+    lines.push(`**In backlog:** ${parked.map((r) => r.feature).join(', ')}. Parked at a prioritization pass; ask whether to start now.`, '')
   }
   const badDates = rows.filter((r) => r.badDelivery)
   if (badDates.length) {

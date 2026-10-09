@@ -8,6 +8,14 @@ to think the problem through before writing, or when a draft arrives that nobody
 The point is the thinking, not the document. A spec generated from a one-line prompt is confidently wrong; a
 spec built from answers the PM had to defend is reviewable.
 
+## Contents
+
+- Ground rules and depth
+- The rounds (pre-fill, Round 1, evidence, Round 2, draft, Round 3)
+- Pushback list
+- Output
+- Hand-off to Gate 3
+
 ## Ground rules
 
 - **Interview, do not generate.** One question per message (invariant 5), each with a short example. Do not
@@ -61,14 +69,23 @@ as in Phase 1 Step 0.
 ### Evidence
 
 Pull the signals the slots can give (votes and requesters, linked support cases or bugs, call mentions, a
-competitor check at Standard and Full). Present all of it, one finding at a time, including what contradicts the
-PM's view. The PM decides what is relevant.
+competitor check at Standard and Full). Show the findings in ONE table, including what contradicts the PM's view.
+Mark the ones the PM has not looked at `not reviewed` and record them as such in the saved progress. The PM reacts
+to the table and opens any row; the PM decides what is relevant.
 
 ### Round 2: strategy
 
 - **Success:** the metric, tied to `outcome.metric`, with its baseline and target. Ask for the number that
   would make the team say "it worked".
-- **Constraints:** legal, contractual, technical, calendar.
+- **Constraints:** show a table of the four categories with what is already known, and ask "which rows are wrong
+  or missing?" instead of asking about each in turn.
+
+  | Category | What is known |
+  |----------|---------------|
+  | Legal | |
+  | Contractual | |
+  | Technical | |
+  | Calendar | |
 - **Non-goals:** at least one, each with a reason. A spec with no non-goals has no scope.
 - **Dependencies and systems touched:** what must exist first, which data and integrations are involved.
 - **Stop condition:** what evidence, found mid-build, would make us stop.
@@ -125,28 +142,14 @@ big. The PM prunes first, then the tech lead; record what was cut and why.
 
 ## Output
 
-A Markdown document next to the state file (named after the feature, ending in "-spec"), with this skeleton:
-
-```
-# Spec: {feature}
-Status: draft | approved on {date} by {PM}
-## Problem and people        (persona, workaround, cost, why now)
-## Evidence                  (what was found, with its source, and what contradicts the plan)
-## Success                   (metric, baseline, target, adoption threshold)
-## Scope                     (in, out with reasons, alternatives considered)
-## Constraints and dependencies
-## Outcomes and deliverables (the coverage matrix, then each deliverable)
-## Acceptance criteria       (Full; otherwise "drafted in refinement")
-## Risks and stop condition  (from the state file, plus anything new)
-## Open questions            (each with an owner and a date)
-```
-
-Do not overwrite an existing spec document: write a new version beside it, or ask.
+A Markdown document next to the saved progress (named after the feature, ending in "-spec"). Ask which template to
+use first (`references/guided-flow.md`, Template registry): the default skeleton is `templates/spec.md`; if the PM
+has their own, use its headings. Do not overwrite an existing spec document: write a new version beside it, or ask.
 
 ## Hand-off to Gate 3
 
 When the PM approves the spec, copy what the state file tracks: `scope.in`, `scope.out`,
-`scope.alternatives_considered`, and `spec.adoption_threshold`. Then collect the rest of the Gate 3 addendum
-(`references/phases-early.md`: implementation class, onboarding, agent surface, riskiest assumption). Record the
-approval in the decision log. For a feature with a model or agent write access, continue with
+`scope.alternatives_considered`, and `spec.adoption_threshold`. Then collect the rest of the Gate 3 addendum in ONE
+message (`references/phases-early.md`: a table of implementation class, onboarding, agent surface, adoption
+threshold and riskiest assumption, with proposed values). Record the approval in the decision log. For a feature with a model or agent write access, continue with
 `references/ai-features.md` before Gate 3.

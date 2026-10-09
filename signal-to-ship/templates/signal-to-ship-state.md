@@ -11,6 +11,13 @@ ai_feature: false
 status: active
 stop_reason:
 stopped_on:
+reopened_on:
+reopened_reason:
+environment:
+  checked_on:
+  decision:
+  connected: []
+  missing: []
 gates:
   initiative_type: pending
   signals: pending
@@ -41,6 +48,7 @@ request:
   tradeoff:
   approver:
   decided_on:
+  notified_on:
 hypothesis:
 risks:
   value:
@@ -50,6 +58,21 @@ risks:
   ai:                # leave empty unless ai_feature: true (do not write n/a)
   highest:
   mitigation_plan:
+prioritization:
+  method:
+  method_suggested:
+  method_reason:
+  method_custom:
+  pass1_size:
+  pass1_confidence:
+  pass1_score:
+  pass1_decision:
+  pass1_on:
+  pass2_effort:
+  pass2_score:
+  pass2_decision:
+  pass2_note:
+  pass2_on:
 scope:
   in: []
   out: []
@@ -77,6 +100,12 @@ beta:
 readiness:
   roast: not_run
   roast_note:
+templates:
+  default: []
+  own: []
+refinement_mode:
+  package:
+  judge:
 learning:
   hypothesis_formed:
   first_evidence:
@@ -95,8 +124,9 @@ measurement:
 
 > The YAML block above is the machine-checked source of truth. Validate it with
 > `node "${CLAUDE_SKILL_DIR}/scripts/validate-state.mjs" <this file>`. Only a simple YAML subset is allowed:
-> two-space nesting, `key: value` scalars and inline lists (`[a, b]`). Everything below the
-> frontmatter is free-form narrative for the PM.
+> two-space nesting, `key: value` scalars and inline lists (`[a, b]`; no lists of objects). Quote free text that
+> contains ` #` or `: `. Everything below the frontmatter is free-form narrative for the PM. Keep this file in
+> `cases/<feature>/` (`templates/case-structure.md`). Do not show the PM this format: say "your saved progress".
 
 ## Field reference
 
@@ -128,6 +158,15 @@ measurement:
 | `readiness.roast` | `not_run`, `done` or `skipped` (see `templates/feature-roast.md`). Full depth cannot close Gate 6 with `not_run`; `skipped` needs `roast_note`. |
 | `learning.*` | `hypothesis_formed` (date, set at Gate 1) and `first_evidence` (date the first real evidence arrived: a test result, a prototype session, beta usage, an adoption figure). The portfolio shows the gap in days. |
 | `measurement.verdict` | `keep`, `iterate` or `retire`, with `verdict_reason`. Required on schema 2 once checkpoint 3 appears in `measurement.checked` (Gate 7 itself closes when measurement is configured, before any result exists). |
+| `gates.measurement` | May close `provisional` when instrumentation (TestIds, survey trigger) is not confirmed yet: write the open action, owner and date in `gate_reasons.measurement`. The checkpoints are still scheduled from `delivery.deployed_on`; the file warns while the gate is provisional and a checkpoint date is missing. |
+| `environment.*` | Written at the environment check. `checked_on` (ISO date), `decision` (`continue` or `connect_first`), `connected` and `missing` (inline lists of short lowercase names such as `[github, linear, gh]`). |
+| `prioritization.method` | `rice`, `ice`, `wsjf`, `moscow`, `value_effort`, `custom` or `gut_check`. The PM always chooses it. `method_suggested` uses the same values (what the skill suggested), `method_reason` says why (and "PM chose X" if different), `method_custom` holds the variables, scales and formula when the method is `custom`. Gate 2 cannot pass on a file that has this block without a method and a pass 1 decision. |
+| `prioritization.pass1_*` | Pass 1 (Gate 2): `pass1_size` (effort as a range, for example "3 to 5 weeks"; XS to XL or a range at Light), `pass1_confidence` (`low`, `medium` or `high`; confidence in the inputs, not the RICE Confidence variable), `pass1_score` (a range or a category; may stay empty for a gut check or a custom method), `pass1_decision` (`build_now`, `backlog` or `archive`), `pass1_on` (ISO date). `backlog` keeps the status active and no later gate may be passed; `archive` is a recorded stop: set `status: stopped` with `stop_reason` and `stopped_on`, and leave `gates.prioritization` pending (Gate 2 passes only on `build_now` or `backlog`). |
+| `prioritization.pass2_*` | Pass 2 (end of Phase 5, Paths 1 and 2): `pass2_effort` (text, with where it comes from: engineer-estimated, PM estimate, or AI draft not reviewed by engineering), `pass2_score`, `pass2_decision` (`confirm`, `change` or `backlog`), `pass2_note` (required for `change`: what changed in scope, date, effort or order), `pass2_on`. On Paths 1 and 2, Gate 6 cannot pass without `confirm` or `change` when pass 1 said `build_now`; Gate 5 warns while it is empty. `backlog` holds the handoff and keeps the status active. |
+| `templates.*` | The PM's template choices. `default`: document types accepted with the default template, or `[all]`. `own`: entries like `"spec=team/our-spec.md"` or `"patch-notes=pasted"`. Document types: spec, refinement-package, scorecard, roadmap-review, stakeholder-request, release-notes, migration-release-notes, patch-notes, product-marketing-spec, gtm-early-warning, rollback-notice, feature-roast, audience-views. |
+| `refinement_mode.*` | `package`: `specialist`, `fallback` or `inline`. `judge`: `specialist`, `self_check` or `pm_review`. Recorded at Gate 5; the file warns when Gate 5 has passed with this block present and `judge` empty, except when `package` is `inline`. |
+| `reopened_on`, `reopened_reason` | The last reopen or go-back (ISO date and a one-line reason). History lives in the decision log. See `references/going-back.md`. |
+| `request.notified_on` | ISO date the requester was told of a stop or decision. A stopped initiative with a stakeholder or customer origin warns while this is empty. |
 
 ## Data collected
 
@@ -257,9 +296,12 @@ Record every decision the orchestrator took or proposed that the PM approved, wi
 ## Resume instructions
 
 When resuming this cycle:
-1. Read this state file and run `node "${CLAUDE_SKILL_DIR}/scripts/validate-state.mjs"` on it.
-2. Skip all gates with status `passed` or `skipped`.
-3. Resume at `current_phase`.
-4. Surface any checkpoint whose due date has passed.
-5. Re-confirm the last gate summary with the PM before advancing.
+1. Find this file (`cases/<feature>/00-signal-to-ship-state.md`, else the working directory) and run
+   `node "${CLAUDE_SKILL_DIR}/scripts/validate-state.mjs" <this file> --today <date>` on it.
+2. Put the environment in one line inside the recap: `Environment: {n} connected ({names}); missing: {names or none}.`
+3. Ask first, in this order, one question at a time: a STOPPED or BACKLOG initiative (reopen or leave stopped; start
+   now or keep in the backlog), then an ASK about the deploy date, then a DUE checkpoint.
+4. Recap in at most 3 lines (where we are, last decision, next step) and continue with the next open step. Skip all
+   gates with status `passed` or `skipped`; resume at `current_phase`.
+5. Ask resume-or-restart only if the check found errors, or the PM's words suggest starting over.
 6. Check whether any `gaps` or `proposals` were resolved since the last session.

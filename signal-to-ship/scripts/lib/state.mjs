@@ -26,6 +26,14 @@ const ROAST = ['not_run', 'done', 'skipped']
 const ANNOUNCEMENT = ['not_sent', 'sent', 'skipped']
 const END_USER = ['not_asked', 'done', 'accepted_risk', 'not_applicable']
 const DATE = /^\d{4}-\d{2}-\d{2}$/
+// v0.12 (all optional): prioritization in two passes, environment check, templates, refinement mode, reopen, notice
+const METHODS = ['rice', 'ice', 'wsjf', 'moscow', 'value_effort', 'custom', 'gut_check']
+const CONFIDENCE = ['low', 'medium', 'high']
+const P1 = ['build_now', 'backlog', 'archive']
+const P2 = ['confirm', 'change', 'backlog']
+const ENV_DECISION = ['continue', 'connect_first']
+const REFINEMENT_PACKAGE = ['specialist', 'fallback', 'inline']
+const JUDGE = ['specialist', 'self_check', 'pm_review']
 
 /** True only for real calendar dates in YYYY-MM-DD form. */
 export function isIsoDate(v) {
@@ -367,6 +375,101 @@ export function validateState(s) {
     }
   }
 
+  // ---- v0.12 blocks: every check runs only when the block or field exists, so 0.11 files validate unchanged ----
+
+  // environment check
+  const env = s.environment
+  if (env) {
+    if (!empty(env.checked_on) && !isIsoDate(env.checked_on)) f.push(err('E_ENV_DATE', 'environment.checked_on must be an ISO date (YYYY-MM-DD)'))
+    if (!empty(env.decision) && !ENV_DECISION.includes(env.decision)) f.push(err('E_ENV_DECISION', `environment.decision must be one of ${ENV_DECISION.join(', ')}`))
+    for (const k of ['connected', 'missing']) {
+      if (env[k] !== null && env[k] !== undefined && !Array.isArray(env[k])) f.push(err('E_ENV_LIST', `environment.${k} must be an inline list such as [github, linear]`))
+    }
+  }
+
+  // prioritization in two passes
+  const hasPrio = Object.prototype.hasOwnProperty.call(s, 'prioritization')
+  const prio = s.prioritization && typeof s.prioritization === 'object' ? s.prioritization : {}
+  for (const k of ['method', 'method_suggested']) {
+    if (!empty(prio[k]) && !METHODS.includes(prio[k])) f.push(err('E_METHOD', `prioritization.${k} must be one of ${METHODS.join(', ')}`))
+  }
+  if (!empty(prio.pass1_confidence) && !CONFIDENCE.includes(prio.pass1_confidence)) {
+    f.push(err('E_PRIO_CONFIDENCE', `prioritization.pass1_confidence must be one of ${CONFIDENCE.join(', ')}`))
+  }
+  if (!empty(prio.pass1_decision) && !P1.includes(prio.pass1_decision)) f.push(err('E_PASS1_DECISION', `prioritization.pass1_decision must be one of ${P1.join(', ')}`))
+  if (!empty(prio.pass2_decision) && !P2.includes(prio.pass2_decision)) f.push(err('E_PASS2_DECISION', `prioritization.pass2_decision must be one of ${P2.join(', ')}`))
+  for (const k of ['pass1_on', 'pass2_on']) {
+    if (!empty(prio[k]) && !isIsoDate(prio[k])) f.push(err('E_PASS_DATE', `prioritization.${k} must be an ISO date (YYYY-MM-DD)`))
+  }
+  if (prio.pass2_decision === 'change' && empty(prio.pass2_note)) {
+    f.push(err('E_PASS2_NOTE', 'prioritization.pass2_decision is change: record what changed (scope, date, effort or order) in pass2_note'))
+  }
+  const afterPrio = GATES.slice(GATES.indexOf('prioritization') + 1)
+  if (passed('prioritization') && hasPrio) {
+    if (empty(prio.method)) f.push(err('E_G2_METHOD', 'Gate 2 passed but prioritization.method is empty (the PM always chooses a method)'))
+    if (prio.pass1_decision !== 'build_now' && prio.pass1_decision !== 'backlog') {
+      f.push(err('E_G2_DECISION', 'Gate 2 passed but prioritization.pass1_decision is not build_now or backlog'))
+    }
+  }
+  if (passed('prioritization') && !hasPrio && v2) {
+    f.push(warn('W_G2_NO_BLOCK', 'Gate 2 passed with no prioritization block: record how the priority was decided'))
+  }
+  if (prio.pass1_decision === 'backlog' && afterPrio.some((g) => passed(g))) {
+    f.push(err('E_G2_BACKLOG', 'prioritization.pass1_decision is backlog but a later gate is passed: a backlog item does not move forward until the PM decides build_now'))
+  }
+  if (prio.pass1_decision === 'archive' && !stopped) {
+    f.push(err('E_G2_ARCHIVE', 'prioritization.pass1_decision is archive: archiving is a recorded stop (status: stopped with stop_reason and stopped_on)'))
+  }
+  const twoPassPath = s.path === 1 || s.path === 2
+  if (passed('delivery') && twoPassPath && hasPrio && prio.pass1_decision === 'build_now' && !['confirm', 'change'].includes(prio.pass2_decision)) {
+    f.push(err('E_G6_PASS2', 'Gate 6 passed but prioritization.pass2_decision is not confirm or change: pass 2 must happen before delivery opens'))
+  }
+  if (prio.pass2_decision === 'backlog' && (passed('delivery') || passed('measurement'))) {
+    f.push(err('E_PASS2_BACKLOG', 'prioritization.pass2_decision is backlog but delivery or measurement is passed'))
+  }
+  if (passed('refinement') && twoPassPath && hasPrio && prio.pass1_decision === 'build_now' && empty(prio.pass2_decision)) {
+    f.push(warn('W_G5_PASS2', 'Gate 5 passed but pass 2 of the prioritization is not recorded yet (prioritization.pass2_decision)'))
+  }
+
+  // templates the PM chose
+  const tpl = s.templates
+  if (tpl) {
+    for (const k of ['default', 'own']) {
+      if (tpl[k] !== null && tpl[k] !== undefined && !Array.isArray(tpl[k])) f.push(err('E_TEMPLATES', `templates.${k} must be an inline list`))
+    }
+    if (Array.isArray(tpl.own)) {
+      for (const e of tpl.own) {
+        if (typeof e !== 'string' || !/^[a-z0-9-]+=.+$/.test(e)) f.push(err('E_TEMPLATES', `templates.own entry "${e}" must look like type=path-or-pasted`))
+      }
+    }
+  }
+
+  // how refinement was done
+  const rm = s.refinement_mode
+  if (rm) {
+    if (!empty(rm.package) && !REFINEMENT_PACKAGE.includes(rm.package)) f.push(err('E_REFINEMENT_MODE', `refinement_mode.package must be one of ${REFINEMENT_PACKAGE.join(', ')}`))
+    if (!empty(rm.judge) && !JUDGE.includes(rm.judge)) f.push(err('E_REFINEMENT_MODE', `refinement_mode.judge must be one of ${JUDGE.join(', ')}`))
+    // an inline (Light) refinement has no judge to record
+    if (passed('refinement') && empty(rm.judge) && rm.package !== 'inline') {
+      f.push(warn('W_G5_MODE', 'Gate 5 passed but refinement_mode.judge is empty: record whether a judge, a self-check or the PM review closed it'))
+    }
+  }
+
+  // reopened initiative (history lives in the decision log)
+  if (!empty(s.reopened_on) && !isIsoDate(s.reopened_on)) f.push(err('E_REOPEN_DATE', 'reopened_on must be an ISO date (YYYY-MM-DD)'))
+  if (!empty(s.reopened_on) && empty(s.reopened_reason)) f.push(err('E_REOPEN_REASON', 'reopened_on is set but reopened_reason is empty'))
+
+  // the requester hears about a stop or a decision
+  if (req && !empty(req.notified_on) && !isIsoDate(req.notified_on)) f.push(err('E_NOTIFIED_DATE', 'request.notified_on must be an ISO date (YYYY-MM-DD)'))
+  if (stopped && req && ['stakeholder', 'customer'].includes(req.origin) && empty(req.notified_on)) {
+    f.push(warn('W_STOP_REQUESTER', 'the initiative is stopped and the request came from a stakeholder or customer: tell the requester (request.notified_on is empty)'))
+  }
+
+  // Gate 7 closed provisional: the checkpoints must still be scheduled, otherwise the clock never starts
+  if (gates.measurement === 'provisional' && [m.checkpoint_1, m.checkpoint_2, m.checkpoint_3].some((c) => empty(c))) {
+    f.push(warn('W_G7_OPEN', 'Gate 7 is provisional and checkpoint_1..3 are not all set: the clock does not start until the checkpoints are set'))
+  }
+
   // advisory (non-blocking)
   if (s.schema === 1) f.push(warn('W_SCHEMA_OLD', 'schema 1: the v0.7 fields (cost_of_inaction, outcome, verdict) are not enforced; migrate to schema 2'))
   if (s.spec?.agent_surface === 'defined' && s.depth !== 'full') {
@@ -403,4 +506,23 @@ export function deployUnconfirmed(s, today) {
   if (s.status === 'stopped' || s.gates?.delivery !== 'passed') return null
   if (!isIsoDate(del.delivery_date) || isIsoDate(del.deployed_on)) return null
   return del.delivery_date <= today ? del.delivery_date : null
+}
+
+/** The stop details when the initiative is stopped (ask whether to reopen it), otherwise null. */
+export function stoppedNotice(s) {
+  if (s?.status !== 'stopped') return null
+  return { reason: empty(s.stop_reason) ? null : s.stop_reason, on: isIsoDate(s.stopped_on) ? s.stopped_on : null }
+}
+
+/**
+ * An active initiative the PM parked in the backlog at pass 1 or pass 2 (ask whether to start it now), otherwise null.
+ * `from` names the pass that parked it; pass 2 wins when both say backlog because it is the later decision.
+ */
+export function backlogNotice(s) {
+  if (!s || s.status === 'stopped') return null
+  const p = s.prioritization
+  if (!p || typeof p !== 'object') return null
+  if (p.pass2_decision === 'backlog') return { since: isIsoDate(p.pass2_on) ? p.pass2_on : null, from: 'pass2' }
+  if (p.pass1_decision === 'backlog') return { since: isIsoDate(p.pass1_on) ? p.pass1_on : null, from: 'pass1' }
+  return null
 }

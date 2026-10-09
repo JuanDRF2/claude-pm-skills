@@ -1,5 +1,7 @@
 # Walkthrough: a first case, up to Gate 1
 
+> Recorded with v0.11. Since 0.12.0 the session opens with an environment check, and Gate 0 is one message that carries the type, the route and the depth.
+
 A real conversation, lightly condensed. The company, product and numbers are fictitious. The PM works at a freight
 software company; the assistant had no connected tools, only the skill and an organization config. Note how the
 assistant keeps to one question at a time, asks what happens if nothing is built, scores risks with evidence, and

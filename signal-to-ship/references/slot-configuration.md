@@ -1,4 +1,15 @@
-# Slot Configuration Format (v0.6.0)
+# Slot Configuration Format
+
+## Contents
+
+- What slots are
+- The slot.yaml file and where it lives
+- Format specification (top-level keys, organization, framework, slot block, slot IDs, delivery, competitive)
+- How the orchestrator uses slot.yaml
+- Relationship to specialist contracts
+- Example
+- The process block
+- Adding a new slot, validation, enabling the taxonomy slot
 
 ## What slots are
 
@@ -11,7 +22,7 @@ inputs, expected outputs, and a quality gate. Any tool or skill that satisfies t
 contract can fill the slot. When no tool is available, the orchestrator uses the slot's
 declared fallback, which is typically manual data entry or a built-in approximation.
 
-Slots exist so that Signal to Ship works for any product organization, not just Acme.
+Slots exist so that Signal to Ship works for any product organization.
 A company using Linear instead of Jira swaps one YAML block. A company without
 a taxonomy tool leaves that slot empty and the orchestrator skips taxonomy alignment.
 
@@ -20,7 +31,7 @@ a taxonomy tool leaves that slot empty and the orchestrator skips taxonomy align
 Each organization gets one `<org>.slot.yaml` file (where it lives: see "File location"). This file declares:
 
 1. **Organization identity** and metadata.
-2. **Active prioritization framework** and its weights.
+2. **Suggested prioritization method** (always confirmed with the PM; the config only suggests).
 3. **Slot bindings**: which tool fills each slot, which MCP tools to call, and any
    slot-specific configuration (boards, projects, competitor lists, repo paths).
 4. **Delivery preferences**: templates, audiences, channels.
@@ -36,7 +47,7 @@ The orchestrator looks for `<org>.slot.yaml` in this order (see `references/slot
 ```
 <project>/.signal-to-ship/<org>.slot.yaml       # 1. the team's own config, with their repo
 ~/.claude/signal-to-ship/orgs/<org>.slot.yaml    # 2. the PM's personal folder, outside any repo
-<this skill>/examples/acme.slot.yaml             # 3. a fictitious example, used only if nothing else exists
+<this skill>/examples/acme.slot.yaml             # 3. a fictitious example, used only if the PM asks for it
 ```
 
 Keep an employer's real configuration in (1) inside that employer's repo or in (2). Never put it in a
@@ -50,7 +61,7 @@ public repository.
 |-----|----------|------|-------------|
 | `version` | Yes | String | Schema version. Currently `"0.6.0"`. |
 | `organization` | Yes | Object | Name, industry, product line. |
-| `framework` | Yes | Object | Active prioritization framework and its weights. |
+| `framework` | No | Object | The suggested prioritization method and signal channels. |
 | `slots` | Yes | Object | Keyed by slot ID. Each entry configures one integration. |
 | `delivery` | No | Object | Templates, audiences, and publication channels. |
 | `competitive` | No | Object | Competitor list and research preferences. |
@@ -69,30 +80,18 @@ organization:
 
 ```yaml
 framework:
-  active: brice_plus          # One of: brice_plus, rice, moscow, wsjf, ice, custom
-  phase: 1                    # Which extension phase (BRICE+ specific)
-  weights:                    # Only for frameworks that use numeric weights
-    new_arr: 2.0
-    expansion: 2.0
-    churn_risk: 3.5
-    nps: 1.0
-    contractual_multiplier: 1.5
-  channels:                   # Signal channel origin tracking
+  active: rice                # Suggested method. One of: rice, ice, wsjf, moscow, value_effort, custom, gut_check
+  channels:                   # Optional. Signal channel origin tracking
     - pain_points
     - competitive_parity
     - market_innovation
     - tech_debt_migration
     - contractual
-  auto_review_threshold: 3    # Channels needed for automatic priority review
+  auto_review_threshold: 3    # Optional. Channels needed for automatic priority review
 ```
 
-For non-numeric frameworks like MoSCoW, the `weights` block is replaced by `categories`:
-
-```yaml
-framework:
-  active: moscow
-  categories: [must, should, could, wont]
-```
+`active` is the organization's suggestion. The PM is always asked which method to use, and the suggestion is shown
+as a suggestion, never applied silently (`references/priority-calculator.md`). There are no weights to configure.
 
 ### Slot block
 
@@ -210,151 +209,24 @@ The slot file and the specialist contract serve different purposes:
 
 The contract is the interface. The slot file is the implementation binding.
 
-## Examples
+## Example
 
-### Acme (full configuration)
+See `examples/acme.slot.yaml` for a complete working example of a fictitious organization (a feedback tool, Linear
+as the tracker, a prototype builder with a text-storyboard fallback). It is used only if the PM asks for it.
 
-See `examples/acme.slot.yaml` for the complete working example. Acme uses
-Productboard for feedback signal collection and RICE for prioritization (corrected
-2026-09-29 — this description previously named a different tool stack — Canny, Jira,
-taxonomy-system, BRICE+ — that doesn't match what the shipped file actually configures).
+### Optional extension: design-system gap report
 
-### Hypothetical: Acme SaaS (Linear + Productboard + RICE)
+The `prototype_builder` slot can carry one optional flag in its config:
 
 ```yaml
-version: "0.6.0"
-
-organization:
-  name: "Acme SaaS"
-  industry: "B2B SaaS"
-  product: "Acme Platform"
-
-framework:
-  active: rice
-  weights:
-    reach: 1.0
-    impact: 1.0
-    confidence: 1.0
-    effort: 1.0
-
-slots:
-  signal_collector:
-    enabled: true
-    adapter: productboard
-    mcp_tools:
-      - "mcp__productboard__list_features"
-      - "mcp__productboard__get_insights"
-    config:
-      workspace: "acme-workspace"
-    fallback: "PM provides feedback data manually."
-
-  competitive_researcher:
-    enabled: true
-    adapter: built_in
-    mcp_tools:
-      - WebSearch
-    fallback: "PM provides competitive context manually."
-
-  legacy_analyzer:
-    enabled: false
-    adapter: none
-    fallback: "No legacy system. Greenfield product."
-
-  priority_scorer:
-    enabled: true
-    adapter: built_in
-    fallback: "N/A (built-in)"
-
-  spec_writer:
-    enabled: false
-    adapter: none
-    fallback: "PM writes specs in Notion. Orchestrator reviews."
-
-  competitive_teardown:
-    enabled: false
-    adapter: none
-    fallback: "Competitive research handled in signal phase only."
-
-  prototype_builder:
-    enabled: true
-    adapter: vercel_v0
-    config:
-      tool: "v0.dev"
-    fallback: "Figma prototypes."
-
-  refinement_orchestrator:
-    enabled: true
-    adapter: built_in
-    fallback: "PM writes stories directly."
-
-  refinement_judge:
-    enabled: false
-    adapter: none
-    fallback: "PM peer review replaces judge."
-
-  ticket_writer:
-    enabled: true
-    adapter: linear
-    mcp_tools:
-      - "mcp__linear__create_issue"
-      - "mcp__linear__update_issue"
-    config:
-      team_id: "ENG"
-      default_project: "Platform"
-    fallback: "PM creates Linear issues manually."
-
-  taxonomy_sync:
-    enabled: false
-    adapter: none
-    fallback: "No taxonomy system. Tags used instead."
-
-  template_filler:
-    enabled: true
-    adapter: built_in
-    fallback: "N/A (built-in)"
-
-  release_notes_writer:
-    enabled: true
-    adapter: built_in
-    fallback: "N/A (built-in)"
-
-  metric_designer:
-    enabled: true
-    adapter: built_in
-    mcp_tools:
-      - WebSearch
-    config:
-      analytics: amplitude
-      survey: hotjar
-    fallback: "PM defines metrics manually."
-
-competitive:
-  competitors:
-    - name: "RivalCo"
-      url: "https://rivalco.com"
-      category: direct
-  research_depth: surface
-
-delivery:
-  templates:
-    - name: "release-notes"
-      path: "templates/release-notes.md"
-  audiences:
-    - engineering
-    - product
-    - sales
-  publication_channels:
-    - type: notion
-      enabled: false
-    - type: slack
-      channel: "#product"
-      enabled: true
+prototype_builder:
+  config:
+    ds_gap_report: true     # off by default
 ```
 
-This example shows an organization that skips legacy analysis (greenfield product),
-does not use a refinement judge (peer review instead), has no taxonomy system,
-and uses Linear instead of Jira. The orchestrator adapts its behavior at each phase
-based on which slots are enabled.
+When it is true, and the prototype tool can compare components against the organization's design system, the
+orchestrator also lists the components used in the prototype that the design system does not have. When absent or
+false, the generic flow does nothing of the sort.
 
 ## The process block
 
@@ -393,7 +265,7 @@ The orchestrator validates the slot file at startup:
 - Schema version must match the orchestrator's supported range.
 - All 15 built-in specialist slot IDs and both integration slots must be present (use `enabled: false` for unused slots).
 - `mcp_tools` entries are checked against the current MCP session.
-- `framework.active` must be a recognized framework ID.
+- `framework.active` must be one of `rice`, `ice`, `wsjf`, `moscow`, `value_effort`, `custom`, `gut_check`, or absent. `gut_check` is used only at Light. Any other value (including values from earlier versions) is read as "no suggestion" and reported in one line.
 - Warnings are emitted for enabled slots with missing MCP tools, but the orchestrator
   does not refuse to start. It uses fallbacks and reports gaps.
 

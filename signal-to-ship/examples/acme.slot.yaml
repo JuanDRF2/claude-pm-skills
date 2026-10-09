@@ -1,3 +1,4 @@
+# Fictitious. Used only if the PM asks for the example. The organization, workspace and project names are made up.
 version: "0.6.0"
 
 organization:
@@ -6,12 +7,7 @@ organization:
   product: "Acme Platform"
 
 framework:
-  active: rice
-  weights:
-    reach: 1.0
-    impact: 1.0
-    confidence: 1.0
-    effort: 1.0
+  active: rice                       # your organization's suggested method; the PM is always asked
 
 slots:
   signal_collector:
@@ -53,12 +49,12 @@ slots:
 
   issue_tracker:
     enabled: true
-    adapter: jira                    # jira | taxonomy_known_issues | github_issues | linear
+    adapter: linear                  # jira | taxonomy_known_issues | github_issues | linear
     mcp_tools:
-      - mcp__claude_ai_Atlassian_Rovo__searchJiraIssuesUsingJql
+      - "mcp__linear__list_issues"
     config:
-      support_case_field: "customfield_XXXXX"
-    # When the taxonomy stores known issues, switch the adapter and disable Jira:
+      team_id: "ENG"
+    # When the taxonomy stores known issues, switch the adapter and disable the tracker:
     #   adapter: taxonomy_known_issues
     #   mcp_tools: [list_known_issues, get_known_issue]
     fallback: "PM pastes the relevant bug list."
@@ -75,20 +71,20 @@ slots:
 
   prototype_builder:
     enabled: true
-    adapter: vercel_v0
+    adapter: mockup-builder
     config:
-      tool: "v0.dev"
-    fallback: "Figma prototypes."
+      ds_gap_report: false           # optional extension, off by default
+    fallback: "Text storyboard the PM builds in any tool."
 
   refinement_orchestrator:
     enabled: true
-    adapter: built_in
-    fallback: "PM writes stories directly."
+    adapter: story-to-test-workflow
+    fallback: "Compact refinement package (see specialist-contracts)."
 
   refinement_judge:
-    enabled: false
-    adapter: none
-    fallback: "PM peer review replaces judge."
+    enabled: true
+    adapter: refinement-judge
+    fallback: "Orchestrator self-check plus PM review."
 
   ticket_writer:
     enabled: true

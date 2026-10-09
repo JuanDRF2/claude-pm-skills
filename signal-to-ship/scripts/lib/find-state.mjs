@@ -3,7 +3,9 @@ import { readdirSync, statSync, existsSync } from 'node:fs'
 import { join, dirname, resolve } from 'node:path'
 
 export const STATE_NAME = '00-signal-to-ship-state.md'
-const SKIP = new Set(['node_modules', '.git', '.claude'])
+// Children with these names are not searched (the eval fixtures are examples, not the user's work).
+// The rule applies to children only, so an explicit start such as evals/fixtures still works.
+const SKIP = new Set(['node_modules', '.git', '.claude', 'evals'])
 
 /** Walk UP from a file or directory looking for the nearest state file. */
 export function findStateUp(start, maxLevels = 5) {

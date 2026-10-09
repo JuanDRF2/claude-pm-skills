@@ -1,273 +1,185 @@
-# Priority Calculator Reference
+# Prioritization in two passes
 
-Instructions for the orchestrator to calculate a priority score in Phase 2
-(Prioritization). Supports multiple frameworks. BRICE+ is the default.
+> How the orchestrator helps the PM decide whether work is worth building, before and after the real effort is
+> known. The PM always chooses the method. A score is an input to the PM's decision, not the decision.
 
-## When to use
+## Contents
 
-- **Path 1/2 (New feature):** always execute
-- **Path 3 (Bug fix):** skip (urgency determines priority)
-- **Path 4 (Migration):** skip (decision already made)
-- **Path 5 (Contractual):** skip (deadline determines priority)
+- When it applies
+- The method question (always asked)
+- Pass 1 (Gate 2)
+- Pass 2 (end of Phase 5)
+- Inputs per method
+- Calibration warnings
+- Light depth
+- Roadmap review and ranking
+- What gets recorded
 
-## Step 1: Select framework
+## When it applies
 
-Ask the PM once per organization (or confirm the default):
-"Which prioritization framework do you use?"
+| Path | Pass 1 (Gate 2) | Pass 2 (end of Phase 5) |
+|------|-----------------|-------------------------|
+| 1 New feature or improvement, visual | yes | yes |
+| 2 New feature or improvement, backend only | yes | yes |
+| 3 Bug fix | skipped (urgency decides) | skipped |
+| 4 Migration or parity | skipped (the decision is made) | skipped |
+| 5 Contractual deadline | skipped (the date decides) | skipped |
 
-- a) **BRICE+** (built-in default; the Acme example config sets RICE): revenue-weighted with signal evidence
-- b) **RICE:** Reach, Impact, Confidence, Effort
-- c) **MoSCoW:** Must, Should, Could, Won't (categorical, no formula)
-- d) **WSJF:** Weighted Shortest Job First (Cost of Delay / Job Size)
-- e) **ICE:** Impact, Confidence, Ease
-- f) **Custom:** PM defines variables and formula
+Pass 2 runs only when Gate 2 recorded `build_now`. A saved case from an earlier version that has no
+prioritization block skips pass 2.
 
-Store the selection in the Signal to Ship state file. Do not ask again in the same cycle.
+## The method question (always asked)
 
-## BRICE+ (default)
-
-### Formula
-
-```
-BRICE+ = (B * w_b + R * w_r + I * w_i + C * w_c + E * w_e) / Effort
-         * (Contractual ? 1.5 : 1.0)
-```
-
-### Variables
-
-| Variable | Full name | Scale | Source | How to collect |
-|----------|-----------|-------|--------|----------------|
-| **B** | Business impact | 1-10 | Manual | See Step 2b |
-| **R** | Reach | 1-10 | Auto + Manual | See Step 2a |
-| **I** | Intelligence | 1-10 | Auto | See Step 2a |
-| **C** | Confidence | 1-5 | Manual (PM) | See Step 2b |
-| **E** | Evidence | 1-5 | Auto | See Step 2a |
-| **Effort** | Engineering effort | 1-10 | Manual (Eng) | See Step 2b |
-| **Contractual** | Contractual obligation | 0 or 1 | Manual (PM) | See Step 2b |
-
-### Weights (configurable per organization)
-
-| Weight | Default | Description |
-|--------|---------|-------------|
-| w_b | 2.0 | Business impact weight |
-| w_r | 1.0 | Reach weight |
-| w_i | 1.0 | Intelligence weight |
-| w_c | 1.0 | Confidence weight |
-| w_e | 0.5 | Evidence weight |
-
-### Step 2a: Auto-fill from Signals data
-
-After Phase 1 (Signals) completes, these variables can be pre-calculated:
-
-**Reach (R):**
+Ask it at the start of pass 1, every time, even if the organization's config names a method. The configured one is
+shown as a suggestion and never applied silently.
 
 ```
-raw_reach = canny.total_users + canny.total_companies
+Which prioritization method do you want to use? My suggestion: {X}, because {reason from evidence you actually have}.
+{If the organization config names one: "Your organization's config names {Y}; I treat that as a suggestion, not a default."}
+1. RICE: Reach, Impact, Confidence, Effort. Best when you have usage or reach data.
+2. ICE: Impact, Confidence, Ease. Best with little information or an early product.
+3. WSJF: cost of delay divided by job size. Best when the cost of delay is known or a deadline decays value.
+4. MoSCoW: Must / Should / Could / Won't. Classifies, does not rank. Best for a fixed-scope release or a date.
+5. Value vs Effort 2x2: best for a team workshop.
+6. Custom: you define the variables and the formula.
+A score is an input to your decision, not the decision.
 ```
 
-Normalize to 1-10 scale:
-- 0 users: R = 1
-- 1-5 users: R = 2
-- 6-15 users: R = 4
-- 16-30 users: R = 6
-- 31-50 users: R = 8
-- 51+ users: R = 10
+### How to suggest one
 
-Present to PM: "Based on Canny, [N] users and [N] companies have expressed interest.
-I calculated Reach as [R]. Does this seem right, or do you want to adjust?"
+Take the first row whose condition the evidence supports, in this order (the most decisive condition first). The
+reason must cite a real finding ("the feedback tool shows 14 requesting accounts", "no usage data was found"),
+never a generic sentence.
 
-**Intelligence (I):**
+| Evidence | Suggest |
+|----------|---------|
+| A fixed date or a fixed scope | MoSCoW |
+| Cost of delay, or a deadline whose value decays, is named | WSJF |
+| Usage or reach data is available | RICE |
+| Anything else (little information, or an early product) | ICE |
+| The PM says they will score it with the team | Value vs Effort 2x2 |
+| The PM asks for their own variables | Custom |
 
-```
-raw_intelligence = canny.total_votes + (canny.total_insights * 2)
-```
+The last two rows depend on what the PM says; never infer them. If the configured value is not one of the six methods (including values from earlier versions), read it as "no
+suggestion" and tell the PM in one line. The value `gut_check` is accepted but used only at Light.
+Record the PM's choice as `prioritization.method`, your suggestion as
+`method_suggested`, and the reason as `method_reason` (add "PM chose X" when different).
 
-Insights are weighted 2x because they represent deeper customer conversations.
+## Pass 1 (Gate 2)
 
-Normalize to 1-10 scale:
-- 0: I = 1
-- 1-5: I = 2
-- 6-15: I = 4
-- 16-30: I = 6
-- 31-50: I = 8
-- 51+: I = 10
+1. **Open the gate** (`references/guided-flow.md`) and ask the method question.
+2. **Collect the inputs in one fill-in line**, for the chosen method (next section). When a feedback tool is
+   visible, propose auto-filled values from the Phase 1 data and ask the PM to correct them; otherwise ask for an
+   estimate. Always include **effort as a range** and a **confidence level** (low / medium / high; confidence in
+   the inputs, not the RICE Confidence variable). Label every input **measured**, **estimated** or **guessed**.
+   Offer "unknown" for any part.
+3. **Show the result.** Compute with the arithmetic visible. Show the score as a **range**: the best case at the
+   low end of the effort, the worst case at the high end. Next to it show the confidence and the highest risk
+   from Phase 1. Show at most three calibration warnings that apply. Say: a score is an input, not the decision.
+4. **Ask the decision**: build now / backlog / archive. Close Gate 2 only on the PM's answer (invariant 17); "ok"
+   to the score is not the answer.
 
-Present to PM with the same pattern.
+Outcomes:
 
-**Evidence (E):**
+- **Build now:** close Gate 2 and go on to Phase 3.
+- **Backlog:** close Gate 2 with the pass 1 record, log it, and do not start Phase 3. The status stays active.
+  Say how to bring it back (`references/going-back.md`).
+- **Archive:** a recorded stop. Set the status to stopped with `stop_reason` and `stopped_on`, record
+  `pass1_decision: archive`, and leave Gate 2 pending (a stopped initiative keeps its remaining gates pending; Gate
+  2 passes only on build now or backlog). A stop is a valid outcome. If a stakeholder or customer asked for it,
+  propose the notice to them (`references/going-back.md`).
 
-Count distinct signal channels that produced data:
-- Canny feedback (votes > 0)
-- Jira bugs (direct_bugs > 0)
-- Linked support cases (support_cases_linked > 0)
-- Competitive (competitors have it)
-- Sales/CSM input (PM confirms deals or accounts)
+Record: `prioritization.method`, `method_suggested`, `method_reason`, `method_custom` (only for Custom),
+`pass1_size`, `pass1_confidence`, `pass1_score` (a range, or a category; it may stay empty for a gut check or a
+custom method), `pass1_decision`, `pass1_on`.
 
-```
-E = count of channels with signal (1-5)
-```
+## Pass 2 (end of Phase 5)
 
-Present: "I found signals in [N] channels: [list]. Evidence score: [E]."
+Run it after the refinement judge verdict (PASS or PASS WITH OBSERVATIONS, or the orchestrator's self-check) and
+**before** the Gate 5 handoff to Dev and QA is proposed. The handoff writes to a shared system; pass 2 must come
+first so tickets are never sent for work the PM then drops. Gate 6 never opens without pass 2.
 
-### Step 2b: Manual collection (one question at a time)
+1. **Take the real effort from the refined stories, and label where it comes from:** `engineer-estimated`,
+   `PM estimate` or `AI draft, not reviewed by engineering`. The compact refinement package carries an effort and a
+   source per story: sum the efforts and take the weakest source. With a specialist package, ask one question:
+   "Effort from the refined stories (sum of the engineering estimates, or your best estimate)?" If the source is
+   `AI draft`, say so and ask whether an engineer can sanity-check it before the PM confirms (one question, the PM
+   may skip). Show the label next to the number and keep it in `pass2_effort` (for example "6 weeks (AI draft, not
+   reviewed by engineering)").
+2. **Recompute with the same method** and the same other inputs, unless the PM says they changed.
+3. **Say where it falls against the pass 1 range:** inside, above or below. If above the top of the range, say it
+   plainly and ask the PM to reconsider. The decision is theirs.
+4. **Ask: confirm / change / backlog.** When the effort lands inside or below the pass 1 range, say so in one line and
+   recommend confirm as the default; do not present a fresh menu.
+   - **Confirm:** keep building. Go on to the handoff proposal.
+   - **Change:** the PM keeps building on changed terms (scope, date, effort or order). Ask what changed in one
+     question and record it as `pass2_note`. This is not a go-back.
+   - **Backlog:** hold the handoff with the reason "back to backlog (pass 2)". Gate 5 closes with the handoff
+     held, Gate 6 does not open, and the status stays active.
+5. Record `pass2_effort`, `pass2_score`, `pass2_decision`, `pass2_note` (required for change), `pass2_on`.
 
-**Business impact (B):** Ask the PM:
-"On a scale of 1 to 10, how much would this impact revenue?"
-- 1-3: Nice to have, no direct revenue impact
-- 4-6: Improves retention or enables upsell for some accounts
-- 7-8: Blocks deals or puts significant MRR at risk
-- 9-10: Critical for major accounts or new market entry
+## Inputs per method
 
-Then, if Sales/CSM are available:
-"Are there deals blocked by this? Estimated ARR impact?"
-"Which accounts are at risk without this? MRR at risk?"
+Ask all of them in one fill-in line; the PM may answer "unknown" for any part.
 
-Combine PM assessment with Sales/CSM data to finalize B.
+| Method | Inputs | Result |
+|--------|--------|--------|
+| RICE | Reach per quarter; Impact (0.25, 0.5, 1, 2, 3); Confidence (50%, 80%, 100%); Effort as a range in person-weeks | Reach x Impact x Confidence / Effort |
+| ICE | Impact (1 to 10); Confidence (1 to 10); Ease (1 to 10, asked directly as a range; show the person-week range beside it) | Impact x Confidence x Ease |
+| WSJF | Value, time criticality, risk reduction (each 1 to 10); job size on the same 1 to 10 relative scale, as a range, with the person-week range beside it | (Value + Time criticality + Risk reduction) / Job size |
+| MoSCoW | Category (Must / Should / Could / Won't); what it hangs on; effort as a range | A category. No score. |
+| Value vs Effort 2x2 | Value (1 to 10); effort as a range. Ask where the lines are between low and high. | A quadrant |
+| Custom | The PM states the variables, their scales and the formula. Restate them back, compute with the arithmetic shown, and store them as `method_custom`. | The PM's formula |
+| Gut check (Light) | Size (XS to XL, or a range); confidence; decision | A size and a decision |
 
-**Confidence (C):** Ask the PM:
-"On a scale of 1 to 5, how confident are you that this will be used as expected?"
-- 1: Very uncertain, might not be used
-- 2: Some uncertainty, limited validation
-- 3: Moderate confidence, some user feedback
-- 4: High confidence, validated with users
-- 5: Certainty, proven demand or contractual
+The range shown reflects the effort range only, unless the PM also gives low and high values for Reach or Impact; in
+that case compute the best case from the high values and the low effort, and the worst case from the low values and
+the high effort. Say which one you showed. Scores from different methods are never compared (ICE multiplies, WSJF
+adds and then divides).
 
-**Effort:** Ask Engineering (or PM if Eng unavailable):
-"What is the rough effort estimate?"
-- Options: XS (1), S (2), M (4), L (6), XL (8), XXL (10)
-- Or story points if the team uses them (normalize to 1-10)
+Worked example for RICE, with fictitious inputs: Reach 400 a quarter (estimated), Impact 1 (estimated), Confidence
+80% (guessed), Effort 3 to 5 person-weeks. Best case 400 x 1 x 0.8 / 3 = 107; worst case 400 x 1 x 0.8 / 5 = 64.
+Result: 64 to 107, confidence medium.
 
-**Contractual:** Ask the PM:
-"Is this promised to a client or required by contract?"
-- Yes: Contractual = 1 (applies 1.5x multiplier)
-- No: Contractual = 0
+Auto-fill when a feedback tool is visible: Reach can start from the requesting users and companies the tool
+reports, and the number of signal channels that produced data shows how well the evidence is spread. These are
+proposals for the PM to correct, labeled with their source.
 
-### Step 3: Calculate and present
+## Calibration warnings
 
-```
-score = (B * 2.0 + R * 1.0 + I * 1.0 + C * 1.0 + E * 0.5) / Effort
-        * (Contractual ? 1.5 : 1.0)
-```
+Show at most three that apply, before the PM decides.
 
-Present:
+- **Vote bias.** Feedback-tool votes over-represent the loudest and most engaged customers. If Reach and Impact
+  rest only on votes, say so and ask whether silent segments (support cases, call insights, churned accounts) tell
+  a different story.
+- **Evidence diversity.** A score backed by one channel is weaker than one backed by three. Name the missing channel.
+- **Effort is the whole path to production.** When construction is AI-assisted, build effort shrinks but
+  validation, review, integration and rollout effort do not. Ask for the whole path to production, not the coding
+  time, or the score will favor work that is quick to generate and slow to ship.
+- **Learning value.** Two items with the same score are not equal if one tests a risky assumption cheaply. Prefer
+  the one that teaches more, and say why.
 
-```
-BRICE+ Score: [result]
+Never rank on the score alone: it is always shown next to the highest risk from Phase 1.
 
-  Business impact (B):  [value] × 2.0 = [weighted]
-  Reach (R):            [value] × 1.0 = [weighted]
-  Intelligence (I):     [value] × 1.0 = [weighted]
-  Confidence (C):       [value] × 1.0 = [weighted]
-  Evidence (E):         [value] × 0.5 = [weighted]
-  ─────────────────────────────────────
-  Subtotal:             [sum]
-  Effort:               / [effort]
-  Contractual:          × [1.0 or 1.5]
-  ─────────────────────────────────────
-  Final score:          [result]
-```
+## Light depth
 
-Ask: "Does this score reflect the priority you would give this feature? If not, which
-variable would you adjust?"
+Replace the six-method menu with a suggestion of a gut check: "Small work: a gut check, no formula. Name a method
+if you prefer one of the six." Replying with size and confidence counts as choosing the gut check. One message asks
+for size (XS to XL, or a range) and confidence as the fill-in, and ends with the decision words (build now /
+backlog / archive) as the one question. Close Gate 2 only when the PM names one of the three (invariant 17). Record
+`method: gut_check`. If the depth is upgraded to Standard later in the case, redo pass 1 with the method menu.
 
-### Step 4: Compare against backlog
+Pass 2 at Light is one line after the inline refinement: "Still build now at about {effort}? yes / change /
+backlog."
 
-If other features have been scored, show a ranked list:
+## Roadmap review and ranking
 
-| Rank | Feature | Score | Key driver |
-|------|---------|-------|------------|
-| 1 | Feature A | 8.5 | High B, contractual |
-| 2 | Feature B | 6.2 | High R, low effort |
-| 3 | This feature | 5.8 | Moderate across all |
+At Full depth, the optional roadmap review (`templates/roadmap-review.md`) happens before pass 1. Its artifact
+shows `Method: {method}`. A ranked list across initiatives compares only items scored with the same method;
+otherwise it groups them by method (`references/roadmap-view.md`).
 
-Ask: "Does this ranking match your intuition? If not, we should review the weights."
+## What gets recorded
 
-## RICE (alternative)
-
-### Formula
-
-```
-RICE = (Reach * Impact * Confidence) / Effort
-```
-
-| Variable | Scale | Source |
-|----------|-------|--------|
-| Reach | Number of users affected per quarter | Auto (Canny users) + PM estimate |
-| Impact | 0.25 (minimal) to 3 (massive) | PM assessment |
-| Confidence | 0.5 (low) to 1.0 (high) | PM assessment |
-| Effort | Person-months | Engineering estimate |
-
-### Collection
-
-Same one-at-a-time pattern. Auto-fill Reach from Canny, ask PM for Impact and
-Confidence, ask Engineering for Effort.
-
-## MoSCoW (alternative)
-
-### No formula. Categorical assignment.
-
-Ask the PM for each feature: "For this release, is this feature:"
-- **Must have:** cannot ship without it
-- **Should have:** important but not critical
-- **Could have:** nice to have, include if time allows
-- **Won't have:** explicitly excluded from this release
-
-No score calculation. Output is a categorized backlog.
-
-## WSJF (alternative)
-
-### Formula
-
-```
-WSJF = Cost of Delay / Job Size
-```
-
-Where Cost of Delay = User/Business Value + Time Criticality + Risk Reduction
-
-| Variable | Scale | Source |
-|----------|-------|--------|
-| User/Business Value | 1-10 | PM assessment |
-| Time Criticality | 1-10 | PM (deadline pressure, market window) |
-| Risk Reduction | 1-10 | PM (compliance, security, tech debt) |
-| Job Size | 1-10 | Engineering estimate |
-
-## ICE (alternative)
-
-### Formula
-
-```
-ICE = Impact * Confidence * Ease
-```
-
-| Variable | Scale | Source |
-|----------|-------|--------|
-| Impact | 1-10 | PM assessment |
-| Confidence | 1-10 | PM assessment |
-| Ease | 1-10 | Engineering (inverse of effort) |
-
-## Calibration warnings (show before the PM approves a score)
-
-A score is a conversation starter, not a verdict. Surface these before Gate 2:
-
-- **Vote bias.** Feedback-tool votes over-represent the loudest and most engaged customers.
-  If R and I are driven only by votes, say so, and ask whether silent segments (support
-  cases, call insights, churned accounts) tell a different story.
-- **Evidence diversity.** A score backed by one channel is weaker than one backed by three.
-  The E variable already counts channels; also report which channel is missing.
-- **Effort under AI-assisted construction.** Historical effort sizes (XS-XXL) were calibrated
-  on human-only delivery. When construction is AI-assisted, build effort shrinks but
-  validation, review, integration and rollout effort do not. Ask the PM to estimate the
-  *whole path to production*, not the coding time, or the score will systematically favor
-  features that are quick to generate and slow to ship.
-- **Learning value.** Two features with the same score are not equal if one tests a risky
-  assumption cheaply. Prefer the one that teaches more, and say why.
-- **Weights are policy, not truth.** The weights live in the slot config. If a weight was
-  changed, record who changed it and why in the state file.
-- **Never rank on score alone.** Show the score next to the highest risk from Phase 1.
-
-## Storing results
-
-After the PM approves the score, update:
-1. Feature scorecard: add score in the Signal to Ship cycle table
-2. State file: set Gate 2 status to passed with score
-3. If backlog comparison done: note the ranking position
+1. The saved progress: the prioritization fields above, and Gate 2 passed (or the stop).
+2. The scorecard: the "Prioritization (two passes)" table (`templates/feature-scorecard.md`).
+3. When the system of record supports it, the score on the work item (`references/system-of-record.md`).

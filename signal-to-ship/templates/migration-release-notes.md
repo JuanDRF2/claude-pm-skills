@@ -13,7 +13,7 @@
 
 ### 1. What is changing?
 
-{Feature Name} is moving from the V1 platform to Acme 2. The functionality you use today
+{Feature Name} is moving from the V1 platform to {the new platform}. The functionality you use today
 continues to work the same way, now powered by the V2 platform.
 
 - **What stays the same:** {List behaviors the user will recognize}
@@ -94,12 +94,12 @@ and continuously improving on the V2 platform.}
 
 This section is for internal reference. Do not share with clients.
 
-- **V1 component:** {e.g., CheckoutFromContact Aura component in AcmeCommerceCore}
-- **V1 controller:** {e.g., CheckoutFromContactV2Controller.cls}
-- **V1 entry point:** {e.g., "Complete Checkout" web link on Contact record}
-- **V2 embed wrapper:** {e.g., QuickCheckoutCanvasOverride in AcmeCanvasKit}
-- **V2 widget:** {e.g., quick-checkout.entry.tsx in AcmeFrontend}
-- **V2 backend:** {e.g., Order/Commitment APIs in AcmeBackend}
+- **V1 component:** {the legacy component and the repo that holds it}
+- **V1 controller:** {the legacy controller or service}
+- **V1 entry point:** {e.g., a "Complete Checkout" link on the Contact record}
+- **V2 embed wrapper:** {the wrapper that embeds the new surface, and its repo}
+- **V2 widget:** {the new front-end entry and its repo}
+- **V2 backend:** {the new APIs and their repo}
 
 ---
 
