@@ -3,6 +3,14 @@
 Instructions for the orchestrator to generate and maintain a cross-feature roadmap
 from existing scorecard data. This is a read mode, not a phase.
 
+## Contents
+
+- Trigger and data source
+- Risk derivation
+- Output (status summary, table, dependency graph, blockers, build order, ranking, timeline risk)
+- Updating the roadmap and adapting
+- The roadmap artifact
+
 ## Trigger
 
 `/signal-to-ship roadmap` or `/signal-to-ship roadmap <case-name>`
@@ -12,7 +20,8 @@ blocks what, what's at risk, and what order to build.
 
 ## Data source
 
-Read all feature scorecards in `cases/<case-name>/feature-cards/*.md`. Extract from
+Read the scorecards of the case: `cases/*/scorecard.md` for single initiatives and
+`cases/<group>/feature-cards/*.md` for a group of related initiatives (`templates/case-structure.md`). Extract from
 each scorecard:
 
 ```yaml
@@ -21,22 +30,23 @@ feature:
   initiative_type: ""         # migration | new_feature | enhancement | bug_fix
   deadline: ""                # From critical path overview or scorecard
   sprint_ready: true/false    # From Refinement status table
-  pip_cycle_status: ""        # From Signal to Ship cycle table (if exists)
+  cycle_status: ""            # From Signal to Ship cycle table (if exists)
 
   dependencies: []            # From ## Dependencies section
   blockers: []                # From parity scan gaps, delivery gaps, or open questions
 
   scores:
-    brice: null               # From BRICE+ score if calculated
-    canny_votes: 0            # From signal sources
-    canny_insights: 0
-    jira_bugs_direct: 0
+    method: ""                # rice | ice | wsjf | moscow | value_effort | custom | gut_check
+    score: null               # The pass 1 (or pass 2) score or category, from the Prioritization table
+    feedback_votes: 0         # From signal sources
+    feedback_insights: 0
+    tracker_bugs_direct: 0
 
   delivery:
     backend: ""               # Not started | Partial | Complete
     frontend: ""
     embed_surface: ""
-    jira_stories: ""
+    tracker_stories: ""
     qa_execution: ""
 
   risk_level: ""              # Derived: low | medium | high | critical
@@ -84,23 +94,17 @@ Show which features depend on which:
 ```
 ## Dependencies
 
-Contacts Sync
-  └── Quick Checkout (Contact pre-fill)
-  └── Quick Renewal (Contact pre-fill)
-  └── Checkout Wizard (customer lookup)
-  └── Renewal Online (visitor registration)
+Shared sync service
+  └── Feature A (contact pre-fill)
+  └── Feature B (contact pre-fill)
+  └── Feature C (customer lookup)
 
-Checkout Wizard backend
-  └── Quick Checkout (reuses same domain)
-  └── POS Checkout (shared Order model)
+Order backend
+  └── Feature A (reuses the same domain)
+  └── Feature D (shared Order model)
 
-Renewal Buy backend
-  └── Quick Renewal (reuses same domain)
-  └── POS Renewals (shared Subscription model)
-  └── Gift Renewal POS (extends POS Renewals Release 4)
-
-Embeddability contract
-  └── All embed-integrated features (complete, no longer blocking)
+Embedding contract
+  └── All embedded features (complete, no longer blocking)
 ```
 
 ### 4. Blocker inventory
@@ -112,11 +116,11 @@ List all blockers across all features, deduplicated:
 
 | Blocker | Affects | Owner | Status |
 |---------|---------|-------|--------|
-| FR-2201 security (2 Critical) | Renewal Online | Engineering | Open |
-| ENV-QC-001 (payment-provider sandbox) | Quick Checkout QA | QA + Payments | Open |
-| ENV-QC-002 (CRM org integration) | Quick Checkout QA | QA + Engineering | Open |
-| Contacts Domain Migrator | Contacts Sync | Engineering | Not started |
-| Outbound sync (V2→CRM) | Contacts Sync | Engineering | Not started |
+| Security findings (2 critical) | Feature C | Engineering | Open |
+| Payment-provider sandbox | Feature A QA | QA + Payments | Open |
+| Test organization integration | Feature A QA | QA + Engineering | Open |
+| Data migrator | Shared sync service | Engineering | Not started |
+| Outbound sync | Shared sync service | Engineering | Not started |
 ```
 
 ### 5. Recommended build order
@@ -127,41 +131,34 @@ Based on dependencies and blockers, propose a build order:
 ## Recommended build order
 
 ### Wave 1: Foundation (unblocks everything else)
-- Contacts Sync: inbound is ready, outbound + migrator needed
-- Checkout Wizard backend: shared domain for Quick Checkout and POS
+- Shared sync service: inbound is ready, outbound + migrator needed
+- Order backend: shared domain for Feature A and Feature D
 
-### Wave 2: CRM entry points (embed integrations)
-- Quick Checkout + Quick Renewal (shared Quick Entry, refactor embed wiring)
-- Checkout Wizard embed (own entry point per FR-2100)
-- Renewal Buy Individual (extends Quick Renewal pattern)
+### Wave 2: Entry points
+- Feature A + Feature B (shared entry, refactor the embedding)
 
-### Wave 3: POS features
-- POS Checkout (app shell exists, add checkout slice)
-- POS Renewals (add renewal slice)
-- POS Contacts (add contacts slice)
-- Gift Renewal POS (Release 4, after POS Renewals base)
-
-### Wave 4: Extensions
-- Renewal Buy Family + Corporate (extend Individual pattern)
-- Renewal Online (blocked by FR-2201, resolve first)
+### Wave 3: Extensions
+- Feature D (extends the Feature A pattern)
+- Feature C (blocked by the security findings, resolve first)
 
 ### Parallel track
-- Contacts Sync outbound (can develop while Waves 1-2 proceed)
+- Shared sync service outbound (can develop while Waves 1-2 proceed)
 ```
 
-### 6. BRICE+ ranking (if scores exist)
+### 6. Priority ranking (if scores exist)
 
-If any features have BRICE+ scores calculated, show a ranked comparison:
+Rank only items scored with the **same method**. If the scored items used different methods, group them by method
+and do not compare scores across groups (a RICE number and an ICE number are not comparable). MoSCoW items are
+grouped by category, not ranked.
 
 ```
-## Priority ranking (BRICE+)
+## Priority ranking (Method: {method})
 
-| Rank | Feature | Score | Key driver |
-|------|---------|-------|------------|
+| Rank | Feature | Score (range) | Confidence | Key driver |
+|------|---------|---------------|------------|------------|
 ```
 
-If no scores exist, note: "No BRICE+ scores calculated. Features are ordered by
-dependency and blocker analysis."
+If no scores exist, note: "No scores recorded. Features are ordered by dependency and blocker analysis."
 
 ### 7. Timeline risk
 
@@ -192,11 +189,11 @@ However, if the PM requests it, the orchestrator can write a snapshot to
 
 ## Adapting for other organizations
 
-The roadmap view reads whatever scorecards exist. It does not assume Acme-specific
+The roadmap view reads whatever scorecards exist. It does not assume any organization-specific
 structure beyond what's in the scorecard template. To adapt:
 
 1. Use the `templates/feature-scorecard.md` template for your features
-2. Add a `cases/<your-project>/` directory with scorecards
+2. Keep each initiative in `cases/<feature>/` (or a group in `cases/<your-project>/`) with its scorecard
 3. Run `/signal-to-ship roadmap <your-project>`
 4. Customize risk derivation rules if your risk model differs
 
@@ -204,6 +201,6 @@ structure beyond what's in the scorecard template. To adapt:
 
 This view is a read mode for the PM. The page that leadership and the go-to-market leads see is the roadmap
 artifact in `templates/roadmap-review.md` (Part 2), produced at Gate 2 after a roadmap review. It carries the
-ranked initiatives, their scores, the decision (build now, backlog, archive) and the reason, worded as outcomes
+ranked initiatives, their method and scores, the decision (build now, backlog, archive) and the reason, worded as outcomes
 rather than feature promises and without delivery dates. Generate it from the same scorecards this view reads;
 share it only after the PM approves.

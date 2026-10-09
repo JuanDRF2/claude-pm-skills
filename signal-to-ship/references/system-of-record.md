@@ -1,12 +1,18 @@
 # System-of-Record Migration Plan
 
-Version: 1.0.0 | Updated: 2026-10-02
-
 How Signal to Ship's data moves from local files and scattered tools toward **one product
 system of record** (in the reference setup, the product taxonomy server), without ever making
 the cycle depend on it. This is a plan for the *integration*, not for building that server.
 
-> **The cycle works today with zero extensions.** It uses local Markdown, the configured
+## Contents
+
+- The model: value entity vs work item
+- Where each datum lives
+- Stages A to E
+- What does not change
+- Dependencies and safety notes
+
+> **The cycle works with zero extensions.** It uses local Markdown, the configured
 > tracker and the docs platform as workarounds. Each stage below only improves it.
 
 ## The model: value entity vs work item
@@ -39,7 +45,7 @@ Consequences:
 | Bugs / known issues | The tracker (e.g. Jira), via the `issue_tracker` slot | Known-issue records in the system of record |
 | Hypothesis, signal summary, advisory feedback, adoption threshold, agent surface, implementation class, onboarding notes | Local scorecard + state file | Fields on the journey |
 | Success metric, baseline, measured value, adoption status and check date | Scorecard + manual check | Fields on the journey |
-| Priority score, scope in/out, alternatives, appetite, squad, lane, type | State file | Fields on the initiative |
+| Prioritization method, scores (pass 1 and pass 2), scope in/out, alternatives, appetite, squad, lane, type | State file | Fields on the initiative |
 | Delivery templates | Local `templates/` | Versioned template library |
 | Release artifacts and their publication record | Docs platform + chat | Artifact records linked to the journey |
 
@@ -66,12 +72,12 @@ disable the tracker adapter; Step 3 of `references/signal-collection.md` already
 **The system ships:** type (required enum) plus score, appetite, squad, lane, scope in/out,
 alternatives, and a `rolled_back` stage.
 **Signal to Ship changes:** at Gate 0, create the initiative (type from the initiative-type
-question); at Gate 2 write the score; at Gate 3 write scope decisions.
+question); at Gate 2 write the pass 1 record and at the end of Phase 5 the pass 2 record; at Gate 3 write scope decisions.
 
 ### Stage D: Squad capacity and template library
 **The system ships:** per-squad capacity and WIP limits, and a versioned template library.
 **Signal to Ship changes:** read templates from the library with a local fallback; warn at
-Phase 2 when the target squad is over its WIP limit.
+pass 1 when the target squad is over its WIP limit.
 
 ### Stage E: Release artifacts linked to the journey
 **Depends on:** Stage B.

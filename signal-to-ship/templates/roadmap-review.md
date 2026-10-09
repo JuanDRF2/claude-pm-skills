@@ -1,6 +1,6 @@
 # Roadmap review: {cycle or quarter}
 
-> Two parts. Part 1 is the pre-read for the review (before Phase 2 scoring). Part 2 is the roadmap artifact,
+> Two parts. Part 1 is the pre-read for the review (before pass 1 of prioritization). Part 2 is the roadmap artifact,
 > produced after Gate 2 and shared only when the PM approves it.
 
 ## Part 1: Candidates for the cycle
@@ -21,14 +21,15 @@ Prepared by: {PM} · Review date: {date} · Participants: {leadership, GTM leads
 
 ## Part 2: Roadmap (after Gate 2)
 
-Decided by: {PM} on {date} · Framework: {BRICE+ | other}
+Decided by: {PM} on {date} · Method: {method}
 
-| Rank | Initiative | Outcome it should move (baseline -> target) | Score | Decision | Why |
+| Rank | Initiative | Outcome it should move (baseline -> target) | Score (range) | Decision | Why |
 |------|-----------|----------------------------------------------|-------|----------|-----|
 | 1 | | | | build now | |
 | 2 | | | | backlog | |
 | 3 | | | | archive | |
 
+- Rank only initiatives scored with the same method; group the others by method.
 - **Build now:** starts Phase 3. **Backlog:** keeps its score and waits; revisit next cycle. **Archive:** a recorded
   stop with its reason.
 - Word each line as the outcome we are working on ("shorten checkout for front-desk staff"), not as a promise of

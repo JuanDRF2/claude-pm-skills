@@ -53,7 +53,7 @@
 
 ---
 
-## 4. Why Acme?
+## 4. Why {Company}?
 
 ### Key Differentiators
 
@@ -61,9 +61,9 @@
 - **{Differentiator}:** {Why it's different/better}
 - **{Differentiator}:** {Why it's different/better}
 
-### The Acme Advantage
+### The {Company} Advantage
 
-{1 to 2 sentences explaining why having this capability inside Acme is valuable
+{1 to 2 sentences explaining why having this capability inside {Company} is valuable
 compared with a standalone product or the customer's current process.}
 
 ---

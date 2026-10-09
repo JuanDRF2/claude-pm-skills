@@ -1,5 +1,17 @@
 # Signal to Ship Architecture
 
+## Contents
+
+- Construction model
+- Component map
+- Paths and Gate 0
+- Depth modes
+- State persistence (cases folder, hooks, scheduled checkpoints, resume)
+- Patterns applied
+- Slot contracts for portability
+- Data flow
+- Pluggable tool slots
+
 ## Construction model
 
 Signal to Ship is not a traditional software project. It's an AI-first workflow system where:
@@ -8,33 +20,34 @@ Signal to Ship is not a traditional software project. It's an AI-first workflow 
 - **Markdown** is the data layer (version-controlled, portable)
 - **GitHub** is the collaboration layer (PRs for review, CI for validation)
 
-## Component map (v0.2.0)
+## Component map
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│                    Signal to Ship Orchestrator                        │
-│         SKILL.md                   │
-│         + 4 references (loaded on demand)                  │
+│                 Signal to Ship Orchestrator                │
+│                         SKILL.md                           │
+│            + references (loaded on demand)                 │
 ├──────────────────────────────────────────────────────────┤
 │                                                            │
 │  ┌───────────────┐  ┌───────────────┐  ┌───────────────┐  │
-│  │ signal-       │  │ priority-     │  │ audience-     │  │
-│  │ collection.md │  │ calculator.md │  │ views.md      │  │
+│  │ environment-  │  │ priority-     │  │ audience-     │  │
+│  │ check.md      │  │ calculator.md │  │ views.md      │  │
 │  └───────┬───────┘  └───────┬───────┘  └───────┬───────┘  │
 │          │                  │                   │          │
 │  ┌───────┴──────────────────┴───────────────────┴───────┐ │
 │  │           specialist-contracts.md                     │ │
-│  │     15 slot definitions across 7 phases               │ │
+│  │   15 slot definitions across 7 phases, each with      │ │
+│  │   a declared fallback                                 │ │
 │  └──────────────────────────────────────────────────────┘ │
 │                                                            │
-│  Gate 0 ──> Gate 1 ──> Gate 2 ──> ... ──> Gate 7          │
-│  (type)    (signals)  (priority)         (measurement)    │
+│  Environment check -> Gate 0 -> Gate 1 -> ... -> Gate 7    │
 │                                                            │
-│  State: signal-to-ship-state-{feature}.md (resume protocol)          │
+│  State: cases/<feature>/00-signal-to-ship-state.md         │
 │                                                            │
 ├──────────────────────────────────────────────────────────┤
 │                    MCP Layer                                │
-│  taxonomy-system │ Canny │ Jira │ Notion │ JTBD Mgr │ GitHub │
+│  whatever the session can see: feedback tool, tracker,     │
+│  docs platform, source control, taxonomy, chat             │
 ├──────────────────────────────────────────────────────────┤
 │                  Knowledge Layer                           │
 │  Markdown files │ Git history │ Templates │ Feature cards  │
@@ -43,41 +56,54 @@ Signal to Ship is not a traditional software project. It's an AI-first workflow 
 
 ### Orchestrator references
 
-The orchestrator loads references on demand, not all at once:
+The orchestrator loads references on demand, not all at once. The full index, with when to read each one, is in
+`SKILL.md`. The main ones:
 
 | Reference | Purpose | Loaded when |
 |-----------|---------|-------------|
-| `signal-collection.md` | Query plan for Canny, Jira, taxonomy, competitive research | Phase 1 (Signals) |
-| `priority-calculator.md` | 5 scoring frameworks (BRICE+, RICE, MoSCoW, WSJF, ICE) | Phase 2 (Prioritization) |
-| `audience-views.md` | 10 audience definitions, applicability matrix, publication destinations | Phase 6 (Delivery) |
+| `environment-check.md` | What the session can see, what is missing, one question | First message of a session |
+| `guided-flow.md` | Gate-opening format, wording rules, orientation, template registry | Opening any gate; before any document |
+| `signal-collection.md` | Query plan for the feedback tool, tracker, taxonomy, competitive research | Phase 1 (Signals) |
+| `priority-calculator.md` | Six methods, two passes, the PM always chooses | Gate 2 and the end of Phase 5 |
+| `audience-views.md` | Audience definitions, applicability matrix, publication destinations | Phase 6 (Delivery) |
+| `going-back.md` | Reopen a stop, repeat a gate, backlog, notify a requester | Resume, or when the PM wants to go back |
 | `specialist-contracts.md` | 15 slot contracts with inputs, outputs, required MCP, fallbacks | Any specialist dispatch |
 
 ## Paths and Gate 0
 
-The orchestrator follows 5 paths determined by initiative type (Gate 0). The PM selects the initiative type in plain language; this gates every subsequent phase.
+The orchestrator follows 5 paths determined by initiative type. Gate 0 is one message that shows what was found, the
+reading of the type, the route in one line, and the depth; the PM answers "ok" or says what is different. This gates
+every subsequent phase.
 
-| Path | Initiative type | Phases included |
-|------|----------------|-----------------|
-| 1 | New feature (visual) | Signals, Prioritization, Specification, Prototyping, Refinement, Delivery, Measurement |
-| 2 | New feature (backend) | Signals, Prioritization, Specification, Refinement, Delivery, Measurement |
-| 3 | Bug fix | Signals (lightweight), Refinement, Delivery |
-| 4 | Migration / parity | Signals (with Legacy Analysis), Specification, Refinement, Delivery, Measurement |
-| 5 | Contractual urgent | Signals, Specification, Delivery |
+| Path | Initiative type | Gates (Gate 0, the route message, is not counted) |
+|------|----------------|-------|
+| 1 | New feature or improvement (visual) | 1 to 7 (7 gates) |
+| 2 | New feature or improvement (backend) | 1 to 3, 5 to 7 (6 gates) |
+| 3 | Bug fix | 1, 5, 6 (3 gates) |
+| 4 | Migration / parity | 1, 3, 5, 6, 7 (5 gates) |
+| 5 | Contractual urgent | 1, 3, 6 (3 gates) |
 
 Parity scan is a lightweight mode that checks a batch of features against V1 or a reference implementation without running the full cycle. Used before sprint planning.
 
 ## Depth modes
 
-Process is right-sized to the work. After the initiative type, the PM confirms a depth:
+Process is right-sized to the work. At Gate 0 the PM confirms a depth:
 **light** (bug fixes, small changes), **standard** (default) or **full** (any risk >= 4,
 contractual or cross-team work, any feature with a model). Depth decides which steps and which
-Gate 1/3 requirements apply, and it can only be upgraded automatically.
+Gate 1/3 requirements apply, and it can only be upgraded automatically. A missing specialist never lowers it.
+`SKILL.md` defines Light phase by phase in one table.
 
 ## State persistence
 
-After every gate, the orchestrator writes `00-signal-to-ship-state.md` in the case folder using the template in `templates/signal-to-ship-state.md`. The file starts with a YAML frontmatter block (a small YAML subset: two-space nesting, scalars, inline lists) that is the machine-checked source of truth: identity, depth, gate statuses with reasons, problem/hypothesis/risks, scope, spec decisions, eval-plan status, delivery and checkpoint dates. The body holds collected data, gaps, proposals, delivery tracking, the checkpoint log and a decision log of what the orchestrator did on the PM's approval.
+After every gate, the orchestrator writes `00-signal-to-ship-state.md` in the initiative's folder,
+`cases/<feature>/`, using the template in `templates/signal-to-ship-state.md` (`templates/case-structure.md` has the
+layout). If the working directory already holds that file, it is used and not nested. The file starts with a YAML
+frontmatter block (a small YAML subset: two-space nesting, scalars, inline lists) that is the machine-checked source
+of truth: identity, depth, gate statuses with reasons, environment, prioritization passes, problem/hypothesis/risks,
+scope, spec decisions, eval-plan status, delivery and checkpoint dates. The body holds collected data, gaps,
+proposals, delivery tracking, the checkpoint log and a decision log of what the orchestrator did on the PM's approval.
 
-`node "${CLAUDE_SKILL_DIR}/scripts/validate-state.mjs" <state-file>` enforces: gates only pass in path order, skipped gates carry a reason, any risk >= 4 means full depth, each gate has the fields its depth requires, AI features have the eval plan approved before Gate 3 and executed before Gate 6, and Day-14/30/60 checkpoint windows are justified when changed. It also prints any checkpoint that is due.
+`node "${CLAUDE_SKILL_DIR}/scripts/validate-state.mjs" <state-file>` enforces: gates only pass in path order, skipped gates carry a reason, any risk >= 4 means full depth, each gate has the fields its depth requires, AI features have the eval plan approved before Gate 3 and executed before Gate 6, a passed Gate 2 records the method and the pass 1 decision, Gate 6 does not pass without pass 2, and Day-14/30/60 checkpoint windows are justified when changed. It also prints a stopped or backlog initiative and any checkpoint that is due.
 
 ### Hooks (guard rails, not blockers)
 
@@ -87,80 +113,65 @@ Two hooks run in Claude Code (configured in `.claude/settings.json`, scripts in 
 
 The orchestrator is pull-based: it only notices a due checkpoint when the PM returns. To make measurement proactive, schedule a recurring agent (for example with the `/schedule` skill) that runs weekly, opens each case folder, runs `validate-state.mjs --today <date>`, and posts any `DUE` lines to the PM. Optionally add a second weekly routine that re-runs signal collection for features in Gates 1-3. Both routines only **read** and **report**; they never write to shared systems.
 
-**Resume protocol:** When starting a new session, the orchestrator checks for an existing state file. If found, it states what was completed and asks the PM whether to resume or restart. Passed gates are skipped; the last gate summary is re-confirmed before advancing. Two things come first: an `ASK` line (the planned delivery date passed and `delivery.deployed_on` is empty, so ask whether and when it shipped, then run the post-deploy step) and any `DUE` checkpoint. Checkpoints are anchored on `delivery.deployed_on`, falling back to the planned `delivery.delivery_date` until the deploy is confirmed.
+**Resume protocol:** When starting a new session, the orchestrator finds the saved progress and checks it. In order it surfaces: a stopped or backlog initiative (one question), an `ASK` line (the planned delivery date passed and `delivery.deployed_on` is empty, so ask whether and when it shipped, then run the post-deploy step), and any `DUE` checkpoint. Then it recaps in at most 3 lines and continues with the next open step. Checkpoints are anchored on `delivery.deployed_on`, falling back to the planned `delivery.delivery_date` until the deploy is confirmed.
 
-## Anthropic patterns applied
+## Patterns applied
 
 | Pattern | How we use it |
 |---------|--------------|
 | AGENTS.md as load-bearing | Routes all work, defines gates and contracts |
-| Verification first | Every phase has a check (Judge, taxonomy sync, TestId coverage) |
-| Credential-free defaults | All local work runs without AWS keys or API tokens |
+| Verification first | Every phase has a check (judge or self-check, taxonomy sync, TestId coverage) |
+| Credential-free defaults | All local work runs without API tokens |
 | Fan-out-and-synthesize | Orchestrator coordinates specialist skills |
 | Contextual RAG | Knowledge chunks enhanced with product context before retrieval |
 | Session memory | Auto-compaction + intentional artifact persistence in memory files |
-| Investigate before asking | Orchestrator researches code, tools, data before posing questions to PM |
-
-## Acme patterns reused
-
-| Pattern | Source | How we reuse it |
-|---------|--------|----------------|
-| Fan-out orchestrator | story-to-test-workflow | Signal to Ship orchestrator follows same dispatch pattern |
-| CLAUDE.md → AGENTS.md | AcmeBackend | Delegation, never duplication |
-| Branch naming | iris | Meaningful branch names for context |
-| Ports-and-adapters | atelier | Credential-free local development |
-| Knowledge bundles | Acme JTBD Manager | Markdown + YAML frontmatter for portable knowledge |
-| MCP for structure | taxonomy-system | Real-time product structure queries |
+| Investigate before asking | Orchestrator researches code, tools, data before posing questions to the PM |
+| Decide before investing | Prioritization in two passes: a rough score before specifying, a re-score with the real effort before delivery |
 
 ## Slot contracts for portability (15 slots)
 
 Every specialist the orchestrator dispatches is a slot with a defined contract: input, output, required MCP tools, quality gate, portability notes, and fallback. See `references/specialist-contracts.md` for the full definitions.
 
-| Slot | Phase | Default (Acme) |
-|------|-------|-------------------|
+| Slot | Phase | Example binding |
+|------|-------|-----------------|
 | signal-collector | Signals | Built-in |
 | competitive-researcher | Signals | Built-in (WebSearch) |
 | legacy-analyzer | Signals | Built-in (repo access) |
-| priority-scorer | Prioritization | Built-in (BRICE+) |
+| priority-scorer | Prioritization | Built-in (6 methods, two passes) |
 | spec-writer | Specification | mini-spec-writer (prd-writer for cross-team scope) |
 | competitive-teardown | Specification | competitive-teardown skill (fallback: WebSearch) |
-| prototype-builder | Prototyping | /prototype |
-| refinement-orchestrator | Refinement | story-to-test-workflow |
-| refinement-judge | Refinement | refinement-judge |
-| ticket-writer | Delivery | jira-story-publisher |
+| prototype-builder | Prototyping | mockup-builder (fallback: text storyboard) |
+| refinement-orchestrator | Refinement | story-to-test-workflow (fallback: compact refinement package) |
+| refinement-judge | Refinement | refinement-judge (fallback: orchestrator self-check plus PM review) |
+| ticket-writer | Delivery | jira-story-publisher (fallback: paste-ready tickets) |
 | taxonomy-sync | Delivery | sync-refinement-package-taxonomy |
 | template-filler | Delivery | Built-in |
 | release-notes-writer | Delivery | release-notes-writer skill (fallback: templates) |
 | metric-designer | Measurement | Built-in |
 | eval-designer | Specification (AI features only) | Built-in |
 
-To adapt for another organization: replace the "Default" column with your tools. The contract column in specialist-contracts.md defines what the slot requires. Any skill that fulfills the contract can fill the slot.
+To adapt for another organization: replace the "Example binding" column with your tools. The contract column in specialist-contracts.md defines what the slot requires. Any skill that fulfills the contract can fill the slot.
 
 ## Data flow
 
-1. **Signals** arrive from 5 channels → collected by orchestrator using signal-collection.md queries
-2. **Prioritization** scores signals using priority-calculator.md framework
-3. **Specs** created for prioritized items → linked to existing refinement packages or created fresh
-4. **Refinement** produces stories + QA → stored in AcmeDocumentation (or domain repo)
-5. **Delivery** pushes to Jira + Taxonomy + Design Hub → templates selected by initiative type
-6. **Measurement** configured (Survey + Pendo) → 3 metric categories, TestIds, CES triggers
-7. **Feedback** collected → routed back to Signals
-8. **State** persisted after every gate → `signal-to-ship-state-{feature}.md` enables resume
-
-## Future: RAG implementation
-
-When knowledge base grows enough:
-- Use contextual RAG (Anthropic pattern): prepend document context to each chunk
-- Embed with product taxonomy tags for filtered retrieval
-- Store in local vector DB (e.g., ChromaDB) or use Claude's native context
-- Priority: signal history, decision rationale, past mistakes (known issues)
+1. **Environment check** reads the session's tools and the organization config, and tells the PM what is connected and what is missing.
+2. **Gate 0** confirms the type, the route and the depth in one message; the progress is saved in `cases/<feature>/`.
+3. **Signals** arrive from up to 5 channels → collected by the orchestrator using signal-collection.md queries.
+4. **Pass 1 of prioritization** (Paths 1 and 2): the PM chooses a method; a rough score with the effort as a range ends in build now / backlog / archive.
+5. **Specs** created for prioritized items → linked to existing refinement packages or created fresh.
+6. **Refinement** produces stories + QA coverage, from the specialist or the compact package, checked by the judge or the self-check.
+7. **Pass 2 of prioritization** re-scores with the real effort from the refined stories; the PM confirms, changes or sends the item back to the backlog. Only then is the handoff to Dev and QA proposed.
+8. **Delivery** pushes to the tracker, the docs platform and (if configured) the taxonomy → templates are chosen by the PM from the defaults by initiative type.
+9. **Measurement** configured (survey + analytics) → metric categories, TestIds, CES triggers; Gate 7 may close provisional with an open action.
+10. **Feedback** collected → routed back to Signals.
+11. **State** persisted after every gate → `cases/<feature>/00-signal-to-ship-state.md` enables resume.
 
 ## Pluggable Tool Slots
 
 Signal to Ship does not hardcode any specific tool. Each integration is a "slot" with:
 - **Type:** what role it fills (issue tracker, feedback tool, taxonomy, etc.)
 - **Adapter:** how it connects (MCP, API, webhook, manual)
-- **Default:** the Acme-preconfigured tool
+- **Example:** a preconfigured tool in the sample config
 - **Alternatives:** what another company could use instead
 
 See `integration-map.md` for the complete slot registry (tool-level slots) and `specialist-contracts.md` for the specialist-level slots (15 contracts covering all 7 phases).
@@ -170,37 +181,5 @@ See `integration-map.md` for the complete slot registry (tool-level slots) and `
 Between Specification and Refinement, Signal to Ship includes an optional Prototyping phase:
 - The orchestrator suggests it when the feature has a visual component
 - Automatically skipped for bugs, backend changes, tech debt
-- Uses `/prototype` skill (Acme: builds clickable screens with real design system on ephemeral URLs)
-- **Post-approval flow:** When a prototype is approved:
-  1. DS Gap Report: identifies components used that don't exist in the design system
-  2. Component spec draft: inferred props, observed variants, usage context
-  3. Issue/ticket in the issue tracker for Engineering to prioritize creation
-- Note: DS Gap Report is Acme-specific (requires code-based prototype). Companies using Figma would handle this manually or skip it.
-
-## Web App Roadmap
-
-| Version | Interface | Notes |
-|---------|-----------|-------|
-| v0.1.0 | Docs + diagrams only | Complete |
-| v0.2.0 | CLI (Claude Code) | Complete. Orchestrator functional, tested on Quick Checkout. |
-| v0.3.0 | Web app MVP | Like taxonomy.acme.example |
-| v1.0.0 | Full web app | First production cycle |
-
-The web app will follow the same patterns as existing Acme tools (taxonomy.acme.example, atelier.acme.example): Next.js, design system integration, MCP for AI backbone.
-
-## BRICE+ Data Sources
-
-| Variable | Auto-collectible | Source | Manual input needed |
-|----------|-----------------|--------|-------------------|
-| Reach | Yes | Canny: User count + Company count | — |
-| Signals depth | Yes | Canny: Votes, Insights, Themes, Board | — |
-| Bug severity | Yes | Jira: count + severity + linked support cases | — |
-| Impact | Partial | Auto: votes + insights | Business impact (PM) |
-| ChurnRisk | Partial | Auto: MRR of requesting companies | Real churn risk (CSM/Sales) |
-| NewARR | No | — | Blocked deals (Sales) |
-| Expansion | No | — | Enabled upsells (CSM) |
-| NPS | No (future) | — | Survey Tool (when connected) |
-| Confidence | No | — | PM judgment |
-| Effort | No | — | Engineering estimate |
-
-The orchestrator pre-fills auto-collectible data and guides manual collection with role-specific questions.
+- Uses the prototype-builder slot: a prototype tool if one is visible, `mockup-builder` if installed, else a text storyboard the PM builds in any tool
+- Skipping needs a recorded reason and is not allowed when the usability risk is 4 or more

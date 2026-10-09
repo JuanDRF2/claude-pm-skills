@@ -1,11 +1,20 @@
 # Phases 4-7 Reference
 
 Detailed instructions for the orchestrator's later phases. Loaded on demand when
-the cycle reaches Phase 4 or later.
+the cycle reaches Phase 4 or later. Open every gate with the format in `references/guided-flow.md`.
+
+## Contents
+
+- Phase 4: Prototyping
+- Phase 5: Refinement (sizing, specialist or fallback, judge or self-check, pass 2, handoff)
+- Pre-Release Readiness
+- Phase 6: Delivery (templates, compact Gate 6 at Light, rollout, launch readiness)
+- Post-deploy
+- Phase 7: Measurement (Light short form, Gate 7 provisional)
 
 ## Phase 4: Prototyping (optional)
 
-**Goal:** Build a clickable prototype, validate it with stakeholders, iterate until approved.
+**Goal:** Build a clickable prototype (or a storyboard), validate it with stakeholders, iterate until approved.
 
 **Orchestrator behavior:**
 - Always run it when: a new feature with a visual component (Path 1), or `risks.usability` >= 4
@@ -13,12 +22,20 @@ the cycle reaches Phase 4 or later.
   Ask: "This changes what people see. Do you want a prototype to validate it?" If the PM declines, skip with a
   recorded reason in `gate_reasons.prototyping`
 - Skip when: backend-only, bug fix, contractual, a migration with no visible change, or the PM declines
+- Light: only if the PM wants one. The end-user question below is still asked, in one line.
 
 **If executed:**
 
-Step 1 — Build:
-- Invoke /prototype skill with the spec as context
-- Claude builds the prototype and deploys to ephemeral URL
+Step 1 — Build (the prototype-builder slot):
+- If the slot names a prototype skill or tool and it is visible in the session, use it with the spec as context.
+- Otherwise use the fallback (`references/specialist-contracts.md`, prototype-builder): `mockup-builder` if it is
+  installed; else a **text storyboard**: numbered screens, each with what the user sees and does, plus a validation
+  checklist, that the PM builds in any tool. Say in one line which one you are using and what it changes.
+- Skipping the prototype needs a recorded reason (`gate_reasons.prototyping`) and is not allowed when the usability
+  risk is 4 or more.
+- Optional extension: an organization whose prototype tool can check components against its design system can turn
+  on a design-system gap report with `prototype_builder.config.ds_gap_report: true` in its slot config. It is off by
+  default and not part of the generic flow.
 
 Step 2 — Validation planning:
 - Ask: "Who needs to validate this prototype?"
@@ -45,11 +62,6 @@ Step 4 — Iterate (loop until validated):
 - If blocking: escalate to PM for decision
 - Repeat until all stakeholders approve or PM makes a call
 
-Step 5 — Post-validation (Acme-specific):
-- Generate DS Gap Report: components in proto not in @acme/design-system
-- Generate component spec drafts
-- Create issue tickets in issue tracker (slot)
-
 **Gate 4, decision point.** When feedback is in, ask the PM to choose. Stakeholder approvals the PM reports,
 and even "close Gate 4", are inputs, not the choice: ask the three-way question explicitly and close the gate
 only after the answer.
@@ -60,9 +72,12 @@ only after the answer.
 
 On *validated*, in the same message, propose the feedback request or validation message (audiences and timing in
 `references/audience-views.md`): who receives it, the prototype link, the specific question ("click through and
-tell us what is missing for your work"). Show it with the recipient list. The PM answers **approve / edit /
-skip**; nothing is sent without that answer. Use a direct message rather than a public channel when you want
-honest feedback.
+tell us what is missing for your work"). Show it with the default recipient list. The PM answers **approve / edit /
+skip** (skip first); nothing is sent without that answer. Use a direct message rather than a public channel when you
+want honest feedback. If the early heads-up was neither sent nor skipped at Gate 3, add it as item 2 of the same
+proposal; each item is approved, edited or skipped separately. A skipped item is never proposed again. Note sent
+or skipped in the decision log so this can be checked. At Light neither is proposed unless the PM asks. Confirm the
+destination is visible first (`references/guided-flow.md`, Destination check).
 
 The feedback request does not hold the gate. If it cannot go out yet (a missing prototype link, say), give the PM
 the ready-to-paste text, note in the narrative that it is pending and who sends it, and close the gate.
@@ -78,35 +93,72 @@ proposed (sent, skipped with a reason, or pending an input from the PM); OR phas
 
 - **Light (and Path 3, a bug fix):** do **not** dispatch `story-to-test-workflow`, `test-case-designer` or any
   multi-file refinement package. Write the refinement **inline**, in one message: a one-sentence story, 2 to 4
-  acceptance criteria in plain Given / When / Then, what to regression-check, and the out-of-scope line. Show
-  it to the PM, record it in the state file's narrative, and close Gate 5 on the PM's review (the judge slot's
-  fallback applies when it is disabled). A one-line fix does not need a story map, a split, or a QA package.
-- **Standard and Full:** use the specialist below.
+  acceptance criteria in plain Given / When / Then, what to regression-check, and the out-of-scope line, plus a
+  rough effort. Show it to the PM, record it in the narrative of the saved progress, and close Gate 5 on the PM's
+  review (record `refinement_mode.package: inline`, `judge: pm_review`). No template question is needed for the
+  inline refinement. On Paths 1 and 2, add pass 2 as one line before the handoff: "Still build now at about
+  {effort}? yes / change / backlog." A one-line fix does not need a story map, a split, or a QA package.
+- **Standard and Full:** use the specialist below, or its fallback when the specialist is not installed.
 
-**Orchestrator actions (Standard and Full):**
+**Orchestrator actions (Standard and Full), specialist installed:**
 - Invoke story-to-test-workflow as the specialist orchestrator for this phase
 - Pass all registered gaps from Specification phase as input
 - story-to-test-workflow handles its own internal gates (Gates 1-5)
-- Signal to Ship orchestrator waits for Judge PASS
+- Signal to Ship orchestrator waits for the judge verdict
+- Record `refinement_mode.package: specialist`
+
+**Orchestrator actions (Standard and Full), specialist NOT installed:** use the declared fallback and never lower
+the depth. Say in one line that the refinement specialist is not installed, that you will write a **compact
+refinement package**, and that the result is lighter. Ask which template to use (`references/guided-flow.md`,
+Template registry; the default is `templates/refinement-package.md`), write the package (stories with effort per
+story, 3 to 6 Given / When / Then criteria each, regression checks, test cases, traceability, coverage against the
+spec's outcomes, risks and open questions; at Full also the criteria axes), and record
+`refinement_mode.package: fallback`.
 
 **For existing packages (review + gap resolution):**
-- story-to-test-workflow reviews the package against Signal to Ship findings
+- The refinement specialist reviews the package against Signal to Ship findings
 - Resolves gaps registered in Specification phase
 - Generates proposals or applies changes (with PM authorization)
 
-**Gate 5, decision point.** After the judge runs, present the result:
+**The verdict.** With the judge installed and enabled, it runs and returns PASS, PASS WITH OBSERVATIONS or FAIL
+(record `refinement_mode.judge: specialist`). Otherwise the orchestrator runs its **self-check**: completeness,
+traceability, consistency, testability, and that every spec outcome has a story or a recorded non-goal. It gives the
+same three verdicts, labeled "checked by the orchestrator, not by an independent judge". When the Agent tool is
+available, run the self-check in a fresh subagent that receives only the spec and the package (no conversation) and
+returns the verdict and findings; note "self_check (fresh agent)" or "self_check (same context)" in the decision
+log. Then the PM reviews and
+approves; record it in the decision log ("judge unavailable: self-check + PM review", or "judge disabled by slot
+config") and set `refinement_mode.judge: self_check` (`pm_review` when the slot is disabled). FAIL still blocks the
+handoff.
+
+**Gate 5, decision point.** After the verdict, present the result:
 
 1. **PASS:** stories and QA coverage are complete. Proceed.
 2. **PASS WITH OBSERVATIONS:** proceed only after the PM has read the observations; record them and the risks they
-   carry in the state file's narrative and name them in the handoff.
+   carry in the narrative of the saved progress and name them in the handoff.
 3. **FAIL:** show the findings. The PM fixes and resubmits; nothing is handed off until PASS or PASS WITH OBSERVATIONS.
 
-On PASS, propose the **handoff to Dev and QA**: the stories, acceptance criteria and scenario counts, the test
-plan, dependencies, blockers and environment needs, delivered through the tracker slot and the refinement
-package. Show the counts and the blocker list, then ask **approve / hold**. The handoff is a write to a shared
-system, so the PM's approval of its content is what triggers it (invariant 14).
+**Pass 2 of prioritization (Paths 1 and 2, when Gate 2 recorded build now).** Right after the verdict and BEFORE
+the handoff is proposed, re-score with the real effort from the refined stories and ask the PM to confirm, change
+or send the item back to the backlog (`references/priority-calculator.md`, Pass 2). The handoff is a write to a
+shared system, so pass 2 comes first. If the PM chooses backlog, hold the handoff with the reason "back to backlog
+(pass 2)"; Gate 5 closes with the handoff held, the status stays active, and Gate 6 does not open. Gate 6 never
+opens without pass 2 on these paths. Paths 3 and 4 have no pass 2, and a saved case with no prioritization record
+skips it.
 
-**Gate 5:** refinement-judge PASS or PASS WITH OBSERVATIONS (risks recorded); handoff to Dev and QA sent, or held with a reason.
+**The handoff.** The Gate 5 handoff hands over the refinement package and a summary to Dev and QA. It does not
+create the Dev tickets: those are created once, at Gate 6, through the ticket-writer slot, and never twice. At Light
+there is no separate Gate 5 handoff: the Dev ticket in the compact Gate 6 is the handoff, and Gate 5 closes on the
+PM's review. On Standard and Full, on PASS (after pass 2 confirmed or changed), first check that the tracker is visible
+(`references/guided-flow.md`, Destination check; re-run the environment check in one line). If it is not, say so
+and make the proposal paste-ready text (use / edit / skip). Otherwise propose the **handoff to Dev and QA**: the
+stories, acceptance criteria and scenario counts, the test plan, dependencies, blockers and environment needs,
+delivered with the refinement package (a link or a comment, as the destination allows). Show the counts and the blocker list, then ask
+**approve / hold**. The handoff is a write to a shared system, so the PM's approval of its content is what triggers
+it (invariant 14).
+
+**Gate 5:** judge PASS or PASS WITH OBSERVATIONS (or the self-check plus PM review), risks recorded; on Paths 1 and 2,
+pass 2 recorded; handoff to Dev and QA sent, or held with a reason.
 
 ## Pre-Release Readiness (between Gate 5 and Gate 6)
 
@@ -148,10 +200,20 @@ does Gate 6 open.
 **Goal:** Push artifacts to all audiences.
 
 **Orchestrator actions:**
-- Invoke jira-story-publisher (or issue tracker equivalent) for Dev tickets
-- Invoke sync-refinement-package-taxonomy for taxonomy alignment
-- Select and fill the appropriate delivery template based on initiative type
+- Check the destinations are visible in this session (`references/guided-flow.md`, Destination check). A destination
+  that is not visible gets paste-ready text (use / edit / skip) instead of an approval question.
+- Use the ticket-writer slot (jira-story-publisher or the tracker equivalent) for Dev tickets, created once here; if a ticket already exists, link it instead of creating another
+- Use the taxonomy-sync slot for taxonomy alignment, only if a taxonomy system is configured
+- Ask which template to use before drafting each document (`references/guided-flow.md`, Template registry), then
+  select and fill the delivery template based on initiative type
 - Generate audience-specific views per `references/audience-views.md`
+
+**Compact Gate 6 (Light).** The Dev ticket here is the only handoff at Light. Do not run the full audience checklist, the rollout menu or the 7-line readiness check.
+In ONE message list only the artifacts that apply, each with its target and its text: the Dev ticket, the patch or
+release note, and a support heads-up if the change is customer-visible. The PM answers approve / edit / skip for
+each by number; an item with no answer is not executed. Assume the rollout is `all_at_once` and confirm it in the
+same message. Launch readiness is limited to the Dev and QA lines. Ask the template question once for the documents
+you will draft. Gate 6 closes when each item is published, skipped with a reason, or pending with an owner.
 
 **Gate-based communication.** Communication is tied to gates, not calendar dates. The full
 protocol (timing by gate, 5-question check, rollout types, rollback) lives in
@@ -235,11 +297,13 @@ approval triggers it. Each one gets its own answer, **approve / edit / skip**; r
 where and when), what was skipped and why, and what is still pending. One approval never covers the next artifact.
 
 **Gate 6:** All applicable audience artifacts generated AND published. Beta/rollout plan
-defined. Launch readiness confirmed (or blockers documented). Publication tracked for every artifact.
+defined. Launch readiness confirmed (or blockers documented). Publication tracked for every artifact. At Light, the
+compact Gate 6 above closes when each listed item is published, skipped with a reason, or pending with an owner.
 
 ## Post-deploy (after Gate 6, before measurement starts)
 
 A separate step, not part of Gate 6: the artifacts say what is coming; this confirms that it arrived.
+At Light: ask for the deploy date, and propose an announcement only if the change is customer-visible.
 
 1. **Confirm it is live.** Ask: "Is it live in production? On what date?" Record `delivery.deployed_on`. If the
    date differs from `delivery.delivery_date` (the plan), keep both: the plan stays as it was, the real date
@@ -249,8 +313,9 @@ A separate step, not part of Gate 6: the artifacts say what is coming; this conf
 3. **Propose the announcement** to the audiences that received the Gate 6 artifacts: what shipped, who it
    affects, how to explain the value, where to find the help article. Show the recipients and the text; the PM
    answers **approve / edit / skip**. Do this right after the deploy date is recorded, even when the launch
-   was weeks ago (say how long ago it was), and before configuring measurement. Record `delivery.announcement` as `sent`, or `skipped` with the
-   reason in `delivery.announcement_note` (an internal-only rollout has no external announcement).
+   was weeks ago (say how long ago it was), and before configuring measurement. Record `delivery.announcement` as
+   `sent`, or `skipped` with the reason in `delivery.announcement_note` (an internal-only rollout has no external
+   announcement).
 4. **Re-anchor the checkpoints** if they were already set from the planned date (Phase 7 below).
 
 **Rollback protocol.** If the PM reports a problem after deploy, offer the rollback notice at once, using
@@ -262,6 +327,10 @@ other communication. Mark the affected delivery rows `rollback_sent`, and route 
 
 **Goal:** Configure metrics and establish baseline.
 
+**Light short form.** Do not propose the five categories, TestIds or a survey unless the PM asks. Take the outcome
+metric (or one adoption sentence) the PM already gave, set the default checkpoints from the real deploy date, and
+close Gate 7. Everything below applies to Standard and Full.
+
 **Orchestrator actions:**
 
 0. **Start from what Phase 3 already decided.** The adoption threshold, the outcome metric (`outcome.*`) and the
@@ -269,7 +338,7 @@ other communication. Mark the affected delivery rows `rollback_sent`, and route 
    be measured and sets up the collection. If Phase 3 was skipped (a bug fix, say), propose metrics from scratch.
 1. Research industry best practices and competitor metrics for the feature domain
 2. Propose metrics organized in five categories:
-   - **Product & Engagement** (Pendo/TestIds): adoption rate, completion rate, time to
+   - **Product & Engagement** (your analytics tool, through TestIds): adoption rate, completion rate, time to
      complete, error rate, channel distribution
    - **Customer Success** (Survey Tool): CES for feature-level satisfaction (better than
      NPS for individual features), NPS for general satisfaction, recurring signup rate
@@ -341,7 +410,7 @@ When measurement data is available, the orchestrator:
    what is still missing as an open action with an owner and a date. Never hold a reported number back
    until a second one arrives: an unrecorded figure is a lost figure.
 
-   Dates are saved in state. The orchestrator is pull-based, so it also supports **scheduled
+   Dates are saved in your progress file. The orchestrator is pull-based, so it also supports **scheduled
    checkpoints** (a recurring agent that opens the case and surfaces due checkpoints; see
    `references/architecture.md`). When the PM returns to `/signal-to-ship <feature>`, three things come first, in
    this order: a planned delivery date that has passed with no `delivery.deployed_on` ("did it ship, and when?");
@@ -361,9 +430,14 @@ When measurement data is available, the orchestrator:
    Whatever the verdict, route the reasons and any user feedback back to Phase 1 as new signals.
    Under-used features carry a cost (maintenance, support, onboarding noise), so `retire` is a
    normal outcome. Record `measurement.adoption_d30` when checkpoint 2 is checked: it feeds the
-   portfolio view (`npm run portfolio`), which flags delivered features nobody has measured.
+   portfolio view (`node "${CLAUDE_SKILL_DIR}/scripts/portfolio.mjs"`), which flags delivered features nobody has measured.
    The validator requires the verdict once checkpoint 3 is in `measurement.checked`.
 
 **Gate 7:** Metrics defined (5 categories, AI Quality when applicable). TestIds assigned with
 event structure. Survey trigger configured. Baseline plan established. Hypothesis verifiable by
 the metrics. Checkpoints scheduled with windows justified.
+
+**Close Gate 7 provisional when instrumentation is not confirmed yet.** If the TestIds or the survey trigger are not
+confirmed in the product, do not hold the gate open. Close it `provisional` and write the open action, its owner and
+its date in `gate_reasons.measurement`. The checkpoints are still scheduled from `delivery.deployed_on`, so the
+clock starts anyway. The saved progress warns while the gate is provisional and a checkpoint date is missing.

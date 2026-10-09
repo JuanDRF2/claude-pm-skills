@@ -4,6 +4,15 @@ Instructions for the orchestrator to generate audience-specific deliverables in
 Phase 6 (Delivery). Each audience gets only the information they need, in the
 format they can act on.
 
+## Contents
+
+- Audience registry and applicability
+- Generation protocol (template question, fill, review, publish)
+- Audience view examples
+- Release Communication Protocol (timing by gate, the PM's decisions, Light, rollout types)
+- Advisory validation and publication tracking
+- Adapting for other organizations
+
 ## Audience registry
 
 | Audience | What they need | Data sources (Signal to Ship phases) |
@@ -43,13 +52,19 @@ and Sales are not applicable. Do you agree?"
 
 ## Generation protocol
 
-### Step 1: Select template
+### Step 1: Select template, and ask
 
-Based on initiative type, select the delivery template from `templates/`:
+Based on initiative type, select the default delivery template from `templates/`:
 - Migration: `migration-release-notes.md`
 - New feature: `release-notes.md`
 - Bug fix: `patch-notes.md`
 - Product-level: `product-marketing-spec.md`
+
+Before drafting, ask the template question naming the default file: "I am going to draft the {document}. Do you
+want the default template (`templates/release-notes.md`) or your own? If your own, paste it or give me the path."
+Use the PM's own template as given (keep their headings and order) and record the choice in `templates`
+(`references/guided-flow.md`, Template registry). Ask once per document type per case. Audience views use Part B of
+the chosen delivery template.
 
 ### Step 2: Fill template sections
 
@@ -83,7 +98,7 @@ For each applicable audience section in the template, pull data from Signal to S
 | Summary | Specification: scope summary in user language |
 | Setup steps | Implementation section (shared) |
 | How it works | Specification: main flows, rephrased for end users |
-| What the user sees | Prototyping: screenshots from proto or Design Hub |
+| What the user sees | Prototyping: screenshots from the prototype or the design tool |
 | Limitations | Support section (shared) |
 | FAQ | Support section (shared, filtered for end-user relevance) |
 
@@ -94,21 +109,24 @@ adjusts before publication.
 
 ### Step 4: Publish to destinations
 
-Each audience has a destination:
+Before proposing a publication, confirm the destination tool is visible in this session
+(`references/guided-flow.md`, Destination check). If it is not, give paste-ready text with use / edit / skip.
+
+Each audience has a destination. The table shows examples; use the destinations your configuration names:
 
 | Audience | Destination | Method |
 |----------|-------------|--------|
-| Dev | Issue tracker (Jira) | jira-story-publisher skill |
+| Dev | Issue tracker (for example Jira) | ticket-writer slot (for example the jira-story-publisher skill) |
 | QA | Refinement package (already there) | Part of story-to-test-workflow output |
-| Product | Taxonomy (taxonomy-system) | sync-refinement-package-taxonomy skill |
+| Product | Taxonomy system, if configured | taxonomy-sync slot (sync-refinement-package-taxonomy skill) |
 | Product (artifacts) | System of record, linked to the **journey** (the value entity), not to the work item | Record-only: the orchestrator publishes through its own connections, then records where and when (see `references/system-of-record.md`) |
-| CSM | Notion (Release Notes database) | Manual or Notion MCP |
-| Implementation | Notion (Release Notes subpage) | Manual or Notion MCP |
-| Support | CRM Knowledge (Knowledge Article) | Manual publish from draft |
-| Marketing | Notion (Product Marketing page) | Manual or Notion MCP |
-| Sales | Notion (Release Notes, Sales section) | Part of release notes |
-| C-Level | Roadmap (Notion or tool) | Manual update |
-| End User | CRM Knowledge (Knowledge Article) | Manual publish from draft |
+| CSM | Docs platform (for example a release-notes database) | Manual or the docs platform's connector |
+| Implementation | Docs platform (release-notes subpage) | Manual or the docs platform's connector |
+| Support | Knowledge base (for example the CRM's knowledge articles) | Manual publish from draft |
+| Marketing | Docs platform (product marketing page) | Manual or the docs platform's connector |
+| Sales | Docs platform (release notes, sales section) | Part of release notes |
+| C-Level | Roadmap (docs platform or roadmap tool) | Manual update |
+| End User | Knowledge base (knowledge article) | Manual publish from draft |
 
 The orchestrator generates the content. Publication to each destination requires
 separate authorization from the PM.
@@ -146,7 +164,7 @@ separate authorization from the PM.
 
 **What's changing:** Staff can now record a checkout directly from the Contact
 page in the CRM, without opening the full checkout wizard. The button says
-"Complete Checkout" (same as today), but the form is now powered by Acme 2.
+"Complete Checkout" (same as today), but the form is now powered by the new platform.
 
 **What stays the same:** The button location, the basic flow (select amount,
 choose payment method, submit). Existing order records are not affected.
@@ -182,7 +200,7 @@ Gate-based, not calendar-based ("3 weeks before" does not survive a slipped date
 | Gate / moment | Who to notify | What to send | Template / channel |
 |---------------|--------------|--------------|--------------------|
 | Gate 3 (spec approved) | GTM leads (CS, Sales, Support) | Early heads-up: problem, target persona, expected timeline | `templates/gtm-early-warning.md`, team channel |
-| Gate 4 (prototype validated) | GTM leads + advisory candidates | Prototype link + validation questions: "click through and tell us what's missing" | Team channel + direct message |
+| Gate 4 (prototype validated) | GTM leads + advisory candidates | Prototype link + validation questions: "click through and tell us what's missing". If the Gate 3 heads-up has not gone out, it joins this proposal as a second numbered item | Team channel + direct message |
 | Gate 5 (Judge PASS) | Dev + QA | Stories ready, test plan available, environment needs | Issue tracker (already handled by ticket creation) |
 | Gate 6 (delivery) | All applicable audiences | Full artifacts per audience (see applicability matrix) | Per-audience destination |
 | Post-deploy (same day, after `delivery.deployed_on` is confirmed) | CS, Support, Sales, Marketing, C-Level | Release announcement: what shipped, who it affects, how to explain the value | Announcements channel + release-notes page |
@@ -190,29 +208,34 @@ Gate-based, not calendar-based ("3 weeks before" does not survive a slipped date
 
 ### Every communication is the PM's decision
 
-The orchestrator proposes each message with its recipients and text, and waits for **approve / edit / skip**.
-Nothing is sent without that answer, and an answer to one message never covers the next. If the PM says no at a
-gate, the flow stops there. Record each decision (and each skip, with its reason) in the state file.
+The orchestrator proposes each message with its text and the **default recipients**, offers **skip** first, and waits
+for **approve / edit / skip**. It asks for recipients only if the PM edits them. Nothing is sent without that
+answer, and an answer to one message never covers the next. When a proposal holds several messages (for example the
+Gate 3 heads-up and the Gate 4 feedback request), number them and take one answer per number. If the PM says no at a
+gate, the flow stops there. Record each decision (and each skip, with its reason) in the saved progress.
 
 | Gate | The PM chooses |
 |------|----------------|
-| Gate 2 | build now / backlog / archive |
+| Gate 2 | pass 1: build now / backlog / archive |
 | Gate 3 | approve / revise / defer to the roadmap |
 | Gate 4 | validated / iterate / pivot |
-| Gate 5 | PASS (send the handoff) / FAIL (fix and resubmit) |
+| Gate 5 | PASS (then pass 2: confirm / change / backlog; then send or hold the handoff) / FAIL (fix and resubmit) |
 | Pre-release | go / hold |
 
 ### Which communications apply to which kind of work
 
 | Moment | New feature | Enhancement | Migration | Bug fix | Contractual |
 |--------|:-----------:|:-----------:|:---------:|:-------:|:-----------:|
-| Roadmap review (before scoring) | Full | Full | no | no | no |
+| Roadmap review (before pass 1) | Full | Full | no | no | no |
 | Early heads-up (Gate 3) | yes | if visible | yes | no | yes |
 | Prototype feedback request (Gate 4) | yes | if a prototype exists | rarely | no | no |
 | Handoff to Dev and QA (Gate 5) | yes | yes | yes | yes | yes |
 | Gate 6 artifacts | per matrix | per matrix | per matrix | patch notes | per matrix |
 | Post-deploy announcement | yes | yes | yes | if customer-visible | yes |
 | Rollback notice | if rolled back | if rolled back | if rolled back | if rolled back | if rolled back |
+
+At Light, the heads-up and the feedback request are not proposed unless the PM asks. Gate 6 is compact: one message
+with only the artifacts that apply (`references/phases-late.md`).
 
 ### Communication timing by rollout type
 
@@ -253,7 +276,7 @@ The audience registry and applicability matrix are configurable. To adapt:
 1. Add or remove audiences in the registry
 2. Adjust the applicability matrix for your initiative types
 3. Map your data sources to the template sections
-4. Configure your publication destinations (replace Notion/Jira/CRM Knowledge
+4. Configure your publication destinations (replace the example docs platform, tracker and knowledge base
    with your tools)
 
 The template files in `templates/` are the starting point. Modify them to match

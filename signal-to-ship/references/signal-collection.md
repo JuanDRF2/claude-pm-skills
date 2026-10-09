@@ -4,6 +4,27 @@ Instructions for the orchestrator to automatically collect signals from all conn
 data sources. Execute these queries at the start of Phase 1 (Signals), then present
 findings to the PM for confirmation before advancing.
 
+## Contents
+
+- Step 1: Identify search terms
+- Step 2: Query the feedback tool
+- Step 3: Query the bug tracker
+- Step 4: Query the product taxonomy
+- Step 5: Competitive research (5a to 5c), Step 5b: customer calls
+- Step 6: Compile the signal record
+- Adapting by initiative type
+
+## How to present what you find
+
+Collect first, present after. Run all the queries that are visible in this session, then present the **three most
+relevant findings one at a time**, each with its data, and list the rest in one short table marked `not reviewed`
+(the PM can open any row). Record the unreviewed ones as such in the saved progress. At Light, use the connected
+sources only, in one batch, and skip competitive research.
+
+When a source is not visible, do not ask for it piece by piece. Ask once, in one batch: "I could not check {sources}.
+Paste what you know from them (votes, requesters, open bugs, call mentions), or say none." List in the saved
+progress which sources were not checked.
+
 ## Step 1: Identify search terms
 
 From the feature name and context, derive:
@@ -68,7 +89,7 @@ Sum across all relevant ideas:
 
 ### 2e. Present findings
 
-Show each idea one at a time with its data. Ask the PM:
+Show the most relevant ideas one at a time with their data (the rest in the `not reviewed` table). Ask the PM:
 "Does this apply to the scope of [feature name]?"
 
 Classify each as:
@@ -115,7 +136,8 @@ For each bug record: key, summary, status, priority, created date, linked suppor
 - **Indirect:** the bug is in a related system (payments, projections, etc.)
 - **Unrelated:** the bug mentions the term but in a different context
 
-Present each bug to the PM. Report direct and indirect counts and linked support cases.
+Present the most relevant bugs to the PM one at a time, the rest in the `not reviewed` table. Report direct and
+indirect counts and linked support cases.
 
 ## Step 4: Query Product Taxonomy
 
@@ -165,11 +187,9 @@ Note: V1 "Not Covered" means not in V2 production, not that it doesn't exist in 
 
 ### 5a. Identify competitors
 
-For the feature domain, search for competing products:
-- Vertical SaaS CRM: Vantage CRM, Meridian Suite, Northstar Platform, Fieldstone CRM,
-  Lumen Ops, Harborline, Cornerstone Reach
-- General commerce/checkout: Swiftcart, Ledgerline, CheckoutForge
-- Adjust list based on the specific product area
+Ask the PM for the competitors that matter, or use the organization config's `competitive.competitors`. Do not
+bring a list of your own: a stale or unrelated list wastes the PM's time. If the PM has none and the config has
+none, search for the feature's category once and offer the two or three most relevant names for the PM to confirm.
 
 ### 5b. Search for capability
 
@@ -185,9 +205,9 @@ Check 2-3 top competitors. Look for:
 ### 5c. Present findings
 
 Show competitor comparison table. Let PM confirm parity status:
-- **Ahead:** Acme has something competitors don't
+- **Ahead:** we have something competitors don't
 - **Parity:** same capability
-- **Behind:** competitor has something Acme doesn't
+- **Behind:** a competitor has something we don't
 
 ## Step 5b: Customer-call insights
 

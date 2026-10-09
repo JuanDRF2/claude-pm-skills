@@ -3,6 +3,7 @@
 > Send when the spec is approved (Gate 3). This is a heads-up, not final documentation.
 > Audience: GTM leads (CS, Sales, Support, Marketing). Channel: the team product-sync channel.
 > Run the 5-question check in `references/audience-views.md` before sending.
+> Not proposed at Light unless the PM asks.
 
 **Status:** Spec approved on [date] · Target availability: [window, not a promise] · Depth: [light/standard/full]
 

@@ -54,19 +54,36 @@
 - [ ] Tech debt: [migration state, debt score]
 - [ ] Contractual: [client commitments]
 
-## BRICE+ score (Paths 1-2)
+## Prioritization (two passes; Paths 1-2)
 
-| Variable | Score | Source |
-|----------|-------|--------|
-| B (Business impact) | | 1-10, manual |
-| R (Reach) | | 1-10, auto from feedback users + companies |
-| I (Intelligence) | | 1-10, auto from feedback votes + insights |
-| C (Confidence) | | 1-5, manual |
-| E (Evidence) | | 1-5, auto from signal channel count |
-| Effort | | XS(1) S(2) M(4) L(6) XL(8) XXL(10), whole path to production |
-| Contractual | | Y/N, 1.5x multiplier |
-| **BRICE+ score** | | (B×2 + R + I + C + E×0.5) / Effort × contractual |
-| Calibration warnings shown | | vote bias / evidence diversity / effort basis / learning value |
+The PM chose the method; a score is an input to the decision, not the decision.
+
+| Field | Value |
+|-------|-------|
+| Method chosen / suggested | rice / ice / wsjf / moscow / value_effort / custom / gut_check; the skill suggested [..] because [..] |
+| Custom variables and formula (only if custom) | |
+
+**Pass 1 (Gate 2)**
+
+| Field | Value |
+|-------|-------|
+| Inputs (each labeled measured / estimated / guessed) | |
+| Effort (range) | |
+| Score (range) or category | |
+| Confidence in the inputs | low / medium / high |
+| Highest Phase 1 risk shown beside it | |
+| Calibration warnings shown | vote bias / evidence diversity / effort basis / learning value |
+| Decision and date | build now / backlog / archive, on [date] |
+
+**Pass 2 (end of Phase 5, after the refinement verdict)**
+
+| Field | Value |
+|-------|-------|
+| Real effort from the refined stories | |
+| Score (range) or category | |
+| Where it falls against the pass 1 range | inside / above / below |
+| Decision and date | confirm / change / backlog, on [date] |
+| What changed (if change) | scope / date / effort / order: [..] |
 
 ## Risk assessment **(S/F)**
 
@@ -151,7 +168,7 @@ A user has adopted this journey when they have [done X] at least [N] times in [Y
 
 ## Design
 
-- Design Hub URL: [link]
+- Design reference URL: [link]
 - Design file URL: [link if applicable]
 
 ## Survey configuration
