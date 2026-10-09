@@ -889,6 +889,92 @@ Revisar ambos consumidores antes de publicar.
         assert not errors, "\n".join(errors)
         assert any("does not address" in warning for warning in warnings), warnings
 
+
+    # taxonomy-mapping-v2: story ownership relationship column + State reconciliation table,
+    # and the package entry point README.md is a required artifact.
+    with tempfile.TemporaryDirectory() as temporary:
+        root = Path(temporary)
+        (root / "integrations").mkdir()
+        (root / "00-workflow-state.md").write_text(
+            "## Taxonomy Alignment State\n"
+            "- Taxonomy required / Taxonomy requerido: Yes\n"
+            "- Handoff policy / Política de handoff: Verified required\n"
+            "- MCP capability / Capacidad MCP: Available\n"
+            "- Mapping path / Ruta del mapping: integrations/taxonomy-mapping.md\n"
+            "- Mapping status / Estado del mapping: Verified\n"
+            "- Last remote evidence / Última evidencia remota: receipt.json\n"
+            "- Owner / Responsable: Product\n"
+            "- Handoff consequence / Consecuencia para el handoff: Ready when verified\n",
+            encoding="utf-8",
+        )
+        (root / "05-user-stories.md").write_text(
+            "# Stories\n\n## US-QM-01 — Comprar membresía\n### AC-QM-01-01 — Confirmar\n"
+            "**Condición de aceptación:** ok.\n#### SC-QM-01-01-01 — Compra\n"
+            "**Dado:** un comprador\n**Cuando:** paga\n**Entonces:** ve la confirmación\n",
+            encoding="utf-8",
+        )
+        v2 = """# Taxonomy Mapping
+
+- Project / Proyecto: Quick Membership
+- Status / Estado: Approved
+- Last updated / Última actualización: 2026-08-27
+- Approved through / Aprobado hasta: Gate 5
+- Taxonomy required / Taxonomy requerido: Yes
+- Mapping contract / Contrato del mapping: taxonomy-mapping-v2
+- Mapping status / Estado del mapping: Verified
+- Owner / Responsable: Product
+- Taxonomy environment / Entorno de taxonomy: Production
+- Last verified / Última verificación: 2026-08-27
+- Evidence / Evidencia: receipt.json
+- Source commit / Commit de origen: 1234567abcdef
+
+## Product and Feature / Producto y feature
+- Product: PRD-022 — Membership
+- Feature: FEA-137 — Membership Sales
+
+## Stories and journeys / Historias y journeys
+| Package story | Relationship | Taxonomy journey | JTBD | Channel | Outcomes | Status or gap |
+|---|---|---|---|---|---|---|
+| US-QM-01 | Belongs to | JRN-9502 | JTB-9414 | Back office | OUT-9912 | Verified |
+
+## Acceptance criteria / Criterios de aceptación
+| Package criterion | Taxonomy criterion | Journey | Status or gap |
+|---|---|---|---|
+| AC-QM-01-01 | ACR-9475 | JRN-9502 | Verified |
+
+## Scenarios / Escenarios
+| Package scenario | Taxonomy scenario | Taxonomy criterion | Status or gap |
+|---|---|---|---|
+| SC-QM-01-01-01 | SCN-2041 | ACR-9475 | Verified |
+
+## State reconciliation / Reconciliación de estados
+| Surface | Identity | Package status | Remote status | Divergence | Observed at | Owner |
+|---|---|---|---|---|---|---|
+| Story | US-QM-01 | Approved | Active | None | 2026-08-27 | Product |
+
+## Unmapped, deferred or not applicable / Sin mapear, diferido o no aplicable
+| Package ID | Type | Status | Reason | Owner | Target |
+|---|---|---|---|---|---|
+"""
+        mapping_path = root / "integrations/taxonomy-mapping.md"
+        mapping_path.write_text(v2, encoding="utf-8")
+        errors, warnings = validator.taxonomy_alignment_checks(root, validator.read_files(root))
+        assert not errors, "\n".join(errors)
+
+        mapping_path.write_text(v2.replace("| Belongs to |", "| Owns |"), encoding="utf-8")
+        errors, _w = validator.taxonomy_alignment_checks(root, validator.read_files(root))
+        assert any("invalid relationship" in e for e in errors), errors
+
+        mapping_path.write_text(v2.replace("| Product |\n\n## Unmapped", "| |\n\n## Unmapped"), encoding="utf-8")
+        errors, _w = validator.taxonomy_alignment_checks(root, validator.read_files(root))
+        assert any("State reconciliation" in e or "state reconciliation" in e for e in errors), errors
+
+        mapping_path.write_text(v2.replace("taxonomy-mapping-v2", "taxonomy-mapping-v9"), encoding="utf-8")
+        errors, _w = validator.taxonomy_alignment_checks(root, validator.read_files(root))
+        assert any("Unsupported taxonomy mapping contract" in e for e in errors), errors
+
+        assert "README.md" in validator.EXPECTED
+
     if args.real_package:
         errors, _warnings = validator.validate(
             args.real_package.resolve(),

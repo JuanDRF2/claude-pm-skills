@@ -32,6 +32,7 @@ RANGE_PATTERN = re.compile(
 )
 
 EXPECTED = [
+    "README.md",
     "00-workflow-state.md",
     "01-project-understanding.md",
     "02-rules-and-questions.md",
@@ -55,6 +56,7 @@ AUDIT_ARTIFACTS = {
 }
 
 TAXONOMY_MAPPING_RELATIVE = "integrations/taxonomy-mapping.md"
+TAXONOMY_DISPOSITION_LEDGER_RELATIVE = "integrations/taxonomy-disposition-ledger.md"
 TAXONOMY_ID_PATTERNS = {
     "PRD": re.compile(r"\bPRD-\d{3,}\b"),
     "FEA": re.compile(r"\bFEA-\d{3,}\b"),
@@ -66,6 +68,13 @@ TAXONOMY_ID_PATTERNS = {
 }
 TAXONOMY_MAPPING_STATUSES = {"Draft", "Verified", "Stale", "Blocked"}
 TAXONOMY_CHANNELS = {"Point of sale", "Back office", "Online"}
+TAXONOMY_MAPPING_CONTRACT_V2 = "taxonomy-mapping-v2"
+TAXONOMY_STORY_RELATIONSHIPS = {
+    "Belongs to",
+    "Enables",
+    "Depends on",
+    "Consumes contract",
+}
 CONTEXT_ARTIFACT_CONTRACT = "project-context-v1"
 
 EN_MARKERS = re.compile(
@@ -114,7 +123,9 @@ def definitions(files: dict[Path, str], prefix: str) -> set[str]:
     heading = re.compile(r"^#{1,6}\s+.*?(" + pattern.pattern + r")", re.MULTILINE)
     table = re.compile(r"^\|\s*(" + pattern.pattern + r")\s*\|", re.MULTILINE)
     for path, text in files.items():
-        if path.as_posix().endswith(TAXONOMY_MAPPING_RELATIVE):
+        if path.as_posix().endswith(
+            (TAXONOMY_MAPPING_RELATIVE, TAXONOMY_DISPOSITION_LEDGER_RELATIVE)
+        ):
             continue
         found.update(heading.findall(text))
         found.update(table.findall(text))
@@ -495,6 +506,15 @@ def taxonomy_alignment_checks(
         else:
             values[field] = value
 
+    mapping_contract = taxonomy_metadata(
+        mapping, "Mapping contract", "Contrato del mapping"
+    )
+    if mapping_contract and mapping_contract != TAXONOMY_MAPPING_CONTRACT_V2:
+        errors.append(
+            f"Unsupported taxonomy mapping contract: {mapping_contract}."
+        )
+    mapping_v2 = mapping_contract == TAXONOMY_MAPPING_CONTRACT_V2
+
     mapping_required_raw = normalized_label(values.get("taxonomy required", ""))
     mapping_required = (
         "Yes" if mapping_required_raw in {"yes", "si"}
@@ -583,7 +603,51 @@ def taxonomy_alignment_checks(
         "DISPOSITION": taxonomy_section(
             mapping, r"unmapped deferred or not applicable|sin mapear diferido o no aplicable"
         ),
+        "STATE": taxonomy_section(
+            mapping, r"state reconciliation|reconciliacion de estados"
+        ),
     }
+    if mapping_v2:
+        state_rows = markdown_table_rows(sections["STATE"])
+        if not sections["STATE"] or not state_rows:
+            errors.append("taxonomy-mapping-v2 needs a State reconciliation table.")
+        for cells in state_rows:
+            if len(cells) < 7:
+                errors.append("Taxonomy state reconciliation contains an incomplete row.")
+                continue
+            if not all(cells[index] for index in (0, 1, 2, 3, 4, 6)):
+                errors.append(
+                    "Taxonomy state reconciliation needs surface, identity, both statuses, divergence and owner."
+                )
+            if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", cells[5]):
+                errors.append("Taxonomy state reconciliation Observed at must be YYYY-MM-DD.")
+    disposition_sections = [sections["DISPOSITION"]]
+    ledger_path = root / TAXONOMY_DISPOSITION_LEDGER_RELATIVE
+    ledger_reference = taxonomy_metadata(
+        mapping, "Disposition ledger", "Ledger de disposiciones"
+    )
+    if ledger_reference and ledger_reference not in {"None", "Ninguno"}:
+        if ledger_reference != TAXONOMY_DISPOSITION_LEDGER_RELATIVE:
+            errors.append(
+                f"Taxonomy disposition ledger must be {TAXONOMY_DISPOSITION_LEDGER_RELATIVE}."
+            )
+        elif not ledger_path.is_file():
+            errors.append(
+                f"Taxonomy mapping references missing {TAXONOMY_DISPOSITION_LEDGER_RELATIVE}."
+            )
+        else:
+            ledger_section = taxonomy_section(
+                ledger_path.read_text(encoding="utf-8"),
+                r"unmapped deferred or not applicable|sin mapear diferido o no aplicable",
+            )
+            if not ledger_section:
+                errors.append("Taxonomy disposition ledger is missing its disposition section.")
+            else:
+                disposition_sections.append(ledger_section)
+    elif ledger_path.is_file():
+        errors.append(
+            f"{TAXONOMY_DISPOSITION_LEDGER_RELATIVE} exists but the mapping does not reference it."
+        )
     if mapping_required == "Yes":
         for kind in ("US", "AC", "SC"):
             if not sections[kind]:
@@ -592,7 +656,7 @@ def taxonomy_alignment_checks(
     mapped: dict[str, set[str]] = {"US": set(), "AC": set(), "SC": set()}
     seen_relationships: set[tuple[str, ...]] = set()
     remote_contract = {
-        "US": (ID_PATTERNS["US"], "JRN", "JTB", 6),
+        "US": (ID_PATTERNS["US"], "JRN", "JTB", 7 if mapping_v2 else 6),
         "AC": (ID_PATTERNS["AC"], "ACR", "JRN", 4),
         "SC": (ID_PATTERNS["SC"], "SCN", "ACR", 4),
     }
@@ -610,36 +674,44 @@ def taxonomy_alignment_checks(
                 errors.append(f"Taxonomy mapping repeats an identical relationship for {package_id}.")
             seen_relationships.add(relationship)
             mapped[kind].add(package_id)
+            remote_index, parent_index, channel_index, outcomes_index = 1, 2, 3, 4
+            if kind == "US" and mapping_v2:
+                if cells[1] not in TAXONOMY_STORY_RELATIONSHIPS:
+                    errors.append(
+                        f"Taxonomy US mapping for {package_id} has invalid relationship: {cells[1]}"
+                    )
+                remote_index, parent_index, channel_index, outcomes_index = 2, 3, 4, 5
             if status == "Verified":
-                if not TAXONOMY_ID_PATTERNS[remote_kind].search(cells[1]):
+                if not TAXONOMY_ID_PATTERNS[remote_kind].search(cells[remote_index]):
                     errors.append(f"Verified mapping for {package_id} needs {remote_kind}-*.")
-                if not TAXONOMY_ID_PATTERNS[parent_kind].search(cells[2]):
+                if not TAXONOMY_ID_PATTERNS[parent_kind].search(cells[parent_index]):
                     errors.append(f"Verified mapping for {package_id} needs {parent_kind}-*.")
                 if kind == "US":
-                    if cells[3] not in TAXONOMY_CHANNELS:
-                        errors.append(f"Verified mapping for {package_id} has invalid channel: {cells[3]}")
-                    if not TAXONOMY_ID_PATTERNS["OUT"].search(cells[4]):
+                    if cells[channel_index] not in TAXONOMY_CHANNELS:
+                        errors.append(f"Verified mapping for {package_id} has invalid channel: {cells[channel_index]}")
+                    if not TAXONOMY_ID_PATTERNS["OUT"].search(cells[outcomes_index]):
                         errors.append(f"Verified mapping for {package_id} needs at least one OUT-*.")
 
     dispositions: set[str] = set()
-    for cells in markdown_table_rows(sections["DISPOSITION"]):
-        if len(cells) < 6:
-            errors.append("Taxonomy disposition table contains an incomplete row.")
-            continue
-        package_id = cells[0]
-        if not STORY_FAMILY_ID.fullmatch(package_id):
-            errors.append(f"Taxonomy disposition has an invalid package ID: {package_id or 'empty'}")
-            continue
-        disposition = cells[2]
-        if disposition not in {"Not applicable", "Deferred", "Pending", "Blocked"}:
-            errors.append(f"{package_id} has unsupported taxonomy disposition: {disposition}")
-        if not cells[3] or not cells[4]:
-            errors.append(f"{package_id} taxonomy disposition needs reason and owner.")
-        if status == "Verified" and disposition in {"Pending", "Blocked"}:
-            errors.append(f"Verified taxonomy mapping cannot leave {package_id} {disposition}.")
-        if status == "Verified" and disposition == "Deferred" and normalized_label(cells[5]) in {"", "n a", "none", "ninguno"}:
-            errors.append(f"Deferred taxonomy item {package_id} needs a target.")
-        dispositions.add(package_id)
+    for disposition_section in disposition_sections:
+        for cells in markdown_table_rows(disposition_section):
+            if len(cells) < 6:
+                errors.append("Taxonomy disposition table contains an incomplete row.")
+                continue
+            package_id = cells[0]
+            if not STORY_FAMILY_ID.fullmatch(package_id):
+                errors.append(f"Taxonomy disposition has an invalid package ID: {package_id or 'empty'}")
+                continue
+            disposition = cells[2]
+            if disposition not in {"Not applicable", "Deferred", "Pending", "Blocked"}:
+                errors.append(f"{package_id} has unsupported taxonomy disposition: {disposition}")
+            if not cells[3] or not cells[4]:
+                errors.append(f"{package_id} taxonomy disposition needs reason and owner.")
+            if status == "Verified" and disposition in {"Pending", "Blocked"}:
+                errors.append(f"Verified taxonomy mapping cannot leave {package_id} {disposition}.")
+            if status == "Verified" and disposition == "Deferred" and normalized_label(cells[5]) in {"", "n a", "none", "ninguno"}:
+                errors.append(f"Deferred taxonomy item {package_id} needs a target.")
+            dispositions.add(package_id)
 
     active = active_story_family_ids(root, files)
     all_active = set().union(*active.values())

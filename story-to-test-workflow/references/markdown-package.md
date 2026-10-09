@@ -71,6 +71,22 @@ Start every generated file with:
 
 Do not claim a person approved an artifact unless that approval occurred in the conversation or was present in a trusted source.
 
+## Package entry point
+
+Every complete project package includes `README.md`. It is required: `validate-package.py` reports a missing or empty
+`README.md` as a hard error (not a warning), so the package fails validation. It must state the package purpose, how to
+read the package by role, and the entry points (links to the authoritative documents). Keep it concise and role-oriented:
+
+- PM starts with project/delivery readiness and open decisions.
+- Engineering starts with approved stories, rules, dependencies and the DEV handoff.
+- QA starts with coverage, functional cases, risks and the QA handoff.
+- Every role can reach `09-package-index.md` for the exhaustive canonical inventory.
+
+Show local documentation readiness and any external mapping state (for example a Product
+Taxonomy mapping) separately; a package may be structurally complete while its mapping is
+still `Draft`. Link the authoritative document for each state; do not restate detailed
+rules, stories or remote records in the README.
+
 ## Links
 
 Use relative links between documents:
