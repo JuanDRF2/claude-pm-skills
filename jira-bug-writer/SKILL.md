@@ -1,6 +1,6 @@
 ---
 name: jira-bug-writer
-description: "Formats and creates bug issues in Jira from a plain-language description. Use this skill whenever the user wants to: report a bug, write a bug ticket, create a bug issue in Jira, document a defect, or turn a bug description into a structured Jira issue. Trigger on phrases like 'write a bug', 'create a bug ticket', 'log this bug', 'report a defect', 'turn this into a bug issue', 'I found a bug', or any time the user shares a bug description and wants it formatted or pushed to Jira. Prefer this skill over writing bug tickets freehand."
+description: "Formats and creates bug issues in Jira from a plain-language description. Use when the user wants to report a bug, write a bug ticket, document a defect, or turn a bug description into a structured Jira issue. Not for publishing an approved user story (jira-story-publisher)."
 ---
 
 # Jira Bug Writer
@@ -78,7 +78,12 @@ Use **exactly** this format:
 After presenting the formatted bug report, add:
 
 1. **Assumptions made** — any gaps in the description you filled with judgment
-2. **Suggested severity** — Critical / High / Medium / Low with a one-line rationale
+2. **Suggested severity** — Critical / High / Medium / Low with a one-line rationale. Use a rubric like this rather than a gut call:
+   - **Critical** — system down, data loss, or a security issue: drop everything, hotfix immediately
+   - **High** — a major feature is broken: fix within 24h
+   - **Medium** — degraded but a workaround exists: fix within the current week (maintenance budget, not a hotfix)
+   - **Low** — cosmetic: fix opportunistically
+3. **Test-first reminder** — every bug fix should ship with an automated regression test covering this exact failure (reproduce it as a failing test first, then fix). Note this explicitly so whoever picks up the ticket doesn't skip it.
 
 Then **stop and ask**: *"Should I create this bug in Jira?"*
 
@@ -125,6 +130,7 @@ that nothing was created; never claim a ticket exists. The same fields fit GitHu
 - Number each step sequentially — no ranges, no "etc."
 - Assume the developer has access but no prior context of the bug
 - Start from a realistic initial state (e.g., "Navigate to X", not "Be in X")
+- Write these steps so they translate directly into a failing automated test (Given/When/Then); that test is what proves the bug is real and, later, that the fix holds
 
 ### Expected Behavior
 - Describe the **desired system outcome**, not just "it shouldn't crash"
@@ -138,6 +144,7 @@ that nothing was created; never claim a ticket exists. The same fields fit GitHu
 - **Never create Jira issues without explicit user confirmation.**
 - **Never skip Phase 1** — always show the formatted bug report first.
 - **Never ask unnecessary questions** — make grounded assumptions and flag them.
+- **Treat the bug-to-test rule as firm.** A bug is not fixed until an automated test reproduces the failure and then passes against the fix. "Fixed" must not mean "I clicked around and it seemed okay."
 - **Never write vague steps** — if the description is unclear, infer from context and mark assumptions.
 - All output must be in **English**, regardless of the language the user writes in.
 - Creating a Jira issue is an `ask`-tier action — see `skills/ACTION-TIERS.md`.
