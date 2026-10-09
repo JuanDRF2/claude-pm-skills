@@ -1,6 +1,6 @@
 ---
 name: prd-writer
-description: "Writes a full Product Requirements Document (PRD) for a feature, initiative, or product area. Use this skill whenever the user wants to write a PRD, product requirements document, feature brief, product one-pager, or any document that needs to align stakeholders before engineering begins. Also trigger when the user says things like \"write a PRD for\", \"I need to document this initiative\", \"help me get alignment on this feature\", \"write the requirements for this epic\", \"I need a one-pager for leadership\", or \"document this before we kick off\". Use this skill — not mini-spec-writer — when the feature is large, cross-domain, cross-team, or requires leadership or stakeholder sign-off before engineering starts. Use this skill before writing a PRD freehand. For a small, well-understood change use `mini-spec-writer` instead."
+description: "Writes a full Product Requirements Document (PRD) for a feature, initiative, or product area. Use when the user wants a PRD, product requirements document, feature brief or leadership one-pager that aligns stakeholders before engineering begins, especially when the work is large, cross-domain or cross-team, or needs sign-off. Not for a small, well-understood change (use `mini-spec-writer`) and not for an idea whose problem is still fuzzy (use `product-spec-interview` first)."
 ---
 
 # PRD Writer
@@ -79,6 +79,11 @@ Write each section in this exact order. Do not skip sections. If a section genui
 Three to five sentences maximum. Answer: *What are we building, for whom, and why now?* This section should stand alone — a busy executive should understand the initiative after reading only this.
 
 Do not describe implementation details here. Describe the bet.
+
+**Appetite:** State the fixed time budget for this initiative right here (for example "Appetite: 6 weeks").
+This is a Shape Up-style appetite, not an estimate: how much time this problem is worth, decided before the
+solution is fully designed. If the write-up later doesn't fit the stated appetite, the fix is to cut scope
+(see Section 7), not to quietly extend the number.
 
 ---
 
@@ -172,6 +177,10 @@ Write 3–8 high-level user stories that capture the primary ways users will int
 
 These are for stakeholder alignment, not engineering. They should be readable by non-technical stakeholders and cover the core flows — not edge cases.
 
+When this moves into a full spec, each of these stories should resolve into concrete BDD scenarios before
+building starts, with a rough floor of at least 3 scenarios for a small initiative and at least 8 for one this
+size. That detail belongs in the Mini Spec or Shape Document, not here; just know it is coming.
+
 ---
 
 ### 9. Dependencies and Risks
@@ -223,6 +232,17 @@ Both sections are mandatory. An PRD with no open questions either has complete i
 
 This PRD is considered **approved** when all required stakeholders have signed off on it. Until then, it is **in review**.
 
+**Optional: Betting Table scoring.** If this goes through a Betting Table (or an equivalent prioritization forum)
+instead of individual sign-offs, score it on four axes rather than a simple yes/no:
+- Evidence of problem (0–3)
+- Estimated impact (0–3)
+- Confidence in solution (0–3)
+- Cost of delay (0–3)
+
+A combined score of 9 or more is a strong bet, 6–8 is worth a discussion, and 5 or less means defer. There is no
+standing backlog for unselected pitches: if this doesn't get bet on, it is either re-pitched later with better
+evidence or it is dead, not parked indefinitely.
+
 ---
 
 ### 12. Appendix *(optional)*
@@ -261,10 +281,11 @@ Before delivering, verify:
 
 1. Can a stakeholder who hasn't been in any meetings understand the problem and the bet from this document alone?
 2. Is the problem statement grounded in evidence — not assumption?
-3. Are success metrics specific, measurable, and tied to outcomes (not outputs)?
-4. Is the scope section honest — does it explicitly name things that are out of scope?
-5. Are all open questions flagged with owners — not buried in prose?
-6. Has the architecture pre-check been run and documented in Section 6?
-7. Is the PRD short enough to actually be read — under 6 pages when printed?
+3. Is the appetite stated up front, as a fixed time budget rather than an open-ended estimate?
+4. Are success metrics specific, measurable, and tied to outcomes (not outputs)?
+5. Is the scope section honest — does it explicitly name things that are out of scope?
+6. Are all open questions flagged with owners — not buried in prose?
+7. Has the architecture pre-check been run and documented in Section 6?
+8. Is the PRD short enough to actually be read — under 6 pages when printed?
 
 If the answer to any of these is "no," fix it before delivering.
