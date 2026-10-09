@@ -1,6 +1,6 @@
 ---
 name: product-spec-interview
-description: "Builds a product spec from zero by interviewing the user, then pushing back where the thinking is weak. Runs rounds with checkpoints (problem and people, evidence, strategy), only then drafts the body, maps every promised outcome to a deliverable or a recorded non-goal, and, for high-stakes work, drafts acceptance criteria by axis. Use when the user says things like \"help me think through this feature\", \"interview me about this spec\", \"I have an idea but no spec\", \"challenge my spec\", \"grill me on this\", or hands over a thin draft nobody has questioned. Use it before `mini-spec-writer` or `prd-writer` when the problem, the success measure or the scope is still fuzzy; once the thinking is done, either document is a faithful format for the result. Does not publish anything."
+description: "Builds a product spec from zero by interviewing the user, then pushing back where the thinking is weak. Runs rounds with checkpoints (problem and people, evidence, strategy), only then drafts the body, maps every promised outcome to a deliverable or a recorded non-goal, and, for high-stakes work, drafts acceptance criteria by axis. Use when the user has an idea but no spec, or a thin draft nobody has questioned, and the problem, success measure or scope is still fuzzy. Use it before `mini-spec-writer` or `prd-writer`. Does not publish anything."
 ---
 
 # Product Spec Interview

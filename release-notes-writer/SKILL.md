@@ -1,6 +1,6 @@
 ---
 name: release-notes-writer
-description: "Writes structured, audience-aware release notes for the platform's products. Use this skill whenever the user mentions writing release notes, launch notes, feature documentation, GTM content, or wants to communicate a new feature to internal teams (CS, Implementation, Support, Sales). Also trigger when the user shares a Jira epic key, a Notion spec link, or says things like \"write the notes for X\", \"document this feature\", \"prepare the GTM doc\", \"push release notes to Notion\", \"draft the comms for this feature\", or \"release notes for [Quarter]\". Prefer this skill over writing release notes freehand."
+description: "Writes structured, audience-aware release notes for the platform's products. Use this skill whenever the user mentions writing release notes, launch notes, feature documentation, GTM content, or wants to communicate a new feature to internal teams (CS, Implementation, Support, Sales). Also trigger when the user shares a Jira epic key, a Notion spec link, or says things like \"write the notes for X\", \"document this feature\", \"prepare the GTM doc\", \"push release notes to Notion\", \"draft the comms for this feature\", or \"release notes for [Quarter]\". Prefer this skill over writing release notes freehand. Not for a one-line changelog entry or channel-specific launch announcements (launch-comms)."
 ---
 
 # Release Notes Writer

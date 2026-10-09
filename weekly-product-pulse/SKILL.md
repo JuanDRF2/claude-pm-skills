@@ -1,14 +1,6 @@
 ---
 name: weekly-product-pulse
-description: >
-  Generates a structured weekly status report for the Head of Product by pulling
-  the active sprint from all product team Jira projects, grouping results by team,
-  and surfacing delivery health, blockers, and risks. Use this skill whenever the
-  Head of Product asks for things like "give me the weekly pulse", "what's the
-  status across teams this week", "how are the sprints going", "weekly update",
-  "what got shipped this week", "sprint health report", or any time a weekly or
-  sprint-level cross-team overview is requested. Use this skill for
-  cross-team status requests rather than summarizing Jira manually.
+description: "Generates a structured weekly status report for the Head of Product by pulling the active sprint from all product team Jira projects, grouping results by team, and surfacing delivery health, blockers, and risks. Use for weekly or sprint-level cross-team overviews, such as the weekly pulse or sprint health. Not for release announcements (release-notes-writer, launch-comms) or a single initiative's status."
 compatibility:
   tools:
     - Atlassian (Jira MCP)

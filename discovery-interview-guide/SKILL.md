@@ -1,6 +1,6 @@
 ---
 name: discovery-interview-guide
-description: "Plans and runs user discovery research. Use this skill whenever the user wants to write an interview guide, plan a user research session, design a discovery interview, create a usability test script, write survey questions, or synthesize findings from user interviews. Trigger on phrases like \"I need to talk to users\", \"help me plan research\", \"write me an interview guide\", \"I want to understand why customers do X\", \"what should I ask users about Y\", \"help me synthesize these interviews\", \"create a research plan\", \"design a survey\", \"run a usability test\", or any time user research, customer discovery, or qualitative insight gathering is mentioned. Prefer this skill over writing interview questions or research plans freehand."
+description: "Plans and runs user discovery research. Use when the user wants to write an interview guide, plan a research session, design a discovery interview, create a usability test script, write survey questions, or synthesize findings from interviews. Not for analyzing product usage data or for choosing what to build from existing evidence (use `prioritization-scorer`). Prefer this skill over writing interview questions or research plans freehand."
 ---
 
 # Discovery Interview Guide

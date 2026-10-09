@@ -1,6 +1,6 @@
 ---
 name: competitive-teardown
-description: "Researches, analyzes, and documents competitive intelligence for a product, feature, or market. Use this skill whenever the user wants to understand the competitive landscape, analyze a specific competitor, compare products, prepare for a pricing conversation, build a competitive battlecard, or track market positioning. Trigger on phrases like \"who are our competitors\", \"how does X compare to us\", \"what is [competitor] doing\", \"competitive analysis for Y\", \"build a battlecard for Z\", \"what's the market doing\", \"where do we stand vs. the market\", \"teardown [product]\", \"how are we positioned\", \"pricing comparison\", \"feature comparison\", or any time competitive intelligence, market analysis, or product positioning is requested. Prefer this skill over doing competitive analysis freehand."
+description: "Researches, analyzes, and documents competitive intelligence for a product, feature, or market. Use when the user wants to understand the competitive landscape, analyze or compare specific competitors, build a battlecard, prepare for a pricing conversation, or check market positioning. Not for a single-product feature spec or for pricing decisions without competitor evidence. Prefer this skill over doing competitive analysis freehand."
 ---
 
 # Competitive Teardown

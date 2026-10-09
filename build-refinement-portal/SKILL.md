@@ -1,6 +1,6 @@
 ---
 name: build-refinement-portal
-description: Genera o actualiza un portal web interactivo para refinamiento a partir de artefactos Markdown de producto y QA. Usar cuando se necesite convertir historias de usuario, criterios de aceptación, reglas de negocio, checks de cobertura, casos funcionales, escenarios, riesgos y trazabilidad en una experiencia navegable para Producto, DEV y QA; también cuando se pida regenerar, validar o publicar el portal después de cambiar los artefactos.
+description: "Genera o actualiza un portal web interactivo para refinamiento a partir de artefactos Markdown de producto y QA. Usar cuando se necesite convertir historias de usuario, criterios de aceptación, reglas de negocio, checks de cobertura, casos funcionales, escenarios, riesgos y trazabilidad en una experiencia navegable para Producto, DEV y QA; también cuando se pida regenerar, validar o publicar el portal después de cambiar los artefactos. No sirve para redactar ni corregir el paquete, solo presenta un paquete ya aprobado (para crearlo, story-to-test-workflow)."
 ---
 
 # Build Refinement Portal

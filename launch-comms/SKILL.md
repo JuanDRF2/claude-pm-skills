@@ -1,6 +1,6 @@
 ---
 name: launch-comms
-description: "Turns an approved release note (or a shipped feature) into the set of short, channel-specific launch communications: internal Slack announcement, leadership brief, CS/Support heads-up, sales enablement blurb, and customer-facing announcement copy. Use this skill whenever the user wants to \"announce\" a launch, \"write the Slack post for X\", \"draft the exec update\", \"tell CS/Support about X\", \"write the launch email\", \"give me the changelog entry\", \"comms for [feature] launch\", or wants to distribute a release across channels. This skill is the DISTRIBUTION layer downstream of release-notes-writer — it consumes the release note, it does not replace it. Use this skill for launch messaging rather than writing launch comms freehand."
+description: "Turns an approved release note (or a shipped feature) into short, channel-specific launch communications: internal Slack announcement, leadership brief, CS/Support heads-up, sales enablement blurb, and customer-facing announcement copy. Use when the user wants to announce a launch or distribute a release across channels. It is the distribution layer downstream of `release-notes-writer`: it consumes the release note and does not replace it. Not for writing the release note itself."
 ---
 
 # Launch Comms

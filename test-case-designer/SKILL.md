@@ -1,6 +1,6 @@
 ---
 name: test-case-designer
-description: "Designs risk-based, traceable QA coverage from stories, criteria, rules, designs, or specs; produces atomic checks and clearly separated functional scenarios in product language, plus gaps, levels, automation guidance, and a downstream test-management handoff. Use once stories, acceptance criteria, or a spec are ready and need QA coverage designed before test execution or automation."
+description: "Designs risk-based, traceable QA coverage from stories, criteria, rules, designs, or specs; produces atomic checks and clearly separated functional scenarios in product language, plus gaps, levels, automation guidance, and a downstream test-management handoff. Use once stories, acceptance criteria, or a spec are ready and need QA coverage designed before test execution or automation. Not for writing the stories or criteria themselves (user-story) or for auditing the whole package (refinement-judge)."
 ---
 
 ## Purpose

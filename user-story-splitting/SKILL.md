@@ -1,6 +1,6 @@
 ---
 name: user-story-splitting
-description: "Breaks a large story or epic into smaller deliverable stories using proven split patterns. Use when backlog items are too big for estimation, sequencing, or independent release."
+description: "Breaks a large story or epic into smaller deliverable stories using proven split patterns. Use when backlog items are too big for estimation, sequencing, or independent release. Not for laying out the whole user journey first (use `user-story-mapping`)."
 ---
 
 

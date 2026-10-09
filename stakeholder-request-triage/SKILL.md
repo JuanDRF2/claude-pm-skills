@@ -1,6 +1,6 @@
 ---
 name: stakeholder-request-triage
-description: "Turns a request from someone with authority (a sales lead, an executive, a key customer) into a defensible decision: the need behind the ask, the smallest slice that meets it, the trade-off stated as what moves and by how much, an explicit decision owner, and a written record. Use when a stakeholder asks for a feature or a change, often with a deal or a deadline attached, and the user asks how to respond, whether to say yes or no, or how to negotiate scope."
+description: "Turns a request from someone with authority (a sales lead, an executive, a key customer) into a defensible decision: the need behind the ask, the smallest slice that meets it, the trade-off stated as what moves and by how much, an explicit decision owner, and a written record. Use when a stakeholder asks for a feature or a change, often with a deal or a deadline attached, and the user asks how to respond, whether to say yes or no, or how to negotiate scope. Not for ranking a whole backlog (use `prioritization-scorer`) or running a full initiative (use `signal-to-ship`)."
 ---
 
 # Stakeholder Request Triage
