@@ -141,9 +141,9 @@ for the data instead. Without Node it does the due-date and stopped checks by ha
 ## What to expect, honestly
 
 - Only Claude Code was tested, and only in a headless harness with a simulated PM, on one model family. There are 51
-  eval cases: twenty-eight were run on version 0.11.0 (one of them a full bug-fix cycle, mostly once or a few
-  times), and the other twenty-three were written for version 0.12.0 and have not been run. The runs found real
-  defects that were fixed. It has not been used by anyone but its author.
+  eval cases: eleven have a recorded run (mostly once or a few times), and the
+  other forty have no recorded result: seventeen older cases and twenty-three written for version 0.12.0 that have not
+  been run. The runs found real defects that were fixed. It has not been used by anyone but its author.
 - It asks one question at a time, so a full cycle is many turns. That is the point, and light depth keeps it short for small work.
 - It does not edit your product code, and it cannot reach a tool you have not connected: it will say so and give
   you the text to paste.

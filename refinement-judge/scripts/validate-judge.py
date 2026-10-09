@@ -172,7 +172,7 @@ def validate_finding_history(
 
 
 def run_report(
-    report: Path, required_stage: str | None, previous_report: Path | None = None
+    report: Path, required_stage: str | None = None, previous_report: Path | None = None
 ) -> int:
     if not report.is_file():
         print(f"ERROR: report does not exist: {report}")
@@ -195,6 +195,11 @@ def run_report(
         errors.append("Missing Intended action/Acción evaluada.")
     if not SNAPSHOT_RE.search(text):
         errors.append("Missing valid 64-character reviewed snapshot SHA-256.")
+    if len(VERDICT_RE.findall(text)) > 1 or len(SNAPSHOT_RE.findall(text)) > 1:
+        errors.append(
+            "Report must hold a single current Verdict and a single reviewed snapshot SHA-256; "
+            "move rerun notes to the Review history section without a competing verdict."
+        )
     stage = ACTION_STAGE_RE.search(text)
     if stage and stage.group(1) == "Preview" and ACTION_SCOPE_LABEL_RE.search(text):
         errors.append(

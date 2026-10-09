@@ -1,6 +1,6 @@
 ---
 name: writing-voice
-description: "Applies your own writing voice — direct, human, concrete, no AI-tells — to external-facing content. Use when drafting or editing content: LinkedIn posts, portfolio copy, bios, cover letters, launch announcements, newsletters, X/tweets, public writing, and personal messages/DMs they'll send as themselves."
+description: "Applies your own writing voice — direct, human, concrete, no AI-tells — to external-facing content. Use when drafting or editing content: LinkedIn posts, portfolio copy, bios, cover letters, launch announcements, newsletters, X/tweets, public writing, and personal messages/DMs they'll send as themselves. Not for specs, tickets, or internal documents (mini-spec-writer, prd-writer)."
 ---
 
 # Writing Voice

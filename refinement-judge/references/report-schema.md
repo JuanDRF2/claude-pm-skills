@@ -14,6 +14,10 @@ Write the report in the package language. Use the translated headings shown belo
 - Review date / Fecha de revisión: YYYY-MM-DD
 - Reviewer / Revisor: Refinement Judge
 
+This is the only current-state summary. Put chronological rerun notes after gate
+authorization under `## Review history / Historial de revisiones`; historical notes must
+not introduce a competing verdict, snapshot hash, coverage table or authorization.
+
 ## Executive summary / Resumen ejecutivo
 
 [What can or cannot proceed and why.]
@@ -73,15 +77,20 @@ Write the report in the package language. Use the translated headings shown belo
 - Allowed actions / Acciones permitidas: [...]
 - Blocked actions / Acciones bloqueadas: [...]
 - Human override / Excepción humana: None / Ninguna
+
+## Review history / Historial de revisiones
+
+- [Date, frozen snapshot, localized scope and outcome; no competing current-state summary]
 ```
 
-`Action stage` y `Action scope` son obligatorios cuando el Judge evalúa una publicación
-localizada en Notion. Usar `technical=N; editorial=N`; contar solo páginas que pueden
-escribirse y declarar `verification-only` por separado. `Publication` significa el write set remoto exacto; no usarlo
-para la mera preparación de un preview. En otros gates pueden omitirse cuando no aplica
-una publicación externa.
-
-En `Preview`, omite `Action scope`: todavía no existe un write set remoto autorizable.
+`Action stage` and `Action scope` apply when the Judge evaluates an external publication
+(any destination that receives a write set, including a localized Notion publication). Use
+`technical=N; editorial=N`, counting only items that can be written, and list
+`verification-only` items separately. `Publication` means the exact write set about to be
+applied, not preparation of a preview; `Post-publication` audits what was written. In
+`Preview`, omit `Action scope`: no authorizable write set exists yet. Other gates may omit
+both fields. Validate with `validate-judge.py report <file> --publication` or
+`--post-publication`.
 
 ## Empty findings
 
@@ -108,7 +117,7 @@ On every rerun:
 7. Update snapshot hash and date.
 8. Recalculate the verdict from open and partially resolved findings.
 9. Keep accepted-risk entries visible.
-10. For Notion publication, update the action stage and exact technical/editorial counts.
+10. For an external publication, update the action stage and exact technical/editorial counts.
 
 For a finding that summarizes several affected IDs, include the complete inventory directly
 or link a durable review artifact with one row per ID, classification, evidence, status and

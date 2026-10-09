@@ -1,6 +1,6 @@
 ---
 name: refinement-judge
-description: "Audits a complete product-refinement package as an independent adversarial quality gate before external publication, Jira creation, final handoff, automation planning, or another consequential action. Use after stories, acceptance criteria, business rules, canonical scenarios, coverage checks, functional test cases, traceability, and handoffs have been generated or materially changed, or when a user asks whether an existing refinement package is trustworthy, complete, consistent, and ready to proceed."
+description: "Audits a complete product-refinement package as an independent adversarial quality gate before external publication, Jira creation, final handoff, automation planning, or another consequential action. Use after stories, acceptance criteria, business rules, canonical scenarios, coverage checks, functional test cases, traceability, and handoffs have been generated or materially changed, or when a user asks whether an existing refinement package is trustworthy, complete, consistent, and ready to proceed. Not for writing or fixing the package: it only audits and reports findings."
 ---
 
 # Refinement Judge
@@ -53,15 +53,15 @@ For a complete package before publication, Jira or final handoff, run the strict
 python3 scripts/validate-judge.py preflight <artifact-folder> --language <es|en>
 ```
 
-Cuando el manifiesto registrado declare `package_kind: shared-contract`, conserva ese tipo:
+When the registered manifest declares `package_kind: shared-contract`, preserve that kind:
 
 ```bash
 python3 scripts/validate-judge.py preflight <artifact-folder> --language <es|en> \
   --package-kind shared-contract
 ```
 
-No selecciones este modo solo por el tamaño del paquete. Un proyecto normal conserva el
-contrato completo aunque le falten archivos.
+Do not select this mode merely because of package size. A normal project keeps the complete
+contract even when files are missing.
 
 For the extension-route Gate C that occurs before Gate 2 stories exist, run:
 
@@ -82,9 +82,14 @@ The preflight validates and hashes product artifacts only. It excludes
 or contradictory IDs and must not become product requirements merely by being
 recorded in the audit.
 
-For a localized Notion publication, evaluate the remote write itself, not only preparation
-of its preview. Record `Action stage / Etapa de acción: Publication` and `Action scope /
-Alcance de acción: technical=N; editorial=N` using the frozen authorization dossier.
+When the intended action writes to an external destination, evaluate the write itself, not
+only its preview: record `Action stage / Etapa de acción` (`Preview`, `Publication` or
+`Post-publication`) and, outside `Preview`, `Action scope / Alcance de acción:
+technical=N; editorial=N` (see `references/report-schema.md`), then validate with
+`validate-judge.py report <file> --publication|--post-publication`. A report keeps one
+current verdict and one snapshot SHA-256; rerun notes go under Review history.
+
+For a localized Notion publication, apply the same rule using the frozen authorization dossier.
 
 For a GitHub handoff, inspect the configured canonical branch, observed base commit, exact
 diff, package path and repository exclusions. Confirm the proposed branch is not the

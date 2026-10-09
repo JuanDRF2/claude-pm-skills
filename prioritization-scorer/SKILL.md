@@ -1,6 +1,6 @@
 ---
 name: prioritization-scorer
-description: "Scores and ranks product work with a transparent framework (RICE, ICE, WSJF, MoSCoW or a custom one), labelling every input as measured, estimated or guessed, and showing how fragile the ranking is. Use when the user wants to prioritize features, decide what to build next, compare options, or sanity-check a roadmap order. Not for urgent bugs or work already committed by contract, where urgency decides."
+description: "Scores and ranks product work with a transparent framework (RICE, ICE, WSJF, MoSCoW or a custom one), labelling every input as measured, estimated or guessed, and showing how fragile the ranking is. Use when the user wants to prioritize features, decide what to build next, compare options, or sanity-check a roadmap order. Not for urgent bugs or work already committed by contract, where urgency decides; not for answering one stakeholder's request (use `stakeholder-request-triage`) or running a whole initiative (use `signal-to-ship`)."
 ---
 
 # Prioritization Scorer

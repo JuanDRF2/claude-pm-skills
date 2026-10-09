@@ -1,6 +1,6 @@
 ---
 name: build-refinement-document
-description: Genera o actualiza un documento Word (.docx) claro y navegable desde un paquete Markdown aprobado de refinamiento de producto y QA. Usar cuando una persona quiera revisar, compartir, aprobar, imprimir o archivar historias, criterios, reglas, checks, casos funcionales, escenarios, automatización, pendientes y riesgos sin usar el portal HTML; también cuando el orquestador ofrezca Word como salida opcional final.
+description: "Genera o actualiza un documento Word (.docx) claro y navegable desde un paquete Markdown aprobado de refinamiento de producto y QA. Usar cuando una persona quiera revisar, compartir, aprobar, imprimir o archivar historias, criterios, reglas, checks, casos funcionales, escenarios, automatización, pendientes y riesgos sin usar el portal HTML; también cuando el orquestador ofrezca Word como salida opcional final. No sirve para redactar ni corregir el paquete, solo presenta un paquete ya aprobado (para crearlo, story-to-test-workflow)."
 ---
 
 # Build Refinement Document

@@ -86,6 +86,7 @@ Never label an item Covered merely because a document exists. Coverage requires 
 | `06-test-coverage.md` | Risk analysis and coverage matrix | Gate 4 |
 | `07-functional-test-cases.md` | Grouped functional cases and QA-reviewable scenarios | Gate 4 |
 | `08-traceability-and-risks.md` | Active rule-to-test coverage, separately labeled retired history and remaining risk | Gate 4/final audit |
+| `README.md` | Required (a missing or empty file is a hard validation error). Package purpose, how to read the package by role, and entry points; role-based entry point and authority boundaries; links each state to its authoritative document | Package creation and every material status change |
 | `09-package-index.md` | Project/delivery status and navigation | Gate 4/final audit |
 | `10-design-and-spec-deltas.md` | Optional expanded ledger for derived artifacts; `02` remains the entry point | Gate 1 and every material prototype/SPEC review |
 | `integrations/taxonomy-mapping.md` | Optional active cross-reference between approved package IDs and Product Taxonomy codes; schema owned by `sync-refinement-package-taxonomy` | Gate 5 when Taxonomy applies and after affected reconciliation |

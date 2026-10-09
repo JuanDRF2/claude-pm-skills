@@ -1,6 +1,6 @@
 ---
 name: video-demo-generator
-description: "Generates polished, on-brand MP4 demo videos for interactive artifacts and UI components. Use this skill whenever a video walkthrough of an interactive HTML artifact, a feature-flow showcase, documentation of user interactions, or a stakeholder demo is needed. Automatically applies design tokens (colors, typography, spacing) from the design-system skill, ensuring consistent branding. Works with: billing flows, upgrade/renewal interfaces, modal interactions, form wizards, or any interactive component. Creates videos in MP4 format, ready to embed or share."
+description: "Generates polished, on-brand MP4 demo videos for interactive artifacts and UI components. Use this skill whenever a video walkthrough of an interactive HTML artifact, a feature-flow showcase, documentation of user interactions, or a stakeholder demo is needed. Automatically applies design tokens (colors, typography, spacing) from the design-system skill, ensuring consistent branding. Works with: billing flows, upgrade/renewal interfaces, modal interactions, form wizards, or any interactive component. Creates videos in MP4 format, ready to embed or share. Not for static mockups (mockup-builder)."
 ---
 
 # Video Demo Generator

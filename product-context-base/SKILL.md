@@ -1,15 +1,6 @@
 ---
 name: product-context-base
-description: >
-  Builds and stores a rich product context snapshot for a specific team by pulling
-  the last 6 months of Jira issues and relevant Notion product pages. Use this skill
-  whenever a PM or Head of Product says things like "load my product context",
-  "give yourself context about my product", "catch up on what we've been building",
-  "refresh your memory about our product", "initialize context for my team", or
-  any time a user wants Claude to understand the history of product decisions before
-  doing strategic work, writing stories, prioritizing roadmap, or doing analysis.
-  Use this skill when deep product work needs context that has not been loaded yet in the
-  conversation, and only when the user asks for it or confirms it first (it reads Jira and Notion).
+description: "Builds and stores a product context snapshot for a team by pulling the last 6 months of Jira issues and relevant Notion product pages. Use when a PM asks Claude to load or refresh context about the product before strategic work such as writing stories, prioritizing a roadmap or analysis, and only when the user asks for it or confirms first (it reads Jira and Notion). Not for a single question that the conversation already answers."
 compatibility:
   tools:
     - Atlassian (Jira + Confluence MCP)

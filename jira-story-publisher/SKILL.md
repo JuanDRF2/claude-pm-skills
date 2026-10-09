@@ -1,6 +1,6 @@
 ---
 name: jira-story-publisher
-description: "Pushes an already-approved user story (written by `user-story` or the `story-to-test-workflow` orchestrator) into Jira as a real issue, with a numeric effort estimate. Use this skill whenever the user wants to: create the Jira issue for an approved story, estimate a confirmed story, push a story package to Jira, or turn `US-*`/`AC-*`/`SC-*` Markdown into a live Jira ticket. Trigger on phrases like \"create this in Jira\", \"push this story to Jira\", \"estimate and file this ticket\", \"turn US-MEM-01 into a Jira issue\", or any time an approved story package is shared alongside a Jira project or epic reference. Does not draft or redesign a story's acceptance criteria — that is `user-story`'s job; this skill only estimates and publishes what has already been approved."
+description: "Pushes an already-approved user story (written by `user-story` or the `story-to-test-workflow` orchestrator) into Jira as a real issue, with a numeric effort estimate. Use when the user wants to create the Jira issue for an approved story, estimate a confirmed story, or turn `US-*`/`AC-*`/`SC-*` Markdown into a live ticket, with a Jira project or epic reference. Not for drafting or redesigning acceptance criteria (that is `user-story`); this skill only estimates and publishes what was approved."
 ---
 
 # Jira Story Publisher
@@ -37,7 +37,7 @@ Pull directly from the story's own Markdown — do not re-derive or rephrase:
 - **Users affected** — every persona/role referenced across the story and its scenarios
 - **Use cases / scope** — the story's Included and Excluded behavior sections
 - **Design specifications** — every `Technical consideration` / `Technical evidence` line across the story's criteria, collected in one place
-- **Acceptance criteria** — every `AC-*` with its `SC-*` Given/When/Then scenarios, copied **verbatim, IDs included** — never regenerate or rephrase a scenario here
+- **Acceptance criteria** — every `AC-*` with its `SC-*` Given/When/Then scenarios and any BDD tags, copied **verbatim, IDs and tags included** — never regenerate or rephrase a scenario here
 
 If any of these sections is missing or the story reads as a draft rather than confirmed behavior, stop and flag the gap — do not fill it with an assumption.
 
@@ -51,6 +51,8 @@ If any of these sections is missing or the story reads as a draft rather than co
 | Large | 4–5d | 2d | 6–7d |
 
 Workdays = 8h. Base the size on scope, complexity, ambiguity, and the number of `SC-*` scenarios — not a guess.
+
+**Appetite check:** if the parent Epic came out of a Shape with a stated appetite (a fixed time budget, not story points), and other stories under the same Epic have already been estimated, sum the estimates so far and check them against that appetite. Flag it explicitly if the running total would blow through it. That is a signal to cut scope, not to silently extend the appetite.
 
 **Tech stack context:** `[YOUR_STACK]` — ask the user for their actual stack (frontend framework, backend language/framework, architecture style, infra) the first time this skill runs on a new project, then reuse it for the rest of the session. Base estimates on that real stack, not a placeholder.
 
@@ -83,7 +85,7 @@ When [action]
 Then [expected outcome]
 And [additional outcome if needed]
 ```
-*(One block per `SC-*`, copied verbatim with its ID — not rewritten.)*
+*(One block per `SC-*`, copied verbatim with its ID and tags — not rewritten.)*
 
 **ESTIMATE:**
 - Development: Xh / Xd
@@ -97,7 +99,7 @@ And [additional outcome if needed]
 Show the assembled ticket, then:
 
 1. **Traceability check** — confirm every `AC-*` in the story has at least one `SC-*` reproduced above; flag any gap instead of inventing a scenario to fill it.
-2. **Estimate rationale** — one line on why this size.
+2. **Estimate rationale** — one line on why this size, and the appetite check result if applicable.
 
 Then **stop and ask**: *"Should I create this story in Jira?"*
 
@@ -136,9 +138,10 @@ without inventing an issue key. Say plainly that nothing was created.
 Before creating any issue, verify:
 
 - [ ] The source story's approval state is confirmed, not draft or pending review
-- [ ] Every `AC-*`/`SC-*` reproduced in the ticket is copied verbatim from the approved package, IDs intact
+- [ ] Every `AC-*`/`SC-*` reproduced in the ticket is copied verbatim from the approved package, IDs and BDD tags intact
 - [ ] No acceptance criterion was rewritten, reworded, or invented in this skill
 - [ ] Estimate reflects the tech stack and the story's real scope, not a placeholder
+- [ ] Appetite check run and reported when the parent Epic has a stated appetite
 
 ---
 

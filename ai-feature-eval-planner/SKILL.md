@@ -1,6 +1,6 @@
 ---
 name: ai-feature-eval-planner
-description: "Plans how to prove that a product feature built on a language model works before it ships: autonomy level per capability, an AI risk review, the eval plan (criteria with numeric thresholds, golden dataset, graders, failure modes, cost and latency budget), tool ergonomics for agents, and a staged rollout. Use when a feature includes a model or lets an agent act in the product, and the user asks how to evaluate it, what can run without confirmation, or whether it is ready to release."
+description: "Plans how to prove that a product feature built on a language model works before it ships: autonomy level per capability, an AI risk review, the eval plan (criteria with numeric thresholds, golden dataset, graders, failure modes, cost and latency budget), tool ergonomics for agents, and a staged rollout. Use when a feature includes a model or lets an agent act in the product, and the user asks how to evaluate it, what can run without confirmation, or whether it is ready to release. Not for QA coverage of ordinary deterministic stories (test-case-designer)."
 ---
 
 # AI Feature Eval Planner

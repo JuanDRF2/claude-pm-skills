@@ -1,6 +1,6 @@
 ---
 name: user-story-mapping
-description: "Creates a user story map that lays out activities, steps, tasks, and release slices. Use when planning a workflow, backlog, or MVP around the user journey."
+description: "Creates a user story map that lays out activities, steps, tasks, and release slices. Use when planning a workflow, backlog, or MVP around the user journey. Not for cutting one oversized story into smaller ones (use `user-story-splitting`)."
 ---
 
 

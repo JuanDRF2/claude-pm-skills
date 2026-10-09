@@ -1,6 +1,6 @@
 ---
 name: user-story
-description: "Creates user stories with Mike Cohn format and focused Gherkin acceptance criteria written in clear product language, with technical considerations separated from observable behavior. Use when turning user needs into development-ready or Jira-ready work with understandable outcomes and testable conditions."
+description: "Creates user stories with Mike Cohn format and focused Gherkin acceptance criteria written in clear product language, with technical considerations separated from observable behavior. Use when turning user needs into development-ready or Jira-ready work with understandable outcomes and testable conditions. Not for specs (mini-spec-writer, prd-writer) or for splitting a large story (user-story-splitting)."
 ---
 
 
@@ -236,6 +236,10 @@ Before accepting a criterion, read it aloud without its rule IDs or technical no
 - Validate exact message wording only when approved copy, legal text, accessibility wording,
   or a contractual label requires it. Otherwise validate the meaning, resulting state and
   available user action without freezing incidental copy.
+
+#### BDD tag convention
+
+If the team tags BDD scenarios, tag each `SC-*` before its `Scenario:` line, for example `@priority:P1/P2/P3`, `@data:static/sequential/temporal`, `@story:PROJ-XXX` (once the tracker issue exists), plus `@a11y`, `@gdpr`, `@security` or `@i18n` for any cross-cutting concern that applies. Skip tags that don't apply rather than forcing all of them. `jira-story-publisher` copies these tags verbatim when it files the story, so never regenerate or rephrase a tagged scenario there.
 
 #### Matrix and dataset references
 

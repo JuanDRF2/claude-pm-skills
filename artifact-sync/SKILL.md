@@ -1,6 +1,6 @@
 ---
 name: artifact-sync
-description: "Propagates a single product decision across every linked artifact so nothing drifts: Jira (epic/story body AND comments), the Notion spec (with a version bump), design references, and HTML/JSX mockups. Use this skill whenever a decision, rule, scope item, field, owner, or date CHANGES after it has already been written down, and the change needs to land in more than one place. Trigger on phrases like \"this changed, update everything\", \"keep the artifacts in sync\", \"propagate this decision\", \"we changed X on [epic], fix the spec and tickets\", \"the spec and the mockup don't match\", or any time an edit to one artifact implies edits to others. Use this skill for cross-artifact changes rather than hand-editing one artifact and assuming the rest are fine."
+description: "Propagates a single product decision across every linked artifact so nothing drifts: Jira (epic/story body and comments), the Notion spec (with a version bump), design references, and HTML/JSX mockups. Use when a decision, rule, scope item, field, owner or date CHANGES after it was written down and the change must land in more than one place, for example when the spec and the mockup no longer match. Not for writing a first version of any artifact, and not for a change that touches only one place."
 compatibility:
   tools:
     - Atlassian (Jira + Confluence MCP)
@@ -24,7 +24,12 @@ full diff, and only then propagate. You never silently edit, and you never leave
 | Spec page | Notion | Body, tables, version number, changelog line |
 | Design references | Notion / Jira | Links and captions pointing at the right design |
 | Mockups | HTML / JSX | Behavior, labels, data shown |
+| BDD scenarios | Test repo / spec | Given/When/Then values that encode the old rule: **flag, do not silently rewrite tests** |
 | Figma | Figma | **Flag only — never edit.** Hand off to the designer |
+
+If the team runs Epic → Stories → BDD scenarios → PR → Deploy traceability, a changed business rule almost
+always means a BDD scenario now encodes stale behavior. That is the artifact most likely to drift silently,
+because it lives in the test repo, not in the tracker or the spec.
 
 ## Defaults (override if the user says otherwise)
 
@@ -58,6 +63,8 @@ Starting from the anchor, enumerate every linked artifact. Do not edit anything 
    Fetch it. Note its current **version** and whether it has a changelog.
 3. **Design references.** Collect every Figma link and every "Design Reference" pointer in Jira and Notion.
 4. **Mockups.** Collect HTML/JSX mockups referenced in Jira comments or Notion (filenames, links, or embedded code).
+5. **BDD scenarios.** If a `@story:PROJ-XXX` tag or an explicit test-file reference points back to the
+   anchor, note the scenario file and scenario name(s) that cover the rule now changing.
 
 Output a short inventory: *"Here is everything linked to {anchor}: N Jira issues, 1 spec (v1.3), 2 Figma
 refs, 1 JSX mockup."* If something looks orphaned or you cannot find the spec, say so — do not guess.
@@ -104,7 +111,10 @@ Apply in this order, so the spec stays the source of truth:
 3. **Jira comments** — add a short comment on each affected issue: *"Updated per decision change: [what].
    Spec now v1.4."* This leaves an audit trail.
 4. **Mockups you can access (HTML/JSX)** — edit the file directly and re-present it.
-5. **Figma and production code** — **flag, do not edit.** List exactly what the designer/engineer must change.
+5. **BDD scenarios** — **flag, do not edit.** A test encoding the old rule needs a developer to update it as
+   part of the code change (failing with the new expectation first, then passing); silently rewriting a test
+   file defeats the point of having the test. List exactly which scenario(s) and what value must change.
+6. **Figma and production code** — **flag, do not edit.** List exactly what the designer/engineer must change.
 
 ---
 
@@ -113,7 +123,7 @@ Apply in this order, so the spec stays the source of truth:
 Close with a compact report:
 
 - ✅ Updated: [artifact + location], … (with the new spec version)
-- 🖐 Needs a human: [Figma frame X], [code path Y]
+- 🖐 Needs a human: [Figma frame X], [BDD scenario Y, old value still asserted], [code path Z]
 - 🔎 Resolved "Also noticed": [owner corrected / TL filled / …] or left open with a question
 
 ---
@@ -129,20 +139,20 @@ as a manual step for the user, and say that those artifacts are not yet in sync.
 - **Propose before write. Always.** Phase 3 is non-negotiable.
 - **Never invent the decision.** You propagate a stated change; you do not decide what changed.
 - **Preserve unrelated content.** Edits are surgical. Bumping a spec must not drop sections.
-- **Never edit Figma or production code.** Flag them for the owner.
+- **Never edit Figma, BDD scenarios/test files, or production code.** Flag them for the owner.
 - **Never change permissions or sharing** on any document — that is always the user's action.
 - **Comments are first-class.** Read them in Phase 1; write an audit comment in Phase 4.
 - **Always bump the spec version** when the spec body changes, with a one-line changelog.
 - All written content in **English**, regardless of the language the user writes in.
-- Propagating to any already-published artifact is an `ask`-tier action; editing Figma/code instead of flagging is `block`-tier — see `skills/ACTION-TIERS.md`.
+- Propagating to any already-published artifact is an `ask`-tier action; editing Figma/BDD/code instead of flagging is `block`-tier — see `skills/ACTION-TIERS.md`.
 
 ## Quality bar
 
-1. Did I enumerate *every* linked artifact, including Jira comments?
+1. Did I enumerate *every* linked artifact, including Jira comments and any BDD scenarios tied to this rule?
 2. Is the diff specific enough that the user can approve it without opening each tool?
 3. Did I surface inconsistencies beyond the requested change?
 4. Did I bump the spec version and leave an audit trail in Jira?
-5. Is it unambiguous what still needs a human (Figma, code)?
+5. Is it unambiguous what still needs a human (Figma, BDD scenarios, code)?
 
 ---
 
