@@ -48,6 +48,18 @@ Search project knowledge or ask the user to confirm whether any of the following
 
 ---
 
+## Step 0.5 — Confirm this is the right-sized tool (Appetite check)
+
+A Mini Spec is for work that fits a **fixed, small time budget**, the feature's *appetite* rather than an
+open-ended estimate. Before writing, confirm size:
+
+- **Dev can build it in under ~2 days with existing patterns and obvious acceptance criteria?** A Mini Spec is the right tool. State the appetite explicitly (for example "Appetite: 2 days") at the top of the spec, right after the title.
+- **New architecture, new cross-domain contracts, or a budget over ~1 week?** This is too big for a Mini Spec. Say so and recommend a full PRD (`prd-writer`) instead of writing a Mini Spec that will just get revised.
+- **About 2 days to 1 week?** Use judgment. Lean toward a PRD (`prd-writer`) if the work is cross-domain or needs sign-off.
+- **Appetite is fixed, scope is variable.** If the write-up doesn't fit the stated appetite, cut scope (move it to Out of Scope) rather than quietly expanding the budget.
+
+---
+
 ## When to ask vs. when to proceed
 
 **Always ask before writing if you're missing:**
@@ -155,14 +167,21 @@ Bold the rule statement. Add a clarifying sentence if needed.
 ---
 
 ### 10. Standard Scenarios
-Walk through 3–6 concrete examples using real-ish data. Each scenario must:
+Walk through concrete examples using real-ish data. These are BDD scenarios: write them so a developer can run
+them as tests before writing any code, not just read them as prose. The minimum count scales with size: **at least
+3** for a small feature (the Mini Spec's normal range), **at least 8** if the scope turned out bigger than expected
+(a sign it may have outgrown the Mini Spec format; flag it per Step 0.5). Each scenario must:
 - Have a descriptive name
 - State the input/trigger
 - State the expected outcome on all affected objects/fields
 
 Format:
 **[Scenario name]**
-[Setup]. [What happens]. [Expected result].
+```gherkin
+Given [precondition]
+When [action]
+Then [expected outcome]
+```
 
 ---
 
@@ -249,12 +268,14 @@ If provided, break down by story/phase. If AI-assisted development is relevant, 
 Before finishing, ask yourself:
 
 1. Did I run the Step 0 architecture pre-check — and is Section 6a present?
-2. Could an engineer build this without a follow-up meeting?
-3. Are all business rules testable?
-4. Are all open questions explicitly flagged — not hidden inside rule statements?
-5. Is the scope unambiguous — both what's in AND what's out?
-6. Are all terms defined that a new team member wouldn't already know?
-7. Does the spec use domain vocabulary exactly as defined — no informal synonyms?
+2. Did I run the Step 0.5 appetite check: is the appetite stated, and does this fit a Mini Spec or need a bigger document?
+3. Could an engineer build this without a follow-up meeting?
+4. Are all business rules testable?
+5. Are all open questions explicitly flagged — not hidden inside rule statements?
+6. Is the scope unambiguous — both what's in AND what's out?
+7. Are all terms defined that a new team member wouldn't already know?
+8. Does the spec use domain vocabulary exactly as defined — no informal synonyms?
+9. Do the Standard Scenarios meet the minimum BDD count for this size, written so they are runnable as tests?
 
 If the answer to any of these is "no," fix it before delivering.
 
