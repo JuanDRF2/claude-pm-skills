@@ -56,6 +56,35 @@ the end of the day," "in conclusion," "furthermore," "moreover."
 secreto que," "un antes y un después," "de la mano de," "en definitiva,"
 potenciar, revolucionario, "además" as a filler opener.
 
+### Advisory list (flag it, then decide; some are fine once in a while)
+
+English: navigate, landscape, realm, synergy, holistic, cutting-edge, passionate, "I am thrilled,"
+"proven track record," "results-driven," "fast-paced environment," "empower," "streamline,"
+"harness," "foster," "pivotal," "not just X, but Y," "let's dive in," and a closing line that
+restates the opening.
+
+Spanish: "apasionado por," "orientado a resultados," "entorno dinámico," "sinergia," "holístico,"
+"de vanguardia," "experiencia comprobada," "me emociona," "no solo X, sino también Y,"
+"llevar al siguiente nivel," and a closing line that restates the opening.
+
+## Register map
+
+Same voice, different dial. Fill in your own lengths, these are starting points.
+
+| Where | Length | Tone |
+|---|---|---|
+| Cover letter | 3 short paragraphs | Direct, confident; their need answered by your proof |
+| CV bullets | One line each | Plain, factual: verb, what, result |
+| LinkedIn post | 80–200 words | Opinionated, concrete, one idea |
+| Recruiter message | 2–4 sentences | Warm, brief; why this role, one proof, one ask |
+| DM to a friend or contact | As short as speech | Casual, written like you talk |
+
+## Naming a gap
+
+When the job asks for something you do not have, say it first and short, then give the nearest true
+thing: "I have not worked inside X. What I bring instead is Y, which I have done in Z." No apology,
+not buried in the last paragraph, and never claim the missing thing.
+
 ## Calibrating to the user's actual voice (required before first use)
 
 This skill only works if it's calibrated to a real writing sample — the voice rules
@@ -73,6 +102,15 @@ context?), sentence rhythm, how concrete vs. abstract they default to, and how t
 close a paragraph (a punchy line vs. a summary sentence). Re-derive the "what to
 copy" notes from the user's own sample — don't assume the generic Voice section above
 is a complete substitute for their actual calibration.
+
+## Learning from edits
+
+When the user sends back an edited version of a draft, compare it with the draft, name the pattern they
+changed (word, length, tone), and propose adding it to the calibration above. Add it only after they say
+yes. Real unedited text from the user replaces any AI-drafted sample.
+
+This skill decides how a draft sounds, not what is true: every fact, number, title and date comes from
+the user's own verified material.
 
 ## The test
 
