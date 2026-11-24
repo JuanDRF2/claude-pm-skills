@@ -49,7 +49,7 @@ The `roadmap` mode reads `cases/*/scorecard.md` and `cases/*/feature-cards/*.md`
 ## Naming conventions
 
 - Initiative folder: kebab-case, descriptive (`quick-checkout`, `night-shift-reassign`).
-- Group folder: kebab-case (`fundraising-critical-path`, `q4-payments`).
+- Group folder: kebab-case (`checkout-critical-path`, `q4-payments`).
 - Delivery docs: `<feature-name>-<template-type>.md` (`quick-checkout-release-notes.md`).
 - The saved progress is always `00-signal-to-ship-state.md`. There is no other file name.
 

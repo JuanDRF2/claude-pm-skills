@@ -21,7 +21,7 @@ Or clone the repo and copy whichever individual skill folders you want into `~/.
 ## Want the whole rhythm, not just individual skills?
 
 The skills below are useful on their own, but they were built to run inside **Cadence** — a
-solo delivery rhythm (Shape → Build → Verify → Ship) they already speak the language of under
+solo delivery rhythm (Shape → Build → Verify → Ship; `idea-to-ship` calls the first stage Define) they already speak the language of under
 generic names, whether or not you know it exists. See [`CADENCE.md`](./CADENCE.md) for the
 one-screen version, [`CADENCE-REFERENCE.md`](./CADENCE-REFERENCE.md) for the fuller write-up with
 sources cited for every idea in it.
@@ -61,7 +61,7 @@ below are enough to start.
 | [`jira-story-publisher`](./jira-story-publisher/) | Takes an *already-approved* story from `user-story` (never drafts one itself), estimates it, and creates the real Jira issue. |
 | [`launch-comms`](./launch-comms/) | Turns an approved release note into a set of short, channel-specific launch communications: internal Slack announcement, leadership brief, CS/Support heads-up, sales enablement blurb, and customer-facing copy. |
 | [`mini-spec-writer`](./mini-spec-writer/) | Converts a raw product idea, feature request, or Slack message into a structured, implementation-ready mini specification. |
-| [`mockup-builder`](./mockup-builder/) | Builds on-brand, handoff-ready HTML or JSX mockups pinned to the platform's design system and domain-correct data references. |
+| [`mockup-builder`](./mockup-builder/) | Builds on-brand, handoff-ready HTML or JSX mockups pinned to your design system and domain-correct data references. |
 | [`okr-tracker`](./okr-tracker/) | Defines, reviews, scores, and updates OKRs (Objectives and Key Results) for a product team or initiative. |
 | [`prd-writer`](./prd-writer/) | Writes a full Product Requirements Document (PRD) for a feature, initiative, or product area. |
 | [`prioritization-scorer`](./prioritization-scorer/) | Scores and ranks product work with a transparent framework (RICE, ICE, WSJF, MoSCoW or custom), labelling every input as measured, estimated or guessed and showing how fragile the ranking is. |
@@ -84,7 +84,7 @@ below are enough to start.
 | [`weekly-product-pulse`](./weekly-product-pulse/) | Generates a structured weekly status report for the Head of Product by pulling the active sprint from all product team Jira projects, grouping results by team, and surfacing delivery health, blockers, and risks. |
 | [`writing-voice`](./writing-voice/) | Applies your own calibrated writing voice — direct, human, no AI-tells — to external-facing content (LinkedIn, cover letters, bios, launch announcements) in English or Spanish. |
 
-35 skills in total.
+30+ skills in total.
 
 ---
 

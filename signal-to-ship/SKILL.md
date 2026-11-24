@@ -1,6 +1,6 @@
 ---
 name: signal-to-ship
-description: "Orchestrates a product initiative from customer signal to measured outcome in seven gated phases: signals, prioritization, specification, prototyping, refinement, delivery and measurement. Use to take a feature, bug fix or migration through the whole cycle (or on /signal-to-ship, resume, portfolio, roadmap), decide whether something is worth building (a recorded stop is valid), handle a stakeholder request, or decide keep, iterate or retire after launch. Right-sizes to light, standard or full, with eval and autonomy gates for model features. Not for scoring, release notes or any single quick task: use the specialist skill directly."
+description: "Orchestrates a product initiative from customer signal to measured outcome in seven gated phases: signals, prioritization, specification, prototyping, refinement, delivery and measurement. Use to take a feature, bug fix or migration through the whole cycle (or on /signal-to-ship, resume, portfolio, roadmap), decide whether something is worth building (a recorded stop is valid), handle a stakeholder request, or decide keep, iterate or retire after launch. Right-sizes to light, standard or full; adds eval and autonomy gates for model features. Not for scoring, release notes or any single quick task: use the specialist skill directly."
 allowed-tools:
   - Read
   - Write
