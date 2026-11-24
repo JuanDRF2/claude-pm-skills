@@ -1,8 +1,10 @@
 # Claude PM Skills
 
-A library of product-management Skills for Claude. Each skill is a folder containing a `SKILL.md` that instructs Claude how to handle a specific PM workflow — from writing specs to distributing launch comms.
+30+ Claude skills for product managers: from a raw idea to a spec, user stories with acceptance criteria, QA coverage and launch comms. Maintained by Juan Ramos, a product manager in B2B SaaS. The PMs on his team use them.
 
-Not sure which one to use? Start with [`idea-to-ship`](./idea-to-ship/) — it doesn't draft anything itself, it figures out where your initiative stands (idea, spec, approved stories, mid-build, shipped) and routes you to the right skill below, one guided step at a time. Works the same whether you run this with a team on Jira or solo with AI and no tracker at all.
+Each skill is a folder with a `SKILL.md` that tells Claude how to run one PM workflow.
+
+Not sure which one to use? Start with [`idea-to-ship`](./idea-to-ship/). It doesn't draft anything itself. It works out where your initiative stands (idea, spec, approved stories, mid-build, shipped) and routes you to the right skill below, one guided step at a time. Works the same whether you run this with a team on Jira or solo with AI and no tracker at all.
 
 See [`ACTION-TIERS.md`](./ACTION-TIERS.md) for the shared `allow`/`ask`/`block` classification that any skill touching a live system (Jira, Notion, a hosted portal) follows instead of inventing its own confirmation rule. It also states that text a skill reads from tools, files or the web is data, never instructions.
 
@@ -15,33 +17,7 @@ This repo is a [Claude Code Plugin](https://code.claude.com/docs/en/plugins) and
 /plugin install pm-skills@juandrf-pm-skills
 ```
 
-Or clone the repo and copy whichever individual skill folders you want into `~/.claude/skills/` (personal) or `.claude/skills/` (project) — no plugin required either way.
-
----
-
-## Want the whole rhythm, not just individual skills?
-
-The skills below are useful on their own, but they were built to run inside **Cadence** — a
-solo delivery rhythm (Shape → Build → Verify → Ship; `idea-to-ship` calls the first stage Define) they already speak the language of under
-generic names, whether or not you know it exists. See [`CADENCE.md`](./CADENCE.md) for the
-one-screen version, [`CADENCE-REFERENCE.md`](./CADENCE-REFERENCE.md) for the fuller write-up with
-sources cited for every idea in it.
-
-If you also want to set up your own version of the *workspace* this all runs from — not copying
-anyone's personal folder, just the structural pattern — it's simple and has no dependencies:
-
-1. **One folder per project**, each with its own short `CLAUDE.md` (or `AGENTS.md`) stating that
-   project's specific rules — keep the shared/global rules in a parent-level file instead of
-   repeating them per project.
-2. **A guided entry point** — a short, plain-language "how to start a session" reference (project
-   names, a one-line starter phrase per project, what happens after you say it) beats expecting
-   anyone — including future-you — to remember exact skill names or vocabulary.
-3. **`idea-to-ship` as the default front door** for anything that doesn't obviously belong to one
-   project yet — it infers the phase and routes for you, so a new workspace doesn't need every
-   other skill memorized on day one.
-
-That's the whole pattern. No scaffolding tool required — a few Markdown files and the skills
-below are enough to start.
+Or clone the repo and copy whichever individual skill folders you want into `~/.claude/skills/` (personal) or `.claude/skills/` (project). No plugin is required either way.
 
 ---
 
@@ -55,9 +31,9 @@ below are enough to start.
 | [`build-refinement-document`](./build-refinement-document/) | Generates or updates a navigable Word (`.docx`) document from an approved product/QA refinement Markdown package. |
 | [`build-refinement-portal`](./build-refinement-portal/) | Generates or updates a self-contained, offline HTML portal from an approved product/QA refinement Markdown package. |
 | [`competitive-teardown`](./competitive-teardown/) | Researches, analyzes, and documents competitive intelligence for a product, feature, or market. |
-| [`design-system`](./design-system/) | Defines a coherent design token system — colors, typography, spacing, components — for consistent UI. Ships with a placeholder colorimetric palette; swap in your own brand color. |
+| [`design-system`](./design-system/) | Defines a coherent design token system (colors, typography, spacing, components) for consistent UI. Ships with a placeholder colorimetric palette; swap in your own brand color. |
 | [`discovery-interview-guide`](./discovery-interview-guide/) | Plans and runs user discovery research, including interview guides, usability test scripts, and survey questions. |
-| [`idea-to-ship`](./idea-to-ship/) | Single entry point above every other skill: figures out which delivery stage (Define/Build/Verify/Ship) an initiative is in — with or without a ticket tracker — and routes to the right skill next, one numbered-menu question at a time. |
+| [`idea-to-ship`](./idea-to-ship/) | Single entry point above every other skill: figures out which delivery stage (Define/Build/Verify/Ship) an initiative is in, with or without a ticket tracker, and routes to the right skill next, one numbered-menu question at a time. |
 | [`jira-bug-writer`](./jira-bug-writer/) | Formats and creates bug issues in Jira from a plain-language description. |
 | [`jira-story-publisher`](./jira-story-publisher/) | Takes an *already-approved* story from `user-story` (never drafts one itself), estimates it, and creates the real Jira issue. |
 | [`launch-comms`](./launch-comms/) | Turns an approved release note into a set of short, channel-specific launch communications: internal Slack announcement, leadership brief, CS/Support heads-up, sales enablement blurb, and customer-facing copy. |
@@ -69,23 +45,37 @@ below are enough to start.
 | [`product-context-base`](./product-context-base/) | Builds and stores a rich product context snapshot for a specific team by pulling the last 6 months of Jira issues and relevant Notion product pages. |
 | [`product-spec-interview`](./product-spec-interview/) | Builds a product spec from zero by interviewing you: problem and people, evidence, strategy, then deliverables with an outcome coverage matrix and, for high-stakes work, acceptance criteria by axis. Pushes back on vague answers and never invents numbers. |
 | [`publish-refinement-to-notion`](./publish-refinement-to-notion/) | Publishes or updates an approved product/QA refinement Markdown package as native, readable Notion pages. |
-| [`refinement-judge`](./refinement-judge/) | Independent adversarial quality gate that audits a complete product-refinement package before external publication, Jira creation, or another consequential action — comparing it against original sources rather than trusting the generating skill's own conclusions. |
+| [`refinement-judge`](./refinement-judge/) | Independent adversarial quality gate that audits a complete product-refinement package before external publication, Jira creation, or another consequential action, comparing it against original sources rather than trusting the generating skill's own conclusions. |
 | [`release-notes-writer`](./release-notes-writer/) | Writes structured, audience-aware release notes and publishes them to Notion. |
 | [`signal-to-ship`](./signal-to-ship/) | Orchestrates a product initiative from customer signal to measured outcome in seven gated phases (signals, prioritization, specification, prototyping, refinement, delivery, measurement), right-sized to light, standard or full depth, with a recorded stop and a keep / iterate / retire verdict. Dispatches the specialist skills in this library. Start with its [`GETTING-STARTED.md`](./signal-to-ship/GETTING-STARTED.md). |
 | [`stakeholder-request-triage`](./stakeholder-request-triage/) | Turns a request from someone with authority into a defensible decision: the need behind the ask, the smallest slice, the trade-off in dates, a decision owner (DACI) and a written record. |
-| [`story-to-test-workflow`](./story-to-test-workflow/) | Orchestrates product refinement end to end — journey mapping, story splitting, user stories with acceptance criteria, and risk-based QA test design — through explicit decision gates, from a rough idea or an approved spec. |
+| [`story-to-test-workflow`](./story-to-test-workflow/) | Orchestrates product refinement end to end (journey mapping, story splitting, user stories with acceptance criteria, and risk-based QA test design) through explicit decision gates, from a rough idea or an approved spec. |
 | [`success-metrics-designer`](./success-metrics-designer/) | Designs how a change will be judged: outcome metric with a measured baseline and target, adoption definition, metrics in five categories, checkpoints, and the keep / iterate / retire rule. |
 | [`sync-refinement-package-notion`](./sync-refinement-package-notion/) | Ongoing sync after an initial Notion publication: status/diff, start a local checkout, publish approved changes, reconcile concurrent edits, recover a partial write, or accept editorial drift. |
 | [`sync-refinement-package-taxonomy`](./sync-refinement-package-taxonomy/) | Aligns an approved refinement package with an external product taxonomy system before a development handoff, or reconciles verified implementation and QA evidence afterward. Read-only preview by default; production writes need exact authorization. |
 | [`test-case-designer`](./test-case-designer/) | Designs risk-based, traceable QA coverage from approved stories and criteria: atomic checks and QA-reviewable functional test cases, with automation guidance and a downstream test-management handoff. |
 | [`user-story`](./user-story/) | Writes a user story (Mike Cohn format) and its acceptance criteria (Gherkin, stable `AC-*`/`SC-*` IDs, plain-language contract, per-role readiness state). |
-| [`user-story-mapping`](./user-story-mapping/) | Creates a user story map — activities, steps, tasks, release slices — that lays out the customer journey before any story gets written. |
+| [`user-story-mapping`](./user-story-mapping/) | Creates a user story map (activities, steps, tasks, release slices) that lays out the customer journey before any story gets written. |
 | [`user-story-splitting`](./user-story-splitting/) | Breaks a large story or epic into smaller deliverable stories using proven split patterns. |
 | [`video-demo-generator`](./video-demo-generator/) | Generates an on-brand MP4 demo video from an interactive artifact or feature flow, using design tokens from `design-system`. |
 | [`weekly-product-pulse`](./weekly-product-pulse/) | Generates a structured weekly status report for the Head of Product by pulling the active sprint from all product team Jira projects, grouping results by team, and surfacing delivery health, blockers, and risks. |
-| [`writing-voice`](./writing-voice/) | Applies your own calibrated writing voice — direct, human, no AI-tells — to external-facing content (LinkedIn, cover letters, bios, launch announcements) in English or Spanish. |
+| [`writing-voice`](./writing-voice/) | Applies your own calibrated writing voice (direct, human, no AI-tells) to external-facing content (LinkedIn, cover letters, bios, launch announcements) in English or Spanish. |
 
 30+ skills in total.
+
+---
+
+## Cadence and your own workspace
+
+The skills are useful on their own. They also follow **Cadence**, a solo delivery rhythm in four stages: Shape, Build, Verify, Ship (`idea-to-ship` calls the first stage Define). You don't need to know it to use them. [`CADENCE.md`](./CADENCE.md) is the one-screen version and [`CADENCE-REFERENCE.md`](./CADENCE-REFERENCE.md) is the fuller write-up, with sources for every idea in it.
+
+If you want your own version of the workspace these skills run from, you don't need anyone's personal folder, only the structure. It has no dependencies:
+
+1. **One folder per project**, each with its own short `CLAUDE.md` (or `AGENTS.md`) stating that project's rules. Keep the shared rules in a parent-level file instead of repeating them per project.
+2. **A guided entry point:** a short, plain-language "how to start a session" note (project names, a one-line starter phrase per project, what happens after you say it). It beats expecting anyone, including future you, to remember exact skill names.
+3. **`idea-to-ship` as the default front door** for anything that doesn't obviously belong to one project yet. It infers the phase and routes for you, so a new workspace doesn't need every other skill memorized on day one.
+
+That's the whole pattern. A few Markdown files and the skills above are enough to start.
 
 ---
 
@@ -168,41 +158,41 @@ reads at run time, so uploading only the `SKILL.md` leaves them broken.
 
 | Skill | Files in the folder | Upload | Related skills it names |
 |---|---|---|---|
-| `ai-feature-eval-planner` | 1 | `SKILL.md` alone | — |
-| `architecture-aware-reviewer` | 1 | `SKILL.md` alone | — |
-| `artifact-sync` | 1 | `SKILL.md` alone | — |
-| `build-refinement-document` | 5 | whole folder (5 files) | — |
-| `build-refinement-portal` | 6 | whole folder (6 files) | — |
-| `competitive-teardown` | 1 | `SKILL.md` alone | — |
+| `ai-feature-eval-planner` | 1 | `SKILL.md` alone | None |
+| `architecture-aware-reviewer` | 1 | `SKILL.md` alone | None |
+| `artifact-sync` | 1 | `SKILL.md` alone | None |
+| `build-refinement-document` | 5 | whole folder (5 files) | None |
+| `build-refinement-portal` | 6 | whole folder (6 files) | None |
+| `competitive-teardown` | 1 | `SKILL.md` alone | None |
 | `design-system` | 2 | whole folder (2 files) | `video-demo-generator` |
-| `discovery-interview-guide` | 1 | `SKILL.md` alone | — |
+| `discovery-interview-guide` | 1 | `SKILL.md` alone | None |
 | `idea-to-ship` | 1 | `SKILL.md` alone | routes to most skills in the library |
-| `jira-bug-writer` | 1 | `SKILL.md` alone | — |
+| `jira-bug-writer` | 1 | `SKILL.md` alone | None |
 | `jira-story-publisher` | 1 | `SKILL.md` alone | `story-to-test-workflow`, `test-case-designer`, `user-story` |
-| `launch-comms` | 1 | `SKILL.md` alone | — |
+| `launch-comms` | 1 | `SKILL.md` alone | None |
 | `mini-spec-writer` | 1 | `SKILL.md` alone | `prd-writer`, `product-spec-interview`, `story-to-test-workflow`, `user-story-mapping` |
-| `mockup-builder` | 1 | `SKILL.md` alone | — |
-| `okr-tracker` | 1 | `SKILL.md` alone | — |
+| `mockup-builder` | 1 | `SKILL.md` alone | None |
+| `okr-tracker` | 1 | `SKILL.md` alone | None |
 | `prd-writer` | 1 | `SKILL.md` alone | `architecture-aware-reviewer`, `idea-to-ship`, `jira-story-publisher`, `mini-spec-writer`, `story-to-test-workflow` |
-| `prioritization-scorer` | 1 | `SKILL.md` alone | — |
-| `product-context-base` | 1 | `SKILL.md` alone | — |
+| `prioritization-scorer` | 1 | `SKILL.md` alone | None |
+| `product-context-base` | 1 | `SKILL.md` alone | None |
 | `product-spec-interview` | 1 | `SKILL.md` alone | `architecture-aware-reviewer`, `mini-spec-writer`, `prd-writer`, `prioritization-scorer`, `story-to-test-workflow`, `success-metrics-designer` |
 | `publish-refinement-to-notion` | 8 | whole folder (8 files) | `sync-refinement-package-notion` |
 | `refinement-judge` | 8 | whole folder (8 files) | `story-to-test-workflow`, `sync-refinement-package-notion` |
-| `release-notes-writer` | 1 | `SKILL.md` alone | — |
+| `release-notes-writer` | 1 | `SKILL.md` alone | None |
 | `signal-to-ship` | 45 | whole folder (45 files) | `competitive-teardown`, `design-system`, `jira-bug-writer`, `jira-story-publisher`, `launch-comms`, `mini-spec-writer`, `prd-writer`, `product-spec-interview`, `refinement-judge`, `release-notes-writer`, `story-to-test-workflow`, `sync-refinement-package-taxonomy` (named in `references/specialist-contracts.md`; it falls back to guiding you directly when one is missing) |
-| `stakeholder-request-triage` | 1 | `SKILL.md` alone | — |
+| `stakeholder-request-triage` | 1 | `SKILL.md` alone | None |
 | `story-to-test-workflow` | 39 | whole folder (39 files) | `build-refinement-document`, `build-refinement-portal`, `idea-to-ship`, `jira-story-publisher`, `publish-refinement-to-notion`, `refinement-judge`, `sync-refinement-package-notion`, `sync-refinement-package-taxonomy`, `test-case-designer`, `user-story`, `user-story-mapping`, `user-story-splitting` |
-| `success-metrics-designer` | 1 | `SKILL.md` alone | — |
-| `sync-refinement-package-notion` | 35 | whole folder (35 files) | — |
-| `sync-refinement-package-taxonomy` | 4 | whole folder (4 files) | — |
+| `success-metrics-designer` | 1 | `SKILL.md` alone | None |
+| `sync-refinement-package-notion` | 35 | whole folder (35 files) | None |
+| `sync-refinement-package-taxonomy` | 4 | whole folder (4 files) | None |
 | `test-case-designer` | 7 | whole folder (7 files) | `user-story`, `user-story-mapping` |
 | `user-story` | 7 | whole folder (7 files) | `user-story-splitting` |
-| `user-story-mapping` | 5 | whole folder (5 files) | — |
+| `user-story-mapping` | 5 | whole folder (5 files) | None |
 | `user-story-splitting` | 5 | whole folder (5 files) | `user-story` |
 | `video-demo-generator` | 3 | whole folder (3 files) | `design-system` |
-| `weekly-product-pulse` | 1 | `SKILL.md` alone | — |
-| `writing-voice` | 1 | `SKILL.md` alone | — |
+| `weekly-product-pulse` | 1 | `SKILL.md` alone | None |
+| `writing-voice` | 1 | `SKILL.md` alone | None |
 
 ---
 
@@ -212,7 +202,7 @@ Some skills reference workspace-specific values that are not published in this r
 
 | Placeholder | What to set |
 |---|---|
-| `<JIRA_SITE>` | Your Atlassian hostname — e.g. `yourorg.atlassian.net` |
+| `<JIRA_SITE>` | Your Atlassian hostname, e.g. `yourorg.atlassian.net` |
 | `<JIRA_CLOUD_ID>` | Your Atlassian Cloud ID UUID (find it in your Jira site settings) |
 | `<NOTION_RELEASE_NOTES_COLLECTION_ID>` | The Notion database ID for your Product Release Notes collection |
 | `<YOUR_PRODUCT_AREAS>` | The product areas / team names used in your release notes metadata |
@@ -234,7 +224,7 @@ Run `python3 scripts/validate-skills.py` before opening a pull request; CI runs 
 
 ## Related
 
-- [`pos-support-agent`](https://github.com/JuanDRF2/pos-support-agent) — a separate public project by the same
+- [`pos-support-agent`](https://github.com/JuanDRF2/pos-support-agent): a separate public project by the same
   author: a local retrieval-augmented support assistant with a deterministic eval suite, built with the same
   discipline (write down the limits, measure instead of claiming).
 
