@@ -26,6 +26,8 @@ for d in sorted(os.listdir(root)):
         print(f"{d}: empty description"); bad += 1
     elif len(desc) > 1024:
         print(f"{d}: description is {len(desc)} characters (limit 1024)"); bad += 1
+    elif len(desc) > 700:
+        print(f"warning: {d}: description is {len(desc)} characters (aim for under 700)")
 # A skill that carries a VERSION file must hold a plain X.Y.Z; signal-to-ship must carry one (an installed copy
 # cannot tell whether it is current without it).
 for d in sorted(os.listdir(root)):
