@@ -1,0 +1,14 @@
+{
+  "name": "juandrf-pm-skills",
+  "owner": {
+    "name": "Juan Ramos",
+    "url": "https://github.com/JuanDRF2"
+  },
+  "plugins": [
+    {
+      "name": "pm-skills",
+      "source": "./",
+      "description": "A library of product-management Skills for Claude: discovery, specs, user stories, risk-based test design, a refinement-package workflow with an independent quality gate, an orchestrator from customer signal to measured outcome, and the Cadence delivery rhythm (Shape, Build, Verify, Ship)."
+    }
+  ]
+}
