@@ -1,6 +1,6 @@
 ---
 name: story-to-test-workflow
-description: "Orchestrates product refinement through an always-guided conversation from a rough idea or spec to reviewed stories, acceptance criteria, QA coverage and handoffs. Use as the entry point for refinement work (not for the whole product cycle: use `idea-to-ship` when unsure where to start) to create a refinement, review existing work, continue an approved phase, reconcile a prototype or generated SPEC, or extend an approved canonical package. Infers and confirms the appropriate internal route, asks one to three related questions per round, waits for answers and uses explicit decision gates; produces a fast provisional draft only when the user explicitly requests one."
+description: "Orchestrates product refinement through an always-guided conversation from a rough idea or spec to reviewed stories, acceptance criteria, QA coverage and handoffs. Use as the entry point for refinement work (not for the whole product cycle: use `idea-to-ship` when unsure where to start) to create a refinement, review existing work, continue an approved phase, reconcile a prototype or generated SPEC, or extend an approved canonical package. Asks one to three related questions per round and uses explicit decision gates; produces a provisional draft only when the user asks for one."
 ---
 
 ## Purpose
