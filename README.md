@@ -8,10 +8,11 @@ See [`ACTION-TIERS.md`](./ACTION-TIERS.md) for the shared `allow`/`ask`/`block` 
 
 ## Install
 
-This repo is a [Claude Code Plugin](https://code.claude.com/docs/en/plugins). Install every skill in one shot:
+This repo is a [Claude Code Plugin](https://code.claude.com/docs/en/plugins) and its own marketplace. Install every skill with two commands:
 
 ```
-/plugin install claude-pm-skills@github:JuanDRF2/claude-pm-skills
+/plugin marketplace add JuanDRF2/claude-pm-skills
+/plugin install pm-skills@juandrf-pm-skills
 ```
 
 Or clone the repo and copy whichever individual skill folders you want into `~/.claude/skills/` (personal) or `.claude/skills/` (project) — no plugin required either way.
