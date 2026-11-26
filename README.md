@@ -1,6 +1,6 @@
 # Claude PM Skills
 
-30+ Claude skills for product managers: from a raw idea to a spec, user stories with acceptance criteria, QA coverage and launch comms. Maintained by Juan Ramos, a product manager in B2B SaaS. The PMs on his team use them.
+30+ Claude skills for product managers: from a raw idea to a spec, user stories with acceptance criteria, QA coverage and launch comms. Maintained by Juan Ramos, a product manager in B2B SaaS.
 
 Each skill is a folder with a `SKILL.md` that tells Claude how to run one PM workflow.
 
